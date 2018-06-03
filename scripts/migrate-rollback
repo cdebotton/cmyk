@@ -1,0 +1,45 @@
+#!/usr/bin/env node
+
+require('dotenv').config();
+
+const fs = require('fs');
+const path = require('path');
+const { Pool } = require('pg');
+
+const { DOWN_FOLDER, MIGRATIONS_FOLDER } = require('./constants');
+const { ensureMigrationFile } = require('./utils');
+
+async function migrate(folder) {
+  const rc = path.join(folder, '.migrationsrc');
+
+  await ensureMigrationFile(rc);
+
+  const rcBuffer = await fs.promises.readFile(rc);
+  const { migrationHistory } = JSON.parse(rcBuffer);
+
+  if (migrationHistory.length === 0) {
+    console.log('No migrations to rollback');
+    process.exit(0);
+  }
+
+  const { undo } = migrationHistory.pop();
+
+  const pool = new Pool();
+
+  for (const filePath of undo) {
+    const buffer = await fs.promises.readFile(filePath);
+    const sql = buffer.toString();
+
+    try {
+      await pool.query(sql);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  pool.end();
+
+  await fs.promises.writeFile(rc, JSON.stringify({ migrationHistory }));
+}
+
+migrate(MIGRATIONS_FOLDER);

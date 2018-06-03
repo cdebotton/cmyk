@@ -1,0 +1,7 @@
+{
+  "ext": "ts,tsx",
+  "execMap": {
+    "ts": "BABEL_TARGET=node babel-node --extensions '.ts,.tsx'",
+    "tsx": "BABEL_TARGET=node babel-node --extensions '.ts,.tsx'"
+  }
+}

@@ -93,3 +93,9 @@ Icon
 Network Trash Folder
 Temporary Items
 .apdisk
+
+ssl
+!ssl/create-ssl.sh
+
+dist
+.migrations

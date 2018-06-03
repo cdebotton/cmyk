@@ -1,0 +1,85 @@
+#!/usr/bin/env node
+
+require('dotenv').config();
+
+const fs = require('fs');
+const path = require('path');
+const { Pool } = require('pg');
+
+const { UP_FOLDER, DOWN_FOLDER, MIGRATIONS_FOLDER } = require('./constants');
+const EMPTY_RC = JSON.stringify({
+  migrationHistory: [],
+});
+
+async function ensureMigrationFile(rc) {
+  let stat = fs.promises.stat(rc);
+  try {
+    await stat;
+  } catch {
+    await fs.promises.writeFile(rc, EMPTY_RC);
+  }
+}
+
+async function migrate(folder) {
+  const rc = path.join(folder, '.migrationsrc');
+
+  await ensureMigrationFile(rc);
+
+  const rcBuffer = await fs.promises.readFile(rc);
+  const { migrationHistory } = JSON.parse(rcBuffer);
+
+  const lastMigrationKey =
+    migrationHistory.length === 0
+      ? 0
+      : migrationHistory[migrationHistory.length - 1].key;
+
+  const migrations = await fs.promises.readdir(UP_FOLDER);
+  const migrationsToRun = migrations
+    .map(fileName => [
+      fileName.split('-')[0],
+      path.join(UP_FOLDER, fileName),
+      path.join(DOWN_FOLDER, fileName),
+    ])
+    .filter(([timestamp]) => timestamp > lastMigrationKey);
+
+  if (migrationsToRun.length === 0) {
+    console.log('No migrations to run');
+    process.exit(0);
+  }
+
+  let nextMigrationKey = 0;
+  let undo = [];
+
+  const pool = new Pool();
+
+  for (const [timestamp, upFilePath, downFilePath] of migrationsToRun) {
+    const buffer = await fs.promises.readFile(upFilePath);
+    const sql = buffer.toString();
+
+    try {
+      await pool.query(sql);
+      nextMigrationKey = timestamp;
+      undo.push(downFilePath);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+
+  pool.end();
+
+  await fs.promises.writeFile(
+    rc,
+    JSON.stringify({
+      migrationHistory: [
+        ...migrationHistory,
+        {
+          key: nextMigrationKey,
+          run: Date.now(),
+          undo,
+        },
+      ],
+    }),
+  );
+}
+
+migrate(MIGRATIONS_FOLDER);

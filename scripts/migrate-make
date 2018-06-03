@@ -1,0 +1,57 @@
+#!/usr/bin/env node
+
+const fs = require('fs');
+const path = require('path');
+
+const {
+  MIGRATIONS_FOLDER,
+  DB_FOLDER,
+  UP_FOLDER,
+  DOWN_FOLDER,
+} = require('./constants');
+
+const { ensureMigrationFile } = require('./utils');
+
+function ensureFolders(folders) {
+  return folders.reduce(async (last, folder) => {
+    if (last) {
+      await last;
+    }
+
+    let stat;
+    try {
+      stat = await fs.promises.stat(folder);
+    } catch {
+      process.stdout.write(`Creating folder ${folder}\n`);
+    }
+
+    if (!stat) {
+      return await fs.promises.mkdir(folder);
+    }
+  }, null);
+}
+
+function getMigrationContents(fileName) {
+  return `-- Generated migration ${fileName}\n\n`;
+}
+
+async function migrateMake(folders) {
+  await ensureFolders(folders);
+  const [migrationName] = process.argv.slice(2);
+  const date = Date.now();
+  const fileName = `${date}-${migrationName}.sql`;
+
+  const upFilePath = path.join(UP_FOLDER, fileName);
+  const downFilePath = path.join(DOWN_FOLDER, fileName);
+
+  [upFilePath, downFilePath].forEach(async filePath => {
+    try {
+      await fs.promises.writeFile(filePath, getMigrationContents(fileName));
+      process.stdout.write(`Created migration file ${filePath}\n`);
+    } catch (err) {
+      process.stderr.write(err);
+    }
+  });
+}
+
+migrateMake([MIGRATIONS_FOLDER, DB_FOLDER, UP_FOLDER, DOWN_FOLDER]);
