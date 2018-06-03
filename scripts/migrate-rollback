@@ -26,7 +26,7 @@ async function migrate(folder) {
 
   const pool = new Pool();
 
-  for (const filePath of undo) {
+  for (const filePath of undo.reverse()) {
     const buffer = await fs.promises.readFile(filePath);
     const sql = buffer.toString();
 

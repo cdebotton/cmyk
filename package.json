@@ -16,7 +16,7 @@
     "prewatch": "rm -rf dist",
     "watch": "NODE_ENV=development npm-run-all --parallel 'watch:webpack' 'watch:postgraphile' 'nodemon'",
     "run": "node dist/server/http/index.js",
-    "postgraphile": "postgraphile --schema cmyk -c \"postgres://localhost:5432\"",
+    "postgraphile": "postgraphile --schema cmyk -c \"postgres://localhost:5432\" --jwt-token-identifier cmyk.jwt_token --jwt-secret echo ${JWT_SECRET}",
     "watch:postgraphile": "yarn postgraphile --watch",
     "nodemon": "wait-on dist/react-loadable.json && nodemon src/http/index.tsx",
     "start": "NODE_ENV=production npm-run-all 'build' 'run'"
