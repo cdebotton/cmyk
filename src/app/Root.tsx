@@ -2,6 +2,12 @@ import React, { SFC } from 'react';
 import { hot } from 'react-hot-loader';
 import Loadable from 'react-loadable';
 import { Switch, Route } from 'react-router';
+import { injectGlobal, SimpleInterpolation } from 'styled-components';
+import { normalize } from 'polished';
+
+injectGlobal`
+  ${normalize() as SimpleInterpolation}
+`;
 
 const Loading = () => <p>Loading...</p>;
 

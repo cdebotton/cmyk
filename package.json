@@ -16,7 +16,7 @@
     "prewatch": "rm -rf dist",
     "watch": "NODE_ENV=development npm-run-all --parallel 'watch:webpack' 'watch:postgraphile' 'nodemon'",
     "run": "node dist/server/http/index.js",
-    "postgraphile": "source .env && postgraphile --schema cmyk -c \"postgres://localhost:5432\" --jwt-token-identifier cmyk.jwt_token --jwt-secret echo ${JWT_SECRET}",
+    "postgraphile": "source .env && postgraphile --schema cmyk -c \"postgres://localhost:5432\" --jwt-token-identifier cmyk_private.jwt_token --jwt-secret echo ${JWT_SECRET} --defualt-role default_role --cors",
     "watch:postgraphile": "yarn postgraphile --watch",
     "nodemon": "wait-on dist/react-loadable.json && nodemon src/http/index.tsx",
     "start": "NODE_ENV=production npm-run-all 'build' 'run'"
@@ -24,10 +24,13 @@
   "dependencies": {
     "apollo-cache-inmemory": "^1.2.2",
     "apollo-client": "2.3.2",
+    "apollo-link": "^1.2.2",
     "apollo-link-http": "1.5.4",
     "boom": "^7.2.0",
     "dotenv": "^6.0.0",
+    "formik": "^0.11.11",
     "graphql": "0.13.2",
+    "graphql-tag": "^2.9.2",
     "koa": "2.5.1",
     "koa-compress": "3.0.0",
     "koa-mount": "3.0.0",
