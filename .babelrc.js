@@ -18,7 +18,6 @@ module.exports = {
   ],
   plugins: [
     'dynamic-import-node',
-    'react-loadable/babel',
     [
       'styled-components',
       {

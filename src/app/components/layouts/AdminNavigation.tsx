@@ -4,14 +4,23 @@ import styled from 'styled-components';
 type Props = {
   className?: string;
   pages: ReactNode;
+  actions: ReactNode;
 };
 
-const AdminNavigation: SFC<Props> = ({ className, pages }) => (
-  <nav className={className}>{pages}</nav>
+const PageContainer = styled.div``;
+
+const ActionsContainer = styled.div``;
+
+const AdminNavigation: SFC<Props> = ({ actions, className, pages }) => (
+  <nav className={className}>
+    <PageContainer>{pages}</PageContainer>
+    <ActionsContainer>{actions}</ActionsContainer>
+  </nav>
 );
 
 export default styled(AdminNavigation)`
   position: relative;
   display: flex;
   flex-flow: row nowrap;
+  justify-content: space-between;
 `;

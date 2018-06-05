@@ -6,7 +6,6 @@ import { SchemaLink } from 'apollo-link-schema';
 import { graphiqlKoa, graphqlKoa } from 'apollo-server-koa';
 import fs from 'fs';
 import http from 'http2';
-import jwt from 'jsonwebtoken';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import compress from 'koa-compress';
@@ -16,8 +15,6 @@ import staticFiles from 'koa-static';
 import path from 'path';
 import React from 'react';
 import { ApolloProvider, getDataFromTree } from 'react-apollo';
-import Loadable from 'react-loadable';
-import { getBundles } from 'react-loadable/webpack';
 import { StaticRouter } from 'react-router';
 import { Prisma } from 'prisma-binding';
 import getCertificate from './utils/getCertificate';
@@ -27,7 +24,6 @@ import Root from '../app/Root';
 import reportErrors from './middleware/reportErrors';
 import schema from '../schema';
 import getSessionUserFromContext from './utils/getSessionUserFromContext';
-import SessionProvider from '../app/containers/SessionProvider';
 
 const {
   PORT = '3000',
@@ -38,14 +34,6 @@ const {
 } = process.env;
 
 const run = async () => {
-  await Loadable.preloadAll();
-
-  const statsFile = fs.readFileSync(
-    path.join(process.cwd(), 'dist/react-loadable.json'),
-  );
-
-  const stats = JSON.parse(statsFile.toString());
-
   const app = new Koa();
   app.keys = [APP_KEY_1, APP_KEY_2];
 
@@ -89,44 +77,52 @@ const run = async () => {
   }
 
   app.use(
-    render(async ctx => {
+    render(ctx => {
       const session = getSessionUserFromContext(ctx);
-      const context = { statusCode: 200 };
-      const modules: string[] = [];
-      const client = new ApolloClient({
-        ssrMode: true,
-        cache: new InMemoryCache(),
-        link: new SchemaLink({
-          schema,
-          context: {
-            session,
-            cookies: ctx.cookies,
-            db: prisma,
-          },
-        }),
-      });
-
-      const element = (
-        <Loadable.Capture report={moduleName => modules.push(moduleName)}>
-          <ApolloProvider client={client}>
-            <StaticRouter location={ctx.req.url} context={context}>
-              <SessionProvider session={session}>
-                <Root />
-              </SessionProvider>
-            </StaticRouter>
-          </ApolloProvider>
-        </Loadable.Capture>
-      );
-
-      await getDataFromTree(element);
-      const data = client.extract();
-      const bundles = getBundles(stats, modules);
-
-      ctx.status = context.statusCode;
-
-      return { element, data, bundles, session };
+      return { session };
     }),
   );
+
+  // Disabling because the Context Consumers don't work with legacy Context
+  // in SSR
+  //
+  // app.use(
+  //   render(async ctx => {
+  //     const session = getSessionUserFromContext(ctx);
+  //     const context = { statusCode: 200 };
+  //     const client = new ApolloClient({
+  //       ssrMode: true,
+  //       cache: new InMemoryCache(),
+  //       link: new SchemaLink({
+  //         schema,
+  //         context: {
+  //           session,
+  //           cookies: ctx.cookies,
+  //           db: prisma,
+  //         },
+  //       }),
+  //     });
+
+  //     const Context = React.createContext(0);
+
+  //     const element = (
+  //       <Context.Provider value={0}>
+  //         <ApolloProvider client={client}>
+  //           <StaticRouter location={ctx.req.url} context={context}>
+  //             <Context.Consumer>{() => <Root />}</Context.Consumer>
+  //           </StaticRouter>
+  //         </ApolloProvider>
+  //       </Context.Provider>
+  //     );
+
+  //     await getDataFromTree(element);
+  //     const data = client.extract();
+
+  //     ctx.status = context.statusCode;
+
+  //     return { element, data, bundles: [], session };
+  //   }),
+  // );
 
   server.listen(PORT, () => {
     const info = server.address();

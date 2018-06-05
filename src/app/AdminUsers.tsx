@@ -46,7 +46,7 @@ const AdminUsers: SFC = () => (
           return null;
         }
 
-        if (!data) {
+        if (!data || !data.users) {
           return <PageLoader />;
         }
 

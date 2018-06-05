@@ -1,5 +1,4 @@
 const path = require('path');
-const { ReactLoadablePlugin } = require('react-loadable/webpack');
 const webpack = require('webpack');
 
 const { NODE_ENV = 'development' } = process.env;
@@ -54,7 +53,6 @@ module.exports = {
                 '@babel/typescript',
               ],
               plugins: [
-                'react-loadable/babel',
                 [
                   'styled-components',
                   {
@@ -76,8 +74,5 @@ module.exports = {
       },
     }),
     new webpack.optimize.SplitChunksPlugin(),
-    new ReactLoadablePlugin({
-      filename: './dist/react-loadable.json',
-    }),
   ],
 };
