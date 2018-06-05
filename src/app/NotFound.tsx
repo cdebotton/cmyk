@@ -1,6 +1,6 @@
 import React, { SFC } from 'react';
-import Status from '../containers/Status';
-import Heading from '../components/atoms/Heading';
+import Status from './containers/Status';
+import Heading from './components/atoms/Heading';
 
 const NotFound: SFC = () => (
   <Status statusCode={404}>

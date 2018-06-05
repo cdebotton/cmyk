@@ -1,83 +1,38 @@
 import bcrypt from 'bcryptjs';
 import Cookies from 'cookies';
+import { importSchema } from 'graphql-import';
 import { makeExecutableSchema, IResolvers } from 'graphql-tools';
-import getFieldsFromInfo from './utils/getFieldsFromInfo';
-import { Repository } from 'typeorm';
-import { User } from '../entity/User';
-import bindTypeORMQuery from './utils/bindTypeORMQuery';
+import { Prisma } from 'prisma-binding';
 
-const typeDefs = `
-  scalar Date
-
-  type User {
-    id: ID!
-    email: String! @unique
-    password: String!
-    documents: [Document!]!
-    createdAt: Date
-    updatedAt: Date
-  }
-
-  type Document {
-    id: ID!
-    title: String!
-    user: User!
-  }
-
-  input CreateUserInput {
-    email: String!
-    password: String!
-  }
-
-  type Mutation {
-    createUser(input: CreateUserInput!): User
-  }
-
-  type Query {
-    users(skip: Int, take: Int): [User]
-  }
-`;
+const typeDefs = importSchema('./src/schema/schema.graphql');
 
 type Context = {
   cookies: Cookies;
-  userRepository: Repository<User>;
+  db: Prisma;
 };
 
-const resolvers: IResolvers<void, Context> = {
+const resolvers: IResolvers<{}, Context> = {
   Query: {
-    users: (root, args, context, info) => {
-      const payload = getFieldsFromInfo<User>(info);
-      const metadata = bindTypeORMQuery(context.userRepository, payload);
-
-      return context.userRepository
-        .createQueryBuilder()
-        .skip(args.skip)
-        .take(args.take)
-        .select(metadata.select)
-        .execute();
+    users: (parent, args, context, info) => {
+      return context.db.query.users({}, info);
     },
   },
   Mutation: {
-    createUser: async (root, args, context, info) => {
-      const { email, password } = args.input;
+    createUser: async (parent, { input }, context, info) => {
       const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(password, salt);
-      const payload = getFieldsFromInfo<User>(info);
-      const metadata = bindTypeORMQuery(context.userRepository, payload);
-
-      return context.userRepository
-        .createQueryBuilder()
-        .insert()
-        .values({ email, password: hashedPassword })
-        .returning(metadata.select.map(f => `inserted.${f}`))
-        .execute();
+      const hashedPassword = await bcrypt.hash(input.password, salt);
+      return context.db.mutation.createUser(
+        { data: { email: input.email, password: hashedPassword } },
+        info,
+      );
+    },
+    deleteUser: async (parent, { where }, context, info) => {
+      return context.db.mutation.deleteUser({ where });
     },
   },
 };
 
-const schema = makeExecutableSchema({
-  resolvers,
+export default makeExecutableSchema({
   typeDefs,
+  resolvers,
 });
-
-export default schema;

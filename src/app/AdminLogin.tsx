@@ -1,5 +1,5 @@
 import React, { SFC } from 'react';
-import Heading from '../components/atoms/Heading';
+import Heading from './components/atoms/Heading';
 
 const AdminLogin: SFC = () => (
   <div>

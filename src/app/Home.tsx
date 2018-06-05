@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import React, { SFC, Fragment } from 'react';
-import Heading from '../components/atoms/Heading';
+import Heading from './components/atoms/Heading';
 import { Query } from 'react-apollo';
 import { Link } from 'react-router-dom';
 
