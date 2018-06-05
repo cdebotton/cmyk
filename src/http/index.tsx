@@ -6,6 +6,7 @@ import { SchemaLink } from 'apollo-link-schema';
 import { graphiqlKoa, graphqlKoa } from 'apollo-server-koa';
 import fs from 'fs';
 import http from 'http2';
+import jwt from 'jsonwebtoken';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
 import compress from 'koa-compress';
@@ -25,8 +26,16 @@ import render from './middleware/render';
 import Root from '../app/Root';
 import reportErrors from './middleware/reportErrors';
 import schema from '../schema';
+import getSessionUserFromContext from './utils/getSessionUserFromContext';
+import SessionProvider from '../app/containers/SessionProvider';
 
-const { PORT = '3000', NODE_ENV = 'development', PRISMA_SECRET } = process.env;
+const {
+  PORT = '3000',
+  NODE_ENV = 'development',
+  PRISMA_SECRET,
+  APP_KEY_1 = '',
+  APP_KEY_2 = '',
+} = process.env;
 
 const run = async () => {
   await Loadable.preloadAll();
@@ -38,6 +47,8 @@ const run = async () => {
   const stats = JSON.parse(statsFile.toString());
 
   const app = new Koa();
+  app.keys = [APP_KEY_1, APP_KEY_2];
+
   const router = new Router();
   const { cert, key } = await getCertificate();
   const server = http.createSecureServer({ cert, key }, app.callback());
@@ -54,6 +65,7 @@ const run = async () => {
     graphqlKoa(ctx => ({
       schema,
       context: {
+        session: getSessionUserFromContext(ctx),
         cookies: ctx.cookies,
         db: prisma,
       },
@@ -78,6 +90,7 @@ const run = async () => {
 
   app.use(
     render(async ctx => {
+      const session = getSessionUserFromContext(ctx);
       const context = { statusCode: 200 };
       const modules: string[] = [];
       const client = new ApolloClient({
@@ -86,6 +99,7 @@ const run = async () => {
         link: new SchemaLink({
           schema,
           context: {
+            session,
             cookies: ctx.cookies,
             db: prisma,
           },
@@ -96,7 +110,9 @@ const run = async () => {
         <Loadable.Capture report={moduleName => modules.push(moduleName)}>
           <ApolloProvider client={client}>
             <StaticRouter location={ctx.req.url} context={context}>
-              <Root />
+              <SessionProvider session={session}>
+                <Root />
+              </SessionProvider>
             </StaticRouter>
           </ApolloProvider>
         </Loadable.Capture>
@@ -108,7 +124,7 @@ const run = async () => {
 
       ctx.status = context.statusCode;
 
-      return { element, data, bundles };
+      return { element, data, bundles, session };
     }),
   );
 

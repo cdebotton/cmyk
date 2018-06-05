@@ -7,6 +7,7 @@ type Query {
 
 type Mutation {
   authenticate(input: AuthenticateInput!): AuthenticatePayload
+  logout(where:UserWhereUniqueInput!): LogoutPayload
   createUser(input:UserCreateInput!): User
   deleteUser(where: UserWhereUniqueInput!): User
 }
@@ -17,5 +18,11 @@ input AuthenticateInput {
 }
 
 type AuthenticatePayload {
-  token: String!
+  userId: String!
+  iat: Int!
+}
+
+type LogoutPayload {
+  userId: String!
+  iat: Int!
 }

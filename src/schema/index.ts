@@ -6,6 +6,7 @@ import Cookies from 'cookies';
 import { importSchema } from 'graphql-import';
 import { makeExecutableSchema, IResolvers } from 'graphql-tools';
 import { Prisma } from 'prisma-binding';
+import { Session } from '../http/utils/getSessionUserFromContext';
 
 const typeDefs = importSchema('./src/schema/schema.graphql');
 const { JWT_SECRET } = process.env;
@@ -58,10 +59,35 @@ const resolvers: IResolvers<{}, Context> = {
       }
 
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+      context.cookies.set('jwt', token, {
+        secure: true,
+        signed: true,
+      });
 
-      return {
-        token,
-      };
+      return jwt.decode(token);
+    },
+    logout: async (parent, args, context, info) => {
+      const [user] = await context.db.query.users({ where: args.where });
+
+      if (!user) {
+        throw new Error();
+      }
+
+      const token = context.cookies.get('jwt');
+
+      if (!token) {
+        return null;
+      }
+
+      const { userId, iat } = jwt.decode(token) as Session;
+
+      if (userId !== user.id) {
+        throw new Error();
+      }
+
+      context.cookies.set('jwt', undefined);
+
+      return { userId, iat };
     },
   },
 };
