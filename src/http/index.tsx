@@ -1,4 +1,4 @@
-import '@babel/polyfill';
+require('dotenv').config();
 
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloClient } from 'apollo-client';
@@ -26,7 +26,7 @@ import Root from '../app/Root';
 import reportErrors from './middleware/reportErrors';
 import schema from '../schema';
 
-const { PORT = '3000', NODE_ENV = 'development' } = process.env;
+const { PORT = '3000', NODE_ENV = 'development', PRISMA_SECRET } = process.env;
 
 const run = async () => {
   await Loadable.preloadAll();
@@ -44,8 +44,8 @@ const run = async () => {
   const prisma = new Prisma({
     typeDefs: 'src/schema/generated/prisma.graphql',
     endpoint: 'http://localhost:4466',
-    secret: 'mysecret123',
-    debug: true,
+    secret: PRISMA_SECRET,
+    debug: NODE_ENV === 'development',
   });
 
   router.post(
@@ -81,6 +81,7 @@ const run = async () => {
       const context = { statusCode: 200 };
       const modules: string[] = [];
       const client = new ApolloClient({
+        ssrMode: true,
         cache: new InMemoryCache(),
         link: new SchemaLink({
           schema,

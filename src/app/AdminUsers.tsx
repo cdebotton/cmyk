@@ -1,6 +1,6 @@
 import React, { SFC } from 'react';
 import Heading from './components/atoms/Heading';
-import { Query, QueryResult, Mutation } from 'react-apollo';
+import { Query, QueryResult, Mutation, FetchResult } from 'react-apollo';
 import gql from 'graphql-tag';
 import PageLoader from './components/molecules/PageLoader';
 import AdminCreateUser from './AdminCreateUser';
@@ -18,7 +18,6 @@ const deleteUserMutation = gql`
   mutation DeleteUser($where: UserWhereUniqueInput!) {
     deleteUser(where: $where) {
       id
-      email
     }
   }
 `;
@@ -28,6 +27,12 @@ type Response = {
     id: string;
     email: string;
   }[];
+};
+
+type MutationResponse = {
+  deleteUser: {
+    id: string;
+  };
 };
 
 const AdminUsers: SFC = () => (
@@ -49,8 +54,34 @@ const AdminUsers: SFC = () => (
           <ul>
             {data.users.map(user => (
               <li key={user.id}>
-                {user.email}
-                <Mutation mutation={deleteUserMutation}>
+                <small>{user.id}</small> {user.email}
+                <Mutation
+                  mutation={deleteUserMutation}
+                  update={(cache, result: FetchResult<MutationResponse>) => {
+                    if (!result.data) {
+                      return;
+                    }
+
+                    const cacheResult = cache.readQuery<Response>({
+                      query: getUsersQuery,
+                    });
+
+                    if (!cacheResult) {
+                      return;
+                    }
+
+                    const removedId = result.data.deleteUser.id;
+
+                    cache.writeQuery({
+                      query: getUsersQuery,
+                      data: {
+                        users: cacheResult.users.filter(
+                          user => user.id !== removedId,
+                        ),
+                      },
+                    });
+                  }}
+                >
                   {mutationFn => (
                     <button
                       onClick={() =>

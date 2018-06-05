@@ -10,7 +10,7 @@ module.exports = {
   output: {
     filename: '[name].js',
     publicPath:
-      NODE_ENV === 'development' ? 'https://localhost:3001/' : 'dist/',
+      NODE_ENV === 'development' ? 'https://localhost:3001/' : '/dist/',
     path: path.join(__dirname, 'dist', 'client'),
   },
   resolve: {

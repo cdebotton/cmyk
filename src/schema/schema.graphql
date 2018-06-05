@@ -6,6 +6,16 @@ type Query {
 }
 
 type Mutation {
+  authenticate(input: AuthenticateInput!): AuthenticatePayload
   createUser(input:UserCreateInput!): User
   deleteUser(where: UserWhereUniqueInput!): User
+}
+
+input AuthenticateInput {
+  email: String!
+  password: String!
+}
+
+type AuthenticatePayload {
+  token: String!
 }

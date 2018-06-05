@@ -1,7 +1,8 @@
 import React, { SFC, Fragment } from 'react';
-import { Mutation } from 'react-apollo';
+import { Mutation, FetchResult } from 'react-apollo';
 import gql from 'graphql-tag';
-import { Formik, Field } from 'formik';
+import { Formik, Field, FormikProps } from 'formik';
+import * as yup from 'yup';
 import Heading from './components/atoms/Heading';
 
 const createUserMutation = gql`
@@ -13,16 +14,73 @@ const createUserMutation = gql`
   }
 `;
 
+type Values = {
+  email: string;
+  password: string;
+};
+
+const schema = yup.object().shape({
+  email: yup
+    .string()
+    .email()
+    .required(),
+  password: yup
+    .string()
+    .min(4)
+    .max(40)
+    .required(),
+});
+
+type CacheQuery = {
+  users: {
+    id: string;
+    email: string;
+  }[];
+};
+
+type Response = {
+  createUser: {
+    id: string;
+    email: string;
+  };
+};
+
 const AdminCreateUser: SFC = () => (
   <div>
     <Heading level={3}>Create user</Heading>
-    <Mutation mutation={createUserMutation}>
+    <Mutation
+      mutation={createUserMutation}
+      update={(cache, result: FetchResult<Response>) => {
+        if (!result.data) {
+          return;
+        }
+
+        const query = gql`
+          query {
+            users {
+              id
+              email
+            }
+          }
+        `;
+        const data = cache.readQuery<CacheQuery>({ query });
+        if (!data) {
+          return;
+        }
+
+        cache.writeQuery({
+          query,
+          data: { users: data.users.concat(result.data.createUser) },
+        });
+      }}
+    >
       {mutationFn => (
         <Formik
           initialValues={{
             email: '',
             password: '',
           }}
+          validationSchema={schema}
           onSubmit={values => {
             mutationFn({
               variables: {
@@ -31,7 +89,7 @@ const AdminCreateUser: SFC = () => (
             });
           }}
         >
-          {({ handleSubmit }) => (
+          {({ handleSubmit, isValid }: FormikProps<Values>) => (
             <form onSubmit={handleSubmit}>
               <Field
                 name="email"
@@ -49,7 +107,9 @@ const AdminCreateUser: SFC = () => (
                   </Fragment>
                 )}
               />
-              <button type="submit">Create</button>
+              <button type="submit" disabled={!isValid}>
+                Create
+              </button>
             </form>
           )}
         </Formik>
