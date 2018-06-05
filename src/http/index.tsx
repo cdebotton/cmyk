@@ -1,16 +1,18 @@
 import '@babel/polyfill';
+import 'reflect-metadata';
 
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { ApolloClient } from 'apollo-client';
-import { HttpLink } from 'apollo-link-http';
+import { SchemaLink } from 'apollo-link-schema';
+import { graphqlKoa, graphiqlKoa } from 'apollo-server-koa';
 import fs from 'fs';
 import http from 'http2';
 import Koa from 'koa';
+import bodyParser from 'koa-bodyparser';
 import compress from 'koa-compress';
 import mount from 'koa-mount';
 import Router from 'koa-router';
 import staticFiles from 'koa-static';
-import fetch from 'node-fetch';
 import path from 'path';
 import React from 'react';
 import { ApolloProvider, getDataFromTree } from 'react-apollo';
@@ -22,6 +24,9 @@ import responseTime from './middleware/responseTime';
 import render from './middleware/render';
 import Root from '../app/Root';
 import reportErrors from './middleware/reportErrors';
+import schema from '../schema';
+import { createConnection } from 'typeorm';
+import { User } from '../entity/User';
 
 const { PORT = '3000', NODE_ENV = 'development' } = process.env;
 
@@ -36,6 +41,31 @@ const run = async () => {
   const router = new Router();
   const { cert, key } = await getCertificate();
   const server = http.createSecureServer({ cert, key }, app.callback());
+
+  const connection = await createConnection();
+  const userRepository = connection.getRepository(User);
+
+  router.post(
+    '/graphql',
+    bodyParser(),
+    graphqlKoa(ctx => ({
+      schema,
+      debug: NODE_ENV === 'development',
+      context: {
+        userRepository,
+        cookies: ctx.cookies,
+      },
+    })),
+  );
+
+  if (NODE_ENV === 'development') {
+    router.get(
+      '/graphiql',
+      graphiqlKoa({
+        endpointURL: '/graphql',
+      }),
+    );
+  }
 
   app.use(responseTime());
   app.use(reportErrors({ devMode: NODE_ENV === 'development' }));
@@ -55,10 +85,8 @@ const run = async () => {
       const modules: string[] = [];
       const client = new ApolloClient({
         cache: new InMemoryCache(),
-        // @ts-ignore
-        link: new HttpLink({
-          fetch,
-          uri: 'http://localhost:5000/graphql',
+        link: new SchemaLink({
+          schema,
         }),
       });
 

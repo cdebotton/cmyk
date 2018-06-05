@@ -12,7 +12,7 @@ module.exports = {
         loose: true,
       },
     ],
-    ['@babel/stage-0', { decoratorsLegacy: true }],
+    ['@babel/stage-0', { decoratorsLegacy: true, loose: true }],
     '@babel/react',
     '@babel/typescript',
   ],
