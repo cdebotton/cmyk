@@ -8,15 +8,15 @@
   "scripts": {
     "prebuild:babel": "mkdir -p dist/server",
     "build:babel": "babel --out-dir dist/server --extensions .ts,.tsx src/",
-    "prebuild": "rm -rf dist/*",
+    "prebuild": "rm -rf dist && rm -rf src/generated",
     "build": "npm-run-all 'build:babel' 'build:webpack'",
     "watch:babel": "yarn build:babel --watch",
     "build:webpack": "webpack",
     "watch:webpack": "webpack-serve",
-    "prewatch": "rm -rf dist",
+    "prewatch": "rm -rf dist && rm -rf src/generated",
     "watch": "NODE_ENV=development npm-run-all --parallel 'watch:webpack' 'nodemon'",
-    "run": "node dist/server/http/index.js",
-    "nodemon": "nodemon src/http/index.tsx",
+    "run": "wait-on src/generated/stats.json && node dist/server/http/index.js",
+    "nodemon": "wait-on src/generated/stats.json && nodemon src/http/index.tsx",
     "start": "NODE_ENV=production npm-run-all 'build' 'run'"
   },
   "dependencies": {
@@ -50,6 +50,8 @@
     "react-hot-loader": "4.2.0",
     "react-router": "4.2.0",
     "react-router-dom": "4.2.2",
+    "react-universal-component": "^2.9.0",
+    "webpack-flush-chunks": "^1.2.3",
     "yup": "^0.25.1"
   },
   "devDependencies": {
@@ -79,6 +81,7 @@
     "babel-loader": "8.0.0-beta.3",
     "babel-plugin-dynamic-import-node": "^1.2.0",
     "babel-plugin-styled-components": "^1.5.1",
+    "babel-plugin-universal-import": "^3.0.0",
     "nodemon": "^1.17.5",
     "npm-run-all": "^4.1.3",
     "polished": "1.9.2",

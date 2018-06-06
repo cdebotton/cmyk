@@ -17,7 +17,7 @@ module.exports = {
     '@babel/typescript',
   ],
   plugins: [
-    'dynamic-import-node',
+    ['universal-import', { babelServer: true }],
     [
       'styled-components',
       {

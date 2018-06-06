@@ -21,7 +21,7 @@ const client = new ApolloClient({
   cache,
 });
 
-ReactDOM.hydrate(
+ReactDOM.render(
   <ApolloProvider client={client}>
     <BrowserRouter>
       <Root />

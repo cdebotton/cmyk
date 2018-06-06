@@ -1,14 +1,15 @@
 import React, { SFC, Fragment } from 'react';
 import Page from './components/atoms/Page';
 import { Switch, Route, RouteComponentProps } from 'react-router';
-import PageLoader from './components/molecules/PageLoader';
 import AdminNavigation from './components/layouts/AdminNavigation';
 import { Link } from 'react-router-dom';
 import ProtectedRoute from './containers/ProtectedRoute';
-import AdminDashboard from './AdminDashboard';
-import AdminUsers from './AdminUsers';
-import AdminLogin from './AdminLogin';
-import NotFound from './NotFound';
+import universal from 'react-universal-component';
+
+const AdminDashboard = universal(import('./AdminDashboard'));
+const AdminUsers = universal(import('./AdminUsers'));
+const AdminLogin = universal(import('./AdminLogin'));
+const NotFound = universal(import('./NotFound'));
 
 type Props = RouteComponentProps<{}>;
 

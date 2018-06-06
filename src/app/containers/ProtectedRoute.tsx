@@ -1,10 +1,10 @@
 import React, { ComponentType } from 'react';
 import { Route, Redirect, RouteProps } from 'react-router';
 
-type Props<T> = {
+type Props = {
   isBlocked: boolean;
   redirectOnBlock: string;
-  component: ComponentType<T>;
+  component: ComponentType<any>;
 } & RouteProps;
 
 function ProtectedRoute<T extends RouteProps>({
@@ -12,7 +12,7 @@ function ProtectedRoute<T extends RouteProps>({
   redirectOnBlock,
   component: Component,
   ...rest
-}: Props<T>) {
+}: Props) {
   return (
     <Route
       {...rest}

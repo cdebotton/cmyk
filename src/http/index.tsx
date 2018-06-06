@@ -1,10 +1,10 @@
 require('dotenv').config();
 
-import { InMemoryCache } from 'apollo-cache-inmemory';
-import { ApolloClient } from 'apollo-client';
-import { SchemaLink } from 'apollo-link-schema';
+// import { InMemoryCache } from 'apollo-cache-inmemory';
+// import { ApolloClient } from 'apollo-client';
+// import { SchemaLink } from 'apollo-link-schema';
 import { graphiqlKoa, graphqlKoa } from 'apollo-server-koa';
-import fs from 'fs';
+// import fs from 'fs';
 import http from 'http2';
 import Koa from 'koa';
 import bodyParser from 'koa-bodyparser';
@@ -13,14 +13,16 @@ import mount from 'koa-mount';
 import Router from 'koa-router';
 import staticFiles from 'koa-static';
 import path from 'path';
-import React from 'react';
-import { ApolloProvider, getDataFromTree } from 'react-apollo';
-import { StaticRouter } from 'react-router';
+// import React from 'react';
+// import { ApolloProvider, getDataFromTree } from 'react-apollo';
+// import { StaticRouter } from 'react-router';
+// import { ReportChunks } from 'react-universal-component';
 import { Prisma } from 'prisma-binding';
+import jwt from 'jsonwebtoken';
 import getCertificate from './utils/getCertificate';
 import responseTime from './middleware/responseTime';
 import render from './middleware/render';
-import Root from '../app/Root';
+// import Root from '../app/Root';
 import reportErrors from './middleware/reportErrors';
 import schema from '../schema';
 import getSessionUserFromContext from './utils/getSessionUserFromContext';
@@ -32,6 +34,8 @@ const {
   APP_KEY_1 = '',
   APP_KEY_2 = '',
 } = process.env;
+
+type Session = { userId: string; iat: number };
 
 const run = async () => {
   const app = new Koa();
@@ -78,14 +82,12 @@ const run = async () => {
 
   app.use(
     render(ctx => {
-      const session = getSessionUserFromContext(ctx);
+      const token = ctx.cookies.get('jwt');
+      const session = jwt.decode(token) as Session | null;
       return { session };
     }),
   );
 
-  // Disabling because the Context Consumers don't work with legacy Context
-  // in SSR
-  //
   // app.use(
   //   render(async ctx => {
   //     const session = getSessionUserFromContext(ctx);
@@ -104,15 +106,24 @@ const run = async () => {
   //     });
 
   //     const Context = React.createContext(0);
+  //     const chunkNames: string[] = [];
 
   //     const element = (
-  //       <Context.Provider value={0}>
-  //         <ApolloProvider client={client}>
-  //           <StaticRouter location={ctx.req.url} context={context}>
-  //             <Context.Consumer>{() => <Root />}</Context.Consumer>
-  //           </StaticRouter>
-  //         </ApolloProvider>
-  //       </Context.Provider>
+  //       <ReportChunks
+  //         report={chunkName => {
+  //           if (chunkName) {
+  //             chunkNames.push(chunkName);
+  //           }
+  //         }}
+  //       >
+  //         <Context.Provider value={0}>
+  //           <ApolloProvider client={client}>
+  //             <StaticRouter location={ctx.req.url} context={context}>
+  //               <Root />
+  //             </StaticRouter>
+  //           </ApolloProvider>
+  //         </Context.Provider>
+  //       </ReportChunks>
   //     );
 
   //     await getDataFromTree(element);
@@ -120,7 +131,7 @@ const run = async () => {
 
   //     ctx.status = context.statusCode;
 
-  //     return { element, data, bundles: [], session };
+  //     return { element, data, chunkNames, session };
   //   }),
   // );
 

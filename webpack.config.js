@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const { StatsWriterPlugin } = require('./scripts/StatsWriterPlugin');
 
 const { NODE_ENV = 'development' } = process.env;
 
@@ -16,9 +17,17 @@ module.exports = {
     extensions: ['.ts', '.tsx', '.js'],
   },
   optimization: {
-    runtimeChunk: true,
+    runtimeChunk: {
+      name: 'bootstrap',
+    },
     splitChunks: {
-      chunks: 'all',
+      chunks: 'initial',
+      cacheGroups: {
+        vendors: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+        },
+      },
     },
   },
   module: {
@@ -53,6 +62,7 @@ module.exports = {
                 '@babel/typescript',
               ],
               plugins: [
+                'universal-import',
                 [
                   'styled-components',
                   {
@@ -74,5 +84,6 @@ module.exports = {
       },
     }),
     new webpack.optimize.SplitChunksPlugin(),
+    new StatsWriterPlugin({ filename: 'src/generated/stats.json' }),
   ],
 };

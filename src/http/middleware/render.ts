@@ -20,8 +20,8 @@ const tail = (session: Session | null) => {
   return (
     '</main>' +
     `<script>window.__SESSION__ = ${sessionString};</script>` +
-    `<script src="${publicPath}/vendors~bundle.js"></script>` +
-    `<script src="${publicPath}/runtime~bundle.js"></script>` +
+    `<script src="${publicPath}/vendor.js"></script>` +
+    `<script src="${publicPath}/bootstrap.js"></script>` +
     `<script src="${publicPath}/bundle.js"></script>` +
     '</body>' +
     '</html>'
