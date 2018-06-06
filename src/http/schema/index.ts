@@ -2,26 +2,27 @@ require('dotenv').config();
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import Cookies from 'cookies';
 import { importSchema } from 'graphql-import';
 import { makeExecutableSchema, IResolvers } from 'graphql-tools';
 import { Prisma } from 'prisma-binding';
-import { Session } from '../http/utils/getSessionUserFromContext';
 
-const typeDefs = importSchema('./src/schema/schema.graphql');
+const typeDefs = importSchema('./src/http/schema/schema.graphql');
 const { JWT_SECRET } = process.env;
 
 if (!JWT_SECRET) {
   throw new Error('You did not provide a JWT_SECRET env variable');
 }
 
+type Session = { userId: string; iat: number };
+
 type Context = {
-  cookies: Cookies;
+  session: Session | null;
   db: Prisma;
 };
 
 const resolvers: IResolvers<{}, Context> = {
   Query: {
+    session: (parent, args, context, info) => context.session,
     users: (parent, args, context, info) => {
       return context.db.query.users({}, info);
     },
@@ -59,35 +60,8 @@ const resolvers: IResolvers<{}, Context> = {
       }
 
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);
-      context.cookies.set('jwt', token, {
-        secure: true,
-        signed: true,
-      });
 
-      return jwt.decode(token);
-    },
-    logout: async (parent, args, context, info) => {
-      const [user] = await context.db.query.users({ where: args.where });
-
-      if (!user) {
-        throw new Error();
-      }
-
-      const token = context.cookies.get('jwt');
-
-      if (!token) {
-        return null;
-      }
-
-      const { userId, iat } = jwt.decode(token) as Session;
-
-      if (userId !== user.id) {
-        throw new Error();
-      }
-
-      context.cookies.set('jwt', undefined);
-
-      return { userId, iat };
+      return { token };
     },
   },
 };

@@ -2,12 +2,12 @@
 # import UserCreateInput from "./generated/prisma.graphql"
 
 type Query {
+  session: Session
   users: [User!]!
 }
 
 type Mutation {
   authenticate(input: AuthenticateInput!): AuthenticatePayload
-  logout(where:UserWhereUniqueInput!): LogoutPayload
   createUser(input:UserCreateInput!): User
   deleteUser(where: UserWhereUniqueInput!): User
 }
@@ -18,11 +18,10 @@ input AuthenticateInput {
 }
 
 type AuthenticatePayload {
-  userId: String!
-  iat: Int!
+  token: String
 }
 
-type LogoutPayload {
+type Session {
   userId: String!
   iat: Int!
 }

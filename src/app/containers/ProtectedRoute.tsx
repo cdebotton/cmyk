@@ -3,13 +3,13 @@ import { Route, Redirect, RouteProps } from 'react-router';
 
 type Props<T> = {
   isBlocked: boolean;
-  redirectOnBlock: string;
+  redirectOnBlock?: string;
   component: ComponentType<T>;
 } & RouteProps;
 
 function ProtectedRoute<T extends RouteProps>({
   isBlocked,
-  redirectOnBlock,
+  redirectOnBlock = '/login',
   component: Component,
   ...rest
 }: Props<T>) {

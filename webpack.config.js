@@ -53,10 +53,11 @@ module.exports = {
                 '@babel/typescript',
               ],
               plugins: [
+                'react-hot-loader/babel',
                 [
                   'styled-components',
                   {
-                    ssr: true,
+                    ssr: false,
                     displayName: NODE_ENV === 'development',
                   },
                 ],

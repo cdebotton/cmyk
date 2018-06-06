@@ -1,6 +1,6 @@
 import React, { SFC } from 'react';
 import Heading from './components/atoms/Heading';
-import { Query, QueryResult, Mutation, FetchResult } from 'react-apollo';
+import { Query, QueryResult, Mutation, MutationUpdaterFn } from 'react-apollo';
 import gql from 'graphql-tag';
 import PageLoader from './components/molecules/PageLoader';
 import AdminCreateUser from './AdminCreateUser';
@@ -29,12 +29,6 @@ type Response = {
   }[];
 };
 
-type MutationResponse = {
-  deleteUser: {
-    id: string;
-  };
-};
-
 const AdminUsers: SFC = () => (
   <div>
     <Heading>Users</Heading>
@@ -55,33 +49,7 @@ const AdminUsers: SFC = () => (
             {data.users.map(user => (
               <li key={user.id}>
                 <small>{user.id}</small> {user.email}
-                <Mutation
-                  mutation={deleteUserMutation}
-                  update={(cache, result: FetchResult<MutationResponse>) => {
-                    if (!result.data) {
-                      return;
-                    }
-
-                    const cacheResult = cache.readQuery<Response>({
-                      query: getUsersQuery,
-                    });
-
-                    if (!cacheResult) {
-                      return;
-                    }
-
-                    const removedId = result.data.deleteUser.id;
-
-                    cache.writeQuery({
-                      query: getUsersQuery,
-                      data: {
-                        users: cacheResult.users.filter(
-                          user => user.id !== removedId,
-                        ),
-                      },
-                    });
-                  }}
-                >
+                <Mutation mutation={deleteUserMutation} update={updateOnDelete}>
                   {mutationFn => (
                     <button
                       onClick={() =>
@@ -101,5 +69,37 @@ const AdminUsers: SFC = () => (
     </Query>
   </div>
 );
+
+type DeleteUserResponse = {
+  deleteUser: {
+    id: string;
+  };
+};
+
+const updateOnDelete: MutationUpdaterFn<DeleteUserResponse> = (
+  cache,
+  result,
+) => {
+  if (!result.data) {
+    return;
+  }
+
+  const cacheResult = cache.readQuery<Response>({
+    query: getUsersQuery,
+  });
+
+  if (!cacheResult) {
+    return;
+  }
+
+  const removedId = result.data.deleteUser.id;
+
+  cache.writeQuery({
+    query: getUsersQuery,
+    data: {
+      users: cacheResult.users.filter(user => user.id !== removedId),
+    },
+  });
+};
 
 export default AdminUsers;

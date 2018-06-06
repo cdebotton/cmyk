@@ -13,17 +13,6 @@ module.exports = {
       },
     ],
     ['@babel/stage-0', { decoratorsLegacy: true, loose: true }],
-    '@babel/react',
     '@babel/typescript',
-  ],
-  plugins: [
-    'dynamic-import-node',
-    [
-      'styled-components',
-      {
-        ssr: true,
-        displayName: NODE_ENV === 'development',
-      },
-    ],
   ],
 };
