@@ -1,7 +1,11 @@
 # source: http://localhost:4466
-# timestamp: Wed Jun 06 2018 17:45:12 GMT-0400 (EDT)
+# timestamp: Wed Jun 06 2018 20:46:02 GMT-0400 (EDT)
 
 type AggregateDocument {
+  count: Int!
+}
+
+type AggregateDocumentType {
   count: Int!
 }
 
@@ -18,6 +22,8 @@ scalar DateTime
 
 type Document implements Node {
   id: ID!
+  title: String!
+  type(where: DocumentTypeWhereInput): DocumentType!
   author(where: UserWhereInput): User
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -34,7 +40,29 @@ type DocumentConnection {
 }
 
 input DocumentCreateInput {
-  author: UserCreateOneInput
+  title: String!
+  type: DocumentTypeCreateOneWithoutDocumentsInput!
+  author: UserCreateOneWithoutDocumentsInput
+}
+
+input DocumentCreateManyWithoutAuthorInput {
+  create: [DocumentCreateWithoutAuthorInput!]
+  connect: [DocumentWhereUniqueInput!]
+}
+
+input DocumentCreateManyWithoutTypeInput {
+  create: [DocumentCreateWithoutTypeInput!]
+  connect: [DocumentWhereUniqueInput!]
+}
+
+input DocumentCreateWithoutAuthorInput {
+  title: String!
+  type: DocumentTypeCreateOneWithoutDocumentsInput!
+}
+
+input DocumentCreateWithoutTypeInput {
+  title: String!
+  author: UserCreateOneWithoutDocumentsInput
 }
 
 """An edge in a connection."""
@@ -49,6 +77,8 @@ type DocumentEdge {
 enum DocumentOrderByInput {
   id_ASC
   id_DESC
+  title_ASC
+  title_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
@@ -57,6 +87,7 @@ enum DocumentOrderByInput {
 
 type DocumentPreviousValues {
   id: ID!
+  title: String!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -100,8 +131,322 @@ input DocumentSubscriptionWhereInput {
   node: DocumentWhereInput
 }
 
+type DocumentType implements Node {
+  id: ID!
+  title: String!
+  documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document!]
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A connection to a list of items."""
+type DocumentTypeConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [DocumentTypeEdge]!
+  aggregate: AggregateDocumentType!
+}
+
+input DocumentTypeCreateInput {
+  title: String!
+  documents: DocumentCreateManyWithoutTypeInput
+}
+
+input DocumentTypeCreateOneWithoutDocumentsInput {
+  create: DocumentTypeCreateWithoutDocumentsInput
+  connect: DocumentTypeWhereUniqueInput
+}
+
+input DocumentTypeCreateWithoutDocumentsInput {
+  title: String!
+}
+
+"""An edge in a connection."""
+type DocumentTypeEdge {
+  """The item at the end of the edge."""
+  node: DocumentType!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum DocumentTypeOrderByInput {
+  id_ASC
+  id_DESC
+  title_ASC
+  title_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type DocumentTypePreviousValues {
+  id: ID!
+  title: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type DocumentTypeSubscriptionPayload {
+  mutation: MutationType!
+  node: DocumentType
+  updatedFields: [String!]
+  previousValues: DocumentTypePreviousValues
+}
+
+input DocumentTypeSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [DocumentTypeSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [DocumentTypeSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [DocumentTypeSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: DocumentTypeWhereInput
+}
+
+input DocumentTypeUpdateInput {
+  title: String
+  documents: DocumentUpdateManyWithoutTypeInput
+}
+
+input DocumentTypeUpdateOneWithoutDocumentsInput {
+  create: DocumentTypeCreateWithoutDocumentsInput
+  connect: DocumentTypeWhereUniqueInput
+  delete: Boolean
+  update: DocumentTypeUpdateWithoutDocumentsDataInput
+  upsert: DocumentTypeUpsertWithoutDocumentsInput
+}
+
+input DocumentTypeUpdateWithoutDocumentsDataInput {
+  title: String
+}
+
+input DocumentTypeUpsertWithoutDocumentsInput {
+  update: DocumentTypeUpdateWithoutDocumentsDataInput!
+  create: DocumentTypeCreateWithoutDocumentsInput!
+}
+
+input DocumentTypeWhereInput {
+  """Logical AND on all given filters."""
+  AND: [DocumentTypeWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [DocumentTypeWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [DocumentTypeWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  title: String
+
+  """All values that are not equal to given value."""
+  title_not: String
+
+  """All values that are contained in given list."""
+  title_in: [String!]
+
+  """All values that are not contained in given list."""
+  title_not_in: [String!]
+
+  """All values less than the given value."""
+  title_lt: String
+
+  """All values less than or equal the given value."""
+  title_lte: String
+
+  """All values greater than the given value."""
+  title_gt: String
+
+  """All values greater than or equal the given value."""
+  title_gte: String
+
+  """All values containing the given string."""
+  title_contains: String
+
+  """All values not containing the given string."""
+  title_not_contains: String
+
+  """All values starting with the given string."""
+  title_starts_with: String
+
+  """All values not starting with the given string."""
+  title_not_starts_with: String
+
+  """All values ending with the given string."""
+  title_ends_with: String
+
+  """All values not ending with the given string."""
+  title_not_ends_with: String
+  createdAt: DateTime
+
+  """All values that are not equal to given value."""
+  createdAt_not: DateTime
+
+  """All values that are contained in given list."""
+  createdAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  createdAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  createdAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  createdAt_lte: DateTime
+
+  """All values greater than the given value."""
+  createdAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+
+  """All values that are not equal to given value."""
+  updatedAt_not: DateTime
+
+  """All values that are contained in given list."""
+  updatedAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  updatedAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  updatedAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  updatedAt_lte: DateTime
+
+  """All values greater than the given value."""
+  updatedAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  updatedAt_gte: DateTime
+  documents_every: DocumentWhereInput
+  documents_some: DocumentWhereInput
+  documents_none: DocumentWhereInput
+}
+
+input DocumentTypeWhereUniqueInput {
+  id: ID
+}
+
 input DocumentUpdateInput {
-  author: UserUpdateOneInput
+  title: String
+  type: DocumentTypeUpdateOneWithoutDocumentsInput
+  author: UserUpdateOneWithoutDocumentsInput
+}
+
+input DocumentUpdateManyWithoutAuthorInput {
+  create: [DocumentCreateWithoutAuthorInput!]
+  connect: [DocumentWhereUniqueInput!]
+  disconnect: [DocumentWhereUniqueInput!]
+  delete: [DocumentWhereUniqueInput!]
+  update: [DocumentUpdateWithWhereUniqueWithoutAuthorInput!]
+  upsert: [DocumentUpsertWithWhereUniqueWithoutAuthorInput!]
+}
+
+input DocumentUpdateManyWithoutTypeInput {
+  create: [DocumentCreateWithoutTypeInput!]
+  connect: [DocumentWhereUniqueInput!]
+  disconnect: [DocumentWhereUniqueInput!]
+  delete: [DocumentWhereUniqueInput!]
+  update: [DocumentUpdateWithWhereUniqueWithoutTypeInput!]
+  upsert: [DocumentUpsertWithWhereUniqueWithoutTypeInput!]
+}
+
+input DocumentUpdateWithoutAuthorDataInput {
+  title: String
+  type: DocumentTypeUpdateOneWithoutDocumentsInput
+}
+
+input DocumentUpdateWithoutTypeDataInput {
+  title: String
+  author: UserUpdateOneWithoutDocumentsInput
+}
+
+input DocumentUpdateWithWhereUniqueWithoutAuthorInput {
+  where: DocumentWhereUniqueInput!
+  data: DocumentUpdateWithoutAuthorDataInput!
+}
+
+input DocumentUpdateWithWhereUniqueWithoutTypeInput {
+  where: DocumentWhereUniqueInput!
+  data: DocumentUpdateWithoutTypeDataInput!
+}
+
+input DocumentUpsertWithWhereUniqueWithoutAuthorInput {
+  where: DocumentWhereUniqueInput!
+  update: DocumentUpdateWithoutAuthorDataInput!
+  create: DocumentCreateWithoutAuthorInput!
+}
+
+input DocumentUpsertWithWhereUniqueWithoutTypeInput {
+  where: DocumentWhereUniqueInput!
+  update: DocumentUpdateWithoutTypeDataInput!
+  create: DocumentCreateWithoutTypeInput!
 }
 
 input DocumentWhereInput {
@@ -153,6 +498,46 @@ input DocumentWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
+  title: String
+
+  """All values that are not equal to given value."""
+  title_not: String
+
+  """All values that are contained in given list."""
+  title_in: [String!]
+
+  """All values that are not contained in given list."""
+  title_not_in: [String!]
+
+  """All values less than the given value."""
+  title_lt: String
+
+  """All values less than or equal the given value."""
+  title_lte: String
+
+  """All values greater than the given value."""
+  title_gt: String
+
+  """All values greater than or equal the given value."""
+  title_gte: String
+
+  """All values containing the given string."""
+  title_contains: String
+
+  """All values not containing the given string."""
+  title_not_contains: String
+
+  """All values starting with the given string."""
+  title_starts_with: String
+
+  """All values not starting with the given string."""
+  title_not_starts_with: String
+
+  """All values ending with the given string."""
+  title_ends_with: String
+
+  """All values not ending with the given string."""
+  title_not_ends_with: String
   createdAt: DateTime
 
   """All values that are not equal to given value."""
@@ -197,6 +582,7 @@ input DocumentWhereInput {
 
   """All values greater than or equal the given value."""
   updatedAt_gte: DateTime
+  type: DocumentTypeWhereInput
   author: UserWhereInput
 }
 
@@ -212,16 +598,22 @@ scalar Long
 
 type Mutation {
   createUser(data: UserCreateInput!): User!
+  createDocumentType(data: DocumentTypeCreateInput!): DocumentType!
   createDocument(data: DocumentCreateInput!): Document!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
+  updateDocumentType(data: DocumentTypeUpdateInput!, where: DocumentTypeWhereUniqueInput!): DocumentType
   updateDocument(data: DocumentUpdateInput!, where: DocumentWhereUniqueInput!): Document
   deleteUser(where: UserWhereUniqueInput!): User
+  deleteDocumentType(where: DocumentTypeWhereUniqueInput!): DocumentType
   deleteDocument(where: DocumentWhereUniqueInput!): Document
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
+  upsertDocumentType(where: DocumentTypeWhereUniqueInput!, create: DocumentTypeCreateInput!, update: DocumentTypeUpdateInput!): DocumentType!
   upsertDocument(where: DocumentWhereUniqueInput!, create: DocumentCreateInput!, update: DocumentUpdateInput!): Document!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
+  updateManyDocumentTypes(data: DocumentTypeUpdateInput!, where: DocumentTypeWhereInput): BatchPayload!
   updateManyDocuments(data: DocumentUpdateInput!, where: DocumentWhereInput): BatchPayload!
   deleteManyUsers(where: UserWhereInput): BatchPayload!
+  deleteManyDocumentTypes(where: DocumentTypeWhereInput): BatchPayload!
   deleteManyDocuments(where: DocumentWhereInput): BatchPayload!
 }
 
@@ -254,10 +646,13 @@ type PageInfo {
 
 type Query {
   users(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [User]!
+  documentTypes(where: DocumentTypeWhereInput, orderBy: DocumentTypeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [DocumentType]!
   documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document]!
   user(where: UserWhereUniqueInput!): User
+  documentType(where: DocumentTypeWhereUniqueInput!): DocumentType
   document(where: DocumentWhereUniqueInput!): Document
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
+  documentTypesConnection(where: DocumentTypeWhereInput, orderBy: DocumentTypeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DocumentTypeConnection!
   documentsConnection(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DocumentConnection!
 
   """Fetches an object given its ID"""
@@ -269,12 +664,14 @@ type Query {
 
 enum Role {
   ADMIN
+  EDITOR
   USER
   UNAUTHORIZED
 }
 
 type Subscription {
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
+  documentType(where: DocumentTypeSubscriptionWhereInput): DocumentTypeSubscriptionPayload
   document(where: DocumentSubscriptionWhereInput): DocumentSubscriptionPayload
 }
 
@@ -283,6 +680,7 @@ type User implements Node {
   email: String!
   password: String!
   role: Role!
+  documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document!]
   lastLogin: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -303,11 +701,19 @@ input UserCreateInput {
   password: String!
   role: Role
   lastLogin: DateTime
+  documents: DocumentCreateManyWithoutAuthorInput
 }
 
-input UserCreateOneInput {
-  create: UserCreateInput
+input UserCreateOneWithoutDocumentsInput {
+  create: UserCreateWithoutDocumentsInput
   connect: UserWhereUniqueInput
+}
+
+input UserCreateWithoutDocumentsInput {
+  email: String!
+  password: String!
+  role: Role
+  lastLogin: DateTime
 }
 
 """An edge in a connection."""
@@ -385,32 +791,33 @@ input UserSubscriptionWhereInput {
   node: UserWhereInput
 }
 
-input UserUpdateDataInput {
-  email: String
-  password: String
-  role: Role
-  lastLogin: DateTime
-}
-
 input UserUpdateInput {
   email: String
   password: String
   role: Role
   lastLogin: DateTime
+  documents: DocumentUpdateManyWithoutAuthorInput
 }
 
-input UserUpdateOneInput {
-  create: UserCreateInput
+input UserUpdateOneWithoutDocumentsInput {
+  create: UserCreateWithoutDocumentsInput
   connect: UserWhereUniqueInput
   disconnect: Boolean
   delete: Boolean
-  update: UserUpdateDataInput
-  upsert: UserUpsertNestedInput
+  update: UserUpdateWithoutDocumentsDataInput
+  upsert: UserUpsertWithoutDocumentsInput
 }
 
-input UserUpsertNestedInput {
-  update: UserUpdateDataInput!
-  create: UserCreateInput!
+input UserUpdateWithoutDocumentsDataInput {
+  email: String
+  password: String
+  role: Role
+  lastLogin: DateTime
+}
+
+input UserUpsertWithoutDocumentsInput {
+  update: UserUpdateWithoutDocumentsDataInput!
+  create: UserCreateWithoutDocumentsInput!
 }
 
 input UserWhereInput {
@@ -618,6 +1025,9 @@ input UserWhereInput {
 
   """All values greater than or equal the given value."""
   updatedAt_gte: DateTime
+  documents_every: DocumentWhereInput
+  documents_some: DocumentWhereInput
+  documents_none: DocumentWhereInput
 }
 
 input UserWhereUniqueInput {

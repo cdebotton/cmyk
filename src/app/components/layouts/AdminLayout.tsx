@@ -1,5 +1,6 @@
 import React, { SFC } from 'react';
 import styled from 'styled-components';
+import { rem } from 'polished';
 
 type Props = {
   className?: string;
@@ -16,8 +17,8 @@ const AdminLayout: SFC<Props> = ({ className, content, navigation }) => (
 
 export default styled(AdminLayout)`
   display: grid;
+  overflow: auto;
   width: 100%;
   min-height: 100vh;
-  overflow: auto;
-  grid-template-rows: min-content auto;
+  grid-template-columns: min-content auto;
 `;

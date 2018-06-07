@@ -8,5 +8,6 @@
     "ssl/**": true,
     "*-error.log": true,
     "dist": true
-  }
+  },
+  "stylelint.enable": true
 }

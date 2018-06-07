@@ -4,6 +4,7 @@
 type Query {
   session: Session
   users: [User!]!
+  documents: [Document!]!
 }
 
 type Mutation {

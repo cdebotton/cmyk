@@ -1,5 +1,6 @@
 enum Role {
   ADMIN
+  EDITOR
   USER
   UNAUTHORIZED
 }
@@ -8,14 +9,25 @@ type User {
   id: ID! @unique
   email: String! @unique
   password: String!
-  role: Role! @default(value: UNAUTHORIZED)
+  role: Role! @default(value: USER)
+  documents: [Document!]!
   lastLogin: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type DocumentType {
+  id: ID! @unique
+  title: String!
+  documents: [Document!]!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
 
 type Document {
   id: ID! @unique
+  title: String!
+  type: DocumentType!
   author: User
   createdAt: DateTime!
   updatedAt: DateTime!

@@ -11,8 +11,8 @@ import {
 } from 'graphql-tools';
 import { Prisma } from 'prisma-binding';
 import getTokenFromAuthorization from './libs/getTokenFromHeader';
-import { createError } from 'apollo-errors';
 import { GraphQLField, GraphQLEnumValue } from 'graphql';
+import { InvalidCredentialsError } from './errors';
 
 const typeDefs = importSchema('./src/http/schema/schema.graphql');
 const { JWT_SECRET } = process.env;
@@ -24,10 +24,6 @@ if (!JWT_SECRET) {
 export type Context = KoaContext & {
   db: Prisma;
 };
-
-const InvalidCredentialsError = createError('InvalidCredentialsError', {
-  message: 'The credentials provided for authentication are incorrect',
-});
 
 const resolvers: IResolvers<{}, Context> = {
   Query: {
@@ -48,6 +44,9 @@ const resolvers: IResolvers<{}, Context> = {
     },
     users: (parent, args, context, info) => {
       return context.db.query.users({}, info);
+    },
+    documents: (parent, args, context, info) => {
+      return context.db.query.documents({}, info);
     },
   },
   Mutation: {

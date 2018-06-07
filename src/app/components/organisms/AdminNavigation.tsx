@@ -1,18 +1,38 @@
 import React, { SFC, ReactNode } from 'react';
 import styled from 'styled-components';
+import { rem } from 'polished';
 
 type Props = {
   className?: string;
+  title: ReactNode;
   pages: ReactNode;
   actions: ReactNode;
 };
 
-const PageContainer = styled.div``;
+const TitleContainer = styled.div`
+  padding: ${rem(20)} ${rem(10)};
+  background-color: hsl(200, 10%, 10%);
+  color: hsl(180, 90%, 90%);
+  grid-column: span 1;
+  grid-row: span 2;
+  writing-mode: vertical-lr;
+`;
 
-const ActionsContainer = styled.div``;
+const PageContainer = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
+  grid-column: span 1;
+  grid-row: span 1;
+`;
 
-const AdminNavigation: SFC<Props> = ({ actions, className, pages }) => (
+const ActionsContainer = styled.div`
+  grid-column: span 1;
+  grid-row: span 1;
+`;
+
+const AdminNavigation: SFC<Props> = ({ actions, className, pages, title }) => (
   <nav className={className}>
+    <TitleContainer>{title}</TitleContainer>
     <PageContainer>{pages}</PageContainer>
     <ActionsContainer>{actions}</ActionsContainer>
   </nav>
@@ -20,7 +40,8 @@ const AdminNavigation: SFC<Props> = ({ actions, className, pages }) => (
 
 export default styled(AdminNavigation)`
   position: relative;
-  display: flex;
-  flex-flow: row nowrap;
-  justify-content: space-between;
+  display: grid;
+  padding-right: ${rem(20)};
+  grid-template-columns: min-content min-content;
+  grid-template-rows: auto min-content;
 `;

@@ -11,4 +11,6 @@ const Heading: SFC<Props> = ({ level = 2, ...props }) => {
   return React.createElement(`h${level}`, props);
 };
 
-export default styled(Heading)``;
+export default styled(Heading)`
+  margin: 0;
+`;
