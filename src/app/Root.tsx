@@ -27,6 +27,10 @@ const Public = Loadable({
 injectGlobal`
   ${normalize() as SimpleInterpolation};
 
+  body {
+    font-family: 'Open sans', sans-serif;
+  }
+
   *,
   *::before,
   *::after {

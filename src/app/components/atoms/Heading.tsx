@@ -11,6 +11,24 @@ const Heading: SFC<Props> = ({ level = 2, ...props }) => {
   return React.createElement(`h${level}`, props);
 };
 
+const getFontWeight = ({ level }: Props) => {
+  if (level === 1) {
+    return 400;
+  }
+
+  return 200;
+};
+
+const getMargin = ({ level }: Props) => {
+  if (level === 1) {
+    return 0;
+  }
+
+  return undefined;
+};
+
 export default styled(Heading)`
-  margin: 0;
+  margin: ${getMargin};
+  font-family: 'Roboto', sans-serif;
+  font-weight: ${getFontWeight};
 `;

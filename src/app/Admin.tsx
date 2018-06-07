@@ -27,7 +27,7 @@ const Admin: SFC<Props> = ({ match }) => (
             title={<Heading level={1}>CMYK</Heading>}
             pages={
               <Fragment>
-                <PageLink to={match.url} icon={faDesktop}>
+                <PageLink exact to={match.url} icon={faDesktop}>
                   Dashboard
                 </PageLink>
                 <PageLink to={`${match.url}/documents`} icon={faFolderOpen}>

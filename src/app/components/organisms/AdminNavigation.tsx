@@ -21,11 +21,15 @@ const TitleContainer = styled.div`
 const PageContainer = styled.div`
   display: flex;
   flex-flow: column nowrap;
+  padding: ${rem(20)} ${rem(40)} ${rem(20)} ${rem(10)};
+  background-color: hsl(200, 20%, 20%);
+  color: hsl(180, 99%, 99%);
   grid-column: span 1;
   grid-row: span 1;
 `;
 
 const ActionsContainer = styled.div`
+  display: grid;
   grid-column: span 1;
   grid-row: span 1;
 `;
