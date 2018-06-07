@@ -1,17 +1,11 @@
-require('dotenv').config();
-
+import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { Context as KoaContext } from 'koa';
 import { importSchema } from 'graphql-import';
-import {
-  makeExecutableSchema,
-  IResolvers,
-  SchemaDirectiveVisitor,
-} from 'graphql-tools';
+import { makeExecutableSchema, IResolvers } from 'graphql-tools';
 import { Prisma } from 'prisma-binding';
 import getTokenFromAuthorization from './libs/getTokenFromHeader';
-import { GraphQLField, GraphQLEnumValue } from 'graphql';
 import { InvalidCredentialsError } from './errors';
 
 const typeDefs = importSchema('./src/http/schema/schema.graphql');
@@ -25,9 +19,14 @@ export type Context = KoaContext & {
   db: Prisma;
 };
 
+type SessionData = {
+  userId: string;
+  iat: number;
+};
+
 const resolvers: IResolvers<{}, Context> = {
   Query: {
-    session: (parent, args, context, info) => {
+    session: async (parent, args, context, info) => {
       const token = getTokenFromAuthorization(
         context.req.headers.authorization,
       );
@@ -37,7 +36,9 @@ const resolvers: IResolvers<{}, Context> = {
       }
 
       try {
-        return jwt.verify(token, JWT_SECRET);
+        const { iat, userId } = jwt.verify(token, JWT_SECRET) as SessionData;
+
+        return context.db.query.user({ where: { id: userId } }, info);
       } catch (err) {
         return null;
       }
@@ -53,12 +54,14 @@ const resolvers: IResolvers<{}, Context> = {
     createUser: async (parent, { input }, context, info) => {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(input.password, salt);
+
       return context.db.mutation.createUser(
         {
           data: {
             email: input.email,
             password: hashedPassword,
             role: input.role,
+            profile: input.profile,
           },
         },
         info,

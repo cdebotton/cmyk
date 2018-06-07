@@ -2,7 +2,7 @@
 # import UserCreateInput from "./generated/prisma.graphql"
 
 type Query {
-  session: Session
+  session: User
   users: [User!]!
   documents: [Document!]!
 }
@@ -20,9 +20,4 @@ input AuthenticateInput {
 
 type AuthenticatePayload {
   token: String
-}
-
-type Session {
-  userId: String!
-  iat: Int!
 }

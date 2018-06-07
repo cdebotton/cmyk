@@ -8,7 +8,7 @@
   "scripts": {
     "prebuild:babel": "mkdir -p dist/http",
     "build:babel": "babel --out-dir dist/http --extensions .ts src/http",
-    "prebuild": "rm -rf dist/* && stylelint src/**/*.tsx && eslint src src/**/*.ts src/**/*.tsx",
+    "prebuild": "rm -rf dist/* && stylelint src/**/*.tsx && eslint src src/**/*.ts src/**/*.tsx && tsc --noEmit",
     "build": "npm-run-all 'build:babel' 'build:webpack'",
     "watch:babel": "yarn build:babel --watch",
     "build:webpack": "webpack",
@@ -76,6 +76,8 @@
     "@types/koa-mount": "3.0.1",
     "@types/koa-router": "7.0.28",
     "@types/koa-static": "4.0.0",
+    "@types/node": "10.1.4",
+    "@types/prop-types": "^15.5.3",
     "@types/react": "16.3.16",
     "@types/react-dom": "16.0.6",
     "@types/react-loadable": "^5.4.0",

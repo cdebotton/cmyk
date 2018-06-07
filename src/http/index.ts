@@ -33,6 +33,7 @@ const run = async () => {
   const server = http.createSecureServer({ cert, key }, app.callback());
   const prisma = new Prisma({
     typeDefs: 'src/http/schema/generated/prisma.graphql',
+
     endpoint: 'http://localhost:4466',
     secret: PRISMA_SECRET,
     debug: NODE_ENV === 'development',
@@ -77,6 +78,15 @@ const run = async () => {
       process.stdout.write(`🚀 Listening at ${address}${port}`);
     }
   });
+
+  // Expose app on HTTP in development mode so we can internally
+  // query the schema for introspection.
+  // Otherwise, we run into SSL verification issues since we run
+  // a self signed certificate locally.
+
+  if (NODE_ENV === 'development') {
+    app.listen(3030);
+  }
 };
 
 run();

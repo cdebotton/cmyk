@@ -29,6 +29,6 @@ const getMargin = ({ level }: Props) => {
 
 export default styled(Heading)`
   margin: ${getMargin};
-  font-family: 'Roboto', sans-serif;
+  font-family: 'Roboto slab', sans-serif;
   font-weight: ${getFontWeight};
 `;

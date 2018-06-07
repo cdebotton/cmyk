@@ -41,8 +41,8 @@ injectGlobal`
 const getSessionQuery = gql`
   query GetSession {
     session {
-      iat
-      userId
+      id
+      email
     }
   }
 `;

@@ -15,16 +15,11 @@ type Props = NavLinkProps & {
 
 const Icon = styled(FontAwesomeIcon)`
   position: relative;
-  margin-right: ${rem(10)};
-`;
-
-const LinkLabel = styled.span`
-  font-size: ${rem(14)};
 `;
 
 const PageLink: SFC<Props> = ({ children, icon, ...props }) => (
   <NavLink {...props}>
-    <Icon size="lg" icon={icon} /> <LinkLabel>{children}</LinkLabel>
+    <Icon size="lg" icon={icon} />
   </NavLink>
 );
 

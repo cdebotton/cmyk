@@ -10,8 +10,19 @@ type User {
   email: String! @unique
   password: String!
   role: Role! @default(value: USER)
-  documents: [Document!]!
+  profile: Profile! @relation(name: "UserProfile", onDelete: CASCADE)
+  documents: [Document!]! @relation(name: "UserDocuments", onDelete: SET_NULL)
   lastLogin: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Profile {
+  id: ID! @unique
+  firstName: String
+  lastName: String
+  dateOfBirth: DateTime
+  user: User! @relation(name: "UserProfile")
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -29,7 +40,7 @@ type Document {
   publishDate: DateTime!
   title: String!
   type: DocumentType!
-  author: User
+  author: User @relation(name: "UserDocuments")
   createdAt: DateTime!
   updatedAt: DateTime!
 }

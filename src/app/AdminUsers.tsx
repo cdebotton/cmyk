@@ -4,12 +4,14 @@ import { Query, QueryResult, Mutation, MutationUpdaterFn } from 'react-apollo';
 import gql from 'graphql-tag';
 import PageLoader from './components/molecules/PageLoader';
 import AdminCreateUser from './AdminCreateUser';
+import { NavLink, RouteComponentProps } from 'react-router-dom';
 
 const getUsersQuery = gql`
   query GetUsers {
     users {
       id
       email
+      role
     }
   }
 `;
@@ -26,10 +28,13 @@ type Response = {
   users: {
     id: string;
     email: string;
+    role: 'ADMIN' | 'EDITOR' | 'USER' | 'UNAUTHORIZED';
   }[];
 };
 
-const AdminUsers: SFC = () => (
+type Props = RouteComponentProps<{}> & {};
+
+const AdminUsers: SFC<Props> = ({ match }) => (
   <div>
     <Heading>Users</Heading>
     <AdminCreateUser />
@@ -48,7 +53,8 @@ const AdminUsers: SFC = () => (
           <ul>
             {data.users.map(user => (
               <li key={user.id}>
-                <small>{user.id}</small> {user.email}
+                <NavLink to={`${match.url}/${user.id}`}>{user.email}</NavLink>{' '}
+                {user.role}
                 <Mutation mutation={deleteUserMutation} update={updateOnDelete}>
                   {mutationFn => (
                     <button

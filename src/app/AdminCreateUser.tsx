@@ -10,6 +10,7 @@ const createUserMutation = gql`
     createUser(input: $input) {
       id
       email
+      role
     }
   }
 `;
@@ -28,6 +29,7 @@ const AdminCreateUser: SFC = () => (
           initialValues={{
             email: '',
             password: '',
+            role: 'ADMIN',
           }}
           validationSchema={schema}
           onSubmit={values => {
