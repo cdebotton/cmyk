@@ -1,4 +1,4 @@
-require('dotenv').config();
+import 'dotenv/config';
 
 import { graphiqlKoa, graphqlKoa } from 'apollo-server-koa';
 import http from 'http2';

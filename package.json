@@ -8,7 +8,7 @@
   "scripts": {
     "prebuild:babel": "mkdir -p dist/http",
     "build:babel": "babel --out-dir dist/http --extensions .ts src/http",
-    "prebuild": "rm -rf dist/* && stylelint src/**/*.tsx",
+    "prebuild": "rm -rf dist/* && stylelint src/**/*.tsx && eslint src src/**/*.ts src/**/*.tsx",
     "build": "npm-run-all 'build:babel' 'build:webpack'",
     "watch:babel": "yarn build:babel --watch",
     "build:webpack": "webpack",
@@ -20,6 +20,11 @@
     "start": "NODE_ENV=production npm-run-all 'build' 'run'"
   },
   "dependencies": {
+    "@fortawesome/fontawesome": "1.1.8",
+    "@fortawesome/fontawesome-free-brands": "5.0.13",
+    "@fortawesome/fontawesome-free-regular": "^5.0.13",
+    "@fortawesome/fontawesome-free-solid": "5.0.13",
+    "@fortawesome/react-fontawesome": "0.0.20",
     "apollo-cache-inmemory": "^1.2.2",
     "apollo-client": "2.3.2",
     "apollo-errors": "^1.9.0",
@@ -61,6 +66,7 @@
     "@babel/preset-react": "7.0.0-beta.49",
     "@babel/preset-stage-0": "7.0.0-beta.49",
     "@babel/preset-typescript": "7.0.0-beta.49",
+    "@fortawesome/fontawesome-common-types": "^0.1.7",
     "@types/bcryptjs": "^2.4.1",
     "@types/boom": "^7.2.0",
     "@types/jsonwebtoken": "^7.2.7",

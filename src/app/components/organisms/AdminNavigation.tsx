@@ -12,7 +12,7 @@ type Props = {
 const TitleContainer = styled.div`
   padding: ${rem(20)} ${rem(10)};
   background-color: hsl(200, 10%, 10%);
-  color: hsl(180, 90%, 90%);
+  color: hsl(180, 99%, 99%);
   grid-column: span 1;
   grid-row: span 2;
   writing-mode: vertical-lr;

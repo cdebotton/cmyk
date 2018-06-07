@@ -1,5 +1,5 @@
 # source: http://localhost:4466
-# timestamp: Wed Jun 06 2018 20:46:02 GMT-0400 (EDT)
+# timestamp: Wed Jun 06 2018 23:50:14 GMT-0400 (EDT)
 
 type AggregateDocument {
   count: Int!
@@ -22,6 +22,7 @@ scalar DateTime
 
 type Document implements Node {
   id: ID!
+  publishDate: DateTime!
   title: String!
   type(where: DocumentTypeWhereInput): DocumentType!
   author(where: UserWhereInput): User
@@ -40,6 +41,7 @@ type DocumentConnection {
 }
 
 input DocumentCreateInput {
+  publishDate: DateTime!
   title: String!
   type: DocumentTypeCreateOneWithoutDocumentsInput!
   author: UserCreateOneWithoutDocumentsInput
@@ -56,11 +58,13 @@ input DocumentCreateManyWithoutTypeInput {
 }
 
 input DocumentCreateWithoutAuthorInput {
+  publishDate: DateTime!
   title: String!
   type: DocumentTypeCreateOneWithoutDocumentsInput!
 }
 
 input DocumentCreateWithoutTypeInput {
+  publishDate: DateTime!
   title: String!
   author: UserCreateOneWithoutDocumentsInput
 }
@@ -77,6 +81,8 @@ type DocumentEdge {
 enum DocumentOrderByInput {
   id_ASC
   id_DESC
+  publishDate_ASC
+  publishDate_DESC
   title_ASC
   title_DESC
   createdAt_ASC
@@ -87,6 +93,7 @@ enum DocumentOrderByInput {
 
 type DocumentPreviousValues {
   id: ID!
+  publishDate: DateTime!
   title: String!
   createdAt: DateTime!
   updatedAt: DateTime!
@@ -394,6 +401,7 @@ input DocumentTypeWhereUniqueInput {
 }
 
 input DocumentUpdateInput {
+  publishDate: DateTime
   title: String
   type: DocumentTypeUpdateOneWithoutDocumentsInput
   author: UserUpdateOneWithoutDocumentsInput
@@ -418,11 +426,13 @@ input DocumentUpdateManyWithoutTypeInput {
 }
 
 input DocumentUpdateWithoutAuthorDataInput {
+  publishDate: DateTime
   title: String
   type: DocumentTypeUpdateOneWithoutDocumentsInput
 }
 
 input DocumentUpdateWithoutTypeDataInput {
+  publishDate: DateTime
   title: String
   author: UserUpdateOneWithoutDocumentsInput
 }
@@ -498,6 +508,28 @@ input DocumentWhereInput {
 
   """All values not ending with the given string."""
   id_not_ends_with: ID
+  publishDate: DateTime
+
+  """All values that are not equal to given value."""
+  publishDate_not: DateTime
+
+  """All values that are contained in given list."""
+  publishDate_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  publishDate_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  publishDate_lt: DateTime
+
+  """All values less than or equal the given value."""
+  publishDate_lte: DateTime
+
+  """All values greater than the given value."""
+  publishDate_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  publishDate_gte: DateTime
   title: String
 
   """All values that are not equal to given value."""

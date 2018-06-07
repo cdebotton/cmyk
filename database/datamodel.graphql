@@ -26,6 +26,7 @@ type DocumentType {
 
 type Document {
   id: ID! @unique
+  publishDate: DateTime!
   title: String!
   type: DocumentType!
   author: User

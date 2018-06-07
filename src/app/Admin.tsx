@@ -11,6 +11,10 @@ import AdminLayout from './components/layouts/AdminLayout';
 import SessionContext from './containers/SessionContext';
 import { logout } from './lib/Auth';
 import Heading from './components/atoms/Heading';
+import PageLink from './components/molecules/PageLink';
+import faDesktop from '@fortawesome/fontawesome-free-solid/faDesktop';
+import faFolderOpen from '@fortawesome/fontawesome-free-solid/faFolderOpen';
+import faUsers from '@fortawesome/fontawesome-free-solid/faUsers';
 
 type Props = RouteComponentProps<{}>;
 
@@ -23,9 +27,15 @@ const Admin: SFC<Props> = ({ match }) => (
             title={<Heading level={1}>CMYK</Heading>}
             pages={
               <Fragment>
-                <Link to={match.url}>Dashboard</Link>
-                <Link to={`${match.url}/documents`}>Documents</Link>
-                <Link to={`${match.url}/users`}>Users</Link>
+                <PageLink to={match.url} icon={faDesktop}>
+                  Dashboard
+                </PageLink>
+                <PageLink to={`${match.url}/documents`} icon={faFolderOpen}>
+                  Documents
+                </PageLink>
+                <PageLink to={`${match.url}/users`} icon={faUsers}>
+                  Users
+                </PageLink>
               </Fragment>
             }
             actions={
