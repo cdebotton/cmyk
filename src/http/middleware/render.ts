@@ -18,9 +18,9 @@ const tail = () => {
 
   return (
     '</main>' +
-    `<script src="${publicPath}/vendors~bundle.js"></script>` +
-    `<script src="${publicPath}/runtime~bundle.js"></script>` +
-    `<script src="${publicPath}/bundle.js"></script>` +
+    `<script src="${publicPath}/vendors~bundle.js" defer></script>` +
+    `<script src="${publicPath}/runtime~bundle.js" defer></script>` +
+    `<script src="${publicPath}/bundle.js" defer></script>` +
     '</body>' +
     '</html>'
   );

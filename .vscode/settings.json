@@ -9,5 +9,14 @@
     "*-error.log": true,
     "dist": true
   },
-  "stylelint.enable": true
+  "stylelint.enable": true,
+  "tslint.enable": false,
+  "eslint.enable": true,
+  "eslint.autoFixOnSave": true,
+  "eslint.validate": [
+    "javascript",
+    "javascriptreact",
+    "typescript",
+    "typescriptreact"
+  ]
 }
