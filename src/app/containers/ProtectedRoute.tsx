@@ -23,7 +23,7 @@ function ProtectedRoute<T extends RouteProps>({
               to={{
                 pathname: redirectOnBlock,
                 state: {
-                  from: props.location,
+                  redirectedFrom: props.location,
                 },
               }}
             />

@@ -5,8 +5,9 @@ import { injectGlobal, SimpleInterpolation } from 'styled-components';
 import { normalize } from 'polished';
 import Loadable from 'react-loadable';
 import PageLoader from './components/molecules/PageLoader';
-import Session from './containers/Session';
-import { ApolloError } from 'apollo-client';
+import SessionContext, { Session } from './containers/SessionContext';
+import { Query, QueryResult } from 'react-apollo';
+import gql from 'graphql-tag';
 
 const Admin = Loadable({
   loader: () => import('./Admin'),
@@ -33,20 +34,44 @@ injectGlobal`
   }
 `;
 
-const ErrorComponent: SFC<{ error: ApolloError }> = () => (
-  <div>
-    <p>Uh oh</p>
-  </div>
-);
+const getSessionQuery = gql`
+  query GetSession {
+    session {
+      iat
+      userId
+    }
+  }
+`;
+
+type SessionQueryResponse = {
+  session: Session | null;
+};
 
 const Root: SFC = () => (
-  <Session.Provider loading={PageLoader} error={ErrorComponent}>
-    <Switch>
-      <Route path="/admin" component={Admin} />
-      <Route path="/login" component={Login} />
-      <Route component={Public} />
-    </Switch>
-  </Session.Provider>
+  <Query query={getSessionQuery}>
+    {({ data, error, client }: QueryResult<SessionQueryResponse>) => {
+      if (!data) {
+        return <PageLoader />;
+      }
+
+      if (error) {
+        console.warn(error);
+        return null;
+      }
+
+      return (
+        <SessionContext.Provider
+          value={{ resetStore: client.resetStore, session: data.session }}
+        >
+          <Switch>
+            <Route path="/admin" component={Admin} />
+            <Route path="/login" component={Login} />
+            <Route component={Public} />
+          </Switch>
+        </SessionContext.Provider>
+      );
+    }}
+  </Query>
 );
 
 export default hot(module)(Root);

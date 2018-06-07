@@ -1,4 +1,4 @@
-import { Middleware, Context } from 'koa';
+import { Middleware } from 'koa';
 
 const head = () => {
   return (
@@ -11,15 +11,13 @@ const head = () => {
   );
 };
 
-const tail = (session: Session | null) => {
+const tail = () => {
   const { NODE_ENV = 'development' } = process.env;
   const publicPath =
     NODE_ENV === 'development' ? 'https://localhost:3001' : '/dist';
-  const sessionString = JSON.stringify(session).replace(/</g, '\\u003c');
 
   return (
     '</main>' +
-    `<script>window.__SESSION__ = ${sessionString};</script>` +
     `<script src="${publicPath}/vendors~bundle.js"></script>` +
     `<script src="${publicPath}/runtime~bundle.js"></script>` +
     `<script src="${publicPath}/bundle.js"></script>` +
@@ -28,27 +26,8 @@ const tail = (session: Session | null) => {
   );
 };
 
-type Bundle = {
-  id: number;
-  name: string;
-  file: string;
-};
-
-type Session = {
-  userId: string;
-  iat: number;
-};
-
-type CallbackResponse = {
-  session: Session | null;
-};
-
-type Callback = (ctx: Context, next: () => Promise<any>) => CallbackResponse;
-
-const render = (callback: Callback): Middleware => async (ctx, next) => {
-  const { session } = callback(ctx, next);
-
-  ctx.body = head() + tail(session);
+const render = (): Middleware => async ctx => {
+  ctx.body = head() + tail();
 };
 
 export default render;

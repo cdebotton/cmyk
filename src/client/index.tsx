@@ -1,3 +1,5 @@
+import '@babel/polyfill';
+
 import { ApolloClient } from 'apollo-client';
 import { InMemoryCache } from 'apollo-cache-inmemory';
 import { from } from 'apollo-link';

@@ -2,9 +2,17 @@ require('dotenv').config();
 
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
+import { Context as KoaContext } from 'koa';
 import { importSchema } from 'graphql-import';
-import { makeExecutableSchema, IResolvers } from 'graphql-tools';
+import {
+  makeExecutableSchema,
+  IResolvers,
+  SchemaDirectiveVisitor,
+} from 'graphql-tools';
 import { Prisma } from 'prisma-binding';
+import getTokenFromAuthorization from './libs/getTokenFromHeader';
+import { createError } from 'apollo-errors';
+import { GraphQLField, GraphQLEnumValue } from 'graphql';
 
 const typeDefs = importSchema('./src/http/schema/schema.graphql');
 const { JWT_SECRET } = process.env;
@@ -13,16 +21,31 @@ if (!JWT_SECRET) {
   throw new Error('You did not provide a JWT_SECRET env variable');
 }
 
-type Session = { userId: string; iat: number };
-
-type Context = {
-  session: Session | null;
+export type Context = KoaContext & {
   db: Prisma;
 };
 
+const InvalidCredentialsError = createError('InvalidCredentialsError', {
+  message: 'The credentials provided for authentication are incorrect',
+});
+
 const resolvers: IResolvers<{}, Context> = {
   Query: {
-    session: (parent, args, context, info) => context.session,
+    session: (parent, args, context, info) => {
+      const token = getTokenFromAuthorization(
+        context.req.headers.authorization,
+      );
+
+      if (!token) {
+        return null;
+      }
+
+      try {
+        return jwt.verify(token, JWT_SECRET);
+      } catch (err) {
+        return null;
+      }
+    },
     users: (parent, args, context, info) => {
       return context.db.query.users({}, info);
     },
@@ -32,7 +55,13 @@ const resolvers: IResolvers<{}, Context> = {
       const salt = await bcrypt.genSalt(10);
       const hashedPassword = await bcrypt.hash(input.password, salt);
       return context.db.mutation.createUser(
-        { data: { email: input.email, password: hashedPassword } },
+        {
+          data: {
+            email: input.email,
+            password: hashedPassword,
+            role: input.role,
+          },
+        },
         info,
       );
     },
@@ -50,13 +79,13 @@ const resolvers: IResolvers<{}, Context> = {
       });
 
       if (!user) {
-        throw new Error();
+        throw new InvalidCredentialsError();
       }
 
       const valid = await bcrypt.compare(password, user.password);
 
       if (!valid) {
-        throw new Error();
+        throw new InvalidCredentialsError();
       }
 
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);

@@ -15,7 +15,6 @@ import responseTime from './middleware/responseTime';
 import render from './middleware/render';
 import reportErrors from './middleware/reportErrors';
 import schema from './schema';
-import getSessionUserFromContext from './utils/getSessionUserFromContext';
 
 const {
   PORT = '3000',
@@ -45,7 +44,7 @@ const run = async () => {
     graphqlKoa(ctx => ({
       schema,
       context: {
-        session: getSessionUserFromContext(ctx),
+        ...ctx,
         db: prisma,
       },
     })),
@@ -67,12 +66,7 @@ const run = async () => {
     );
   }
 
-  app.use(
-    render(ctx => {
-      const session = getSessionUserFromContext(ctx);
-      return { session };
-    }),
-  );
+  app.use(render());
 
   server.listen(PORT, () => {
     const info = server.address();

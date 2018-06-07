@@ -1,5 +1,22 @@
+enum Role {
+  ADMIN
+  USER
+  UNAUTHORIZED
+}
+
 type User {
   id: ID! @unique
   email: String! @unique
   password: String!
+  role: Role! @default(value: UNAUTHORIZED)
+  lastLogin: DateTime
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Document {
+  id: ID! @unique
+  author: User
+  createdAt: DateTime!
+  updatedAt: DateTime!
 }

@@ -1,19 +1,20 @@
 import React, { SFC, Fragment } from 'react';
 import { Switch, Route, RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
-import AdminNavigation from './components/layouts/AdminNavigation';
+import AdminNavigation from './components/organisms/AdminNavigation';
 import ProtectedRoute from './containers/ProtectedRoute';
 import AdminDashboard from './AdminDashboard';
 import AdminUsers from './AdminUsers';
 import NotFound from './NotFound';
 import AdminLayout from './components/layouts/AdminLayout';
-import Session from './containers/Session';
+import SessionContext from './containers/SessionContext';
+import { logout } from './lib/Auth';
 
 type Props = RouteComponentProps<{}>;
 
 const Admin: SFC<Props> = ({ match }) => (
-  <Session.Consumer>
-    {session => (
+  <SessionContext.Consumer>
+    {({ session, resetStore }) => (
       <AdminLayout
         navigation={
           <AdminNavigation
@@ -25,7 +26,15 @@ const Admin: SFC<Props> = ({ match }) => (
             }
             actions={
               <Fragment>
-                <button type="button">Logout</button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    logout();
+                    resetStore();
+                  }}
+                >
+                  Logout
+                </button>
               </Fragment>
             }
           />
@@ -49,7 +58,7 @@ const Admin: SFC<Props> = ({ match }) => (
         }
       />
     )}
-  </Session.Consumer>
+  </SessionContext.Consumer>
 );
 
 export default Admin;
