@@ -1,14 +1,13 @@
 import React, { SFC } from 'react';
-import Page from './components/atoms/Page';
 import { Switch, Route } from 'react-router';
 import NotFound from './NotFound';
 
 const Public: SFC = () => (
-  <Page>
+  <div>
     <Switch>
       <Route component={NotFound} />
     </Switch>
-  </Page>
+  </div>
 );
 
 export default Public;

@@ -1,36 +1,46 @@
 import React, { SFC, ReactNode } from 'react';
 import styled from 'styled-components';
 import { rem } from 'polished';
+import Avatar from '../atoms/Avatar';
+import CMYKLogo from '../molecules/CMYKLogo';
+import PageLink from '../molecules/PageLink';
+import colors from '../../theme/colors';
 
 type Props = {
   className?: string;
+  title: ReactNode;
   pages: ReactNode;
   actions: ReactNode;
 };
 
-const PageContainer = styled.div`
-  display: flex;
-  flex-flow: row nowrap;
-  grid-column: span 1;
-  grid-row: span 1;
+const Title = styled.div`
+  position: relative;
+  margin: ${rem(10)} 0;
+  writing-mode: vertical-lr;
+`;
+
+const PagesContainer = styled.div`
+  position: relative;
 `;
 
 const ActionsContainer = styled.div`
-  display: grid;
-  grid-column: span 1;
-  grid-row: span 1;
+  position: relative;
 `;
 
-const AdminNavigation: SFC<Props> = ({ actions, className, pages }) => (
+const AdminNavBar: SFC<Props> = ({ actions, className, pages, title }) => (
   <nav className={className}>
-    <PageContainer>{pages}</PageContainer>
+    <Title>
+      <CMYKLogo level={1}>{title}</CMYKLogo>
+    </Title>
+    <Avatar />
+    <PagesContainer>{pages}</PagesContainer>
     <ActionsContainer>{actions}</ActionsContainer>
   </nav>
 );
 
-export default styled(AdminNavigation)`
+export default styled(AdminNavBar)`
   position: relative;
   display: grid;
-  padding-right: ${rem(20)};
-  grid-template-columns: auto min-content;
+  background-color: ${colors.palette.dark[1]};
+  grid-template-rows: min-content min-content auto min-content;
 `;

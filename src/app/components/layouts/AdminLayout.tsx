@@ -1,50 +1,36 @@
 import React, { SFC, ReactNode } from 'react';
-import styled from 'styled-components';
+import styled, { ThemedStyledProps } from 'styled-components';
 import { rem } from 'polished';
+import colors from '../../theme/colors';
+import { Theme } from '../../theme';
 
 type Props = {
   className?: string;
-  title: ReactNode;
-  navigation: ReactNode;
+  controls: ReactNode;
   content: ReactNode;
 };
 
-const AdminLayout: SFC<Props> = ({ className, content, navigation, title }) => (
+const AdminLayout: SFC<Props> = ({ className, content, controls }) => (
   <div className={className}>
-    {title}
-    {navigation}
+    {controls}
     {content}
   </div>
 );
+
+const getBackgroundColor = (props: ThemedStyledProps<Props, Theme>) => {
+  switch (props.theme.mode) {
+    case 'dark':
+      return colors.palette.dark[0];
+    default:
+      return '#fff';
+  }
+};
 
 export default styled(AdminLayout)`
   display: grid;
   overflow: auto;
   width: 100%;
   min-height: 100vh;
+  background-color: ${getBackgroundColor};
   grid-template-columns: min-content auto;
-  grid-template-rows: min-content auto;
-
-  & > *:nth-child(1) {
-    padding: ${rem(10)} ${rem(10)};
-    background-color: hsl(200, 10%, 10%);
-    color: hsl(240, 99%, 99%);
-    grid-column: span 1;
-    grid-row: span 2;
-    writing-mode: vertical-lr;
-  }
-
-  & > *:nth-child(2) {
-    padding: ${rem(10)};
-    background-color: hsl(200, 10%, 10%);
-    color: hsl(240, 99%, 99%);
-    grid-column: 2 / span 1;
-    grid-row: span 1;
-  }
-
-  & > *:nth-child(3) {
-    padding: ${rem(10)};
-    grid-column: 2 / span 1;
-    grid-row: 2 / span 1;
-  }
 `;

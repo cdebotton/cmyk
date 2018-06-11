@@ -1,5 +1,6 @@
 const path = require('path');
 const webpack = require('webpack');
+const ErrorOverlayPlugin = require('error-overlay-webpack-plugin');
 
 const { NODE_ENV = 'development' } = process.env;
 
@@ -75,5 +76,6 @@ module.exports = {
       },
     }),
     new webpack.optimize.SplitChunksPlugin(),
+    new ErrorOverlayPlugin(),
   ],
 };

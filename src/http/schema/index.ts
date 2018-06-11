@@ -43,6 +43,9 @@ const resolvers: IResolvers<{}, Context> = {
         return null;
       }
     },
+    user: (parent, args, context, info) => {
+      return context.db.query.user({ where: args.where }, info);
+    },
     users: (parent, args, context, info) => {
       return context.db.query.users({}, info);
     },
@@ -63,6 +66,15 @@ const resolvers: IResolvers<{}, Context> = {
             role: input.role,
             profile: input.profile,
           },
+        },
+        info,
+      );
+    },
+    updateUser: async (parent, { data, where }, context, info) => {
+      return context.db.mutation.updateUser(
+        {
+          data,
+          where,
         },
         info,
       );
@@ -91,6 +103,11 @@ const resolvers: IResolvers<{}, Context> = {
       }
 
       const token = jwt.sign({ userId: user.id }, JWT_SECRET);
+
+      await context.db.mutation.updateUser({
+        where: { id: user.id },
+        data: { lastLogin: new Date() },
+      });
 
       return { token };
     },

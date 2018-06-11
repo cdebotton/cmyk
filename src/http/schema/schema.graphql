@@ -1,15 +1,19 @@
 # import User from "./generated/prisma.graphql"
 # import UserCreateInput from "./generated/prisma.graphql"
+# import UserUpdateInput from "./generated/prisma.graphql"
+# import UserWhereUniqueInput from "./generated/prisma.graphql"
 
 type Query {
   session: User
+  user(where: UserWhereUniqueInput!): User
   users: [User!]!
   documents: [Document!]!
 }
 
 type Mutation {
   authenticate(input: AuthenticateInput!): AuthenticatePayload
-  createUser(input:UserCreateInput!): User
+  createUser(input: UserCreateInput!): User
+  updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   deleteUser(where: UserWhereUniqueInput!): User
 }
 

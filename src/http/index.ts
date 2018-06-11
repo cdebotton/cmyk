@@ -31,13 +31,6 @@ const run = async () => {
   const router = new Router();
   const { cert, key } = await getCertificate();
   const server = http.createSecureServer({ cert, key }, app.callback());
-  const prisma = new Prisma({
-    typeDefs: 'src/http/schema/generated/prisma.graphql',
-
-    endpoint: 'http://localhost:4466',
-    secret: PRISMA_SECRET,
-    debug: NODE_ENV === 'development',
-  });
 
   router.post(
     '/graphql',
@@ -46,7 +39,12 @@ const run = async () => {
       schema,
       context: {
         ...ctx,
-        db: prisma,
+        db: new Prisma({
+          typeDefs: 'src/http/schema/generated/prisma.graphql',
+          endpoint: 'http://localhost:4466',
+          secret: PRISMA_SECRET,
+          debug: NODE_ENV === 'development',
+        }),
       },
     })),
   );
