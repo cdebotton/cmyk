@@ -4,13 +4,11 @@ import Loadable from 'react-loadable';
 import gql from 'graphql-tag';
 import Heading from './components/atoms/Heading';
 import PageLoader from './components/molecules/PageLoader';
-import AdminCreateUser from './AdminCreateUser';
 import { RouteComponentProps } from 'react-router-dom';
 import SessionContext from './containers/SessionContext';
 import Page from './components/atoms/Page';
 import List from './components/molecules/List';
 import UserLabel from './components/molecules/UserLabel';
-import UserDescription from './components/molecules/UserDescription';
 
 const AdminEditUser = Loadable({
   loader: () => import('./AdminEditUser'),
@@ -45,8 +43,8 @@ type User = {
   email: string;
   role: 'ADMIN' | 'EDITOR' | 'USER' | 'UNAUTHORIZED';
   profile: {
-    firstName: string;
-    lastName: string;
+    firstName: string | null;
+    lastName: string | null;
   };
   lastLogin: string | null;
 };
@@ -72,30 +70,27 @@ const AdminUsers: SFC<Props> = ({ match }) => (
         }
 
         return (
-          <List
-            items={data.users}
-            label={(user: User) => (
-              <UserLabel to={`${match.url}/${user.id}`} user={user} />
-            )}
-            description={(user: User) => (
-              <SessionContext.Consumer>
-                {({ session }) => (
-                  <Mutation
-                    mutation={deleteUserMutation}
-                    update={updateOnDelete}
-                  >
-                    {deleteUser => (
-                      <UserDescription
-                        isCurrentUser={session && session.id === user.id}
+          <SessionContext.Consumer>
+            {({ session }) => (
+              <Mutation mutation={deleteUserMutation} update={updateOnDelete}>
+                {deleteUser => (
+                  <List
+                    items={data.users}
+                    listItem={(user: User) => (
+                      <UserLabel
+                        to={`${match.url}/${user.id}`}
                         user={user}
+                        isCurrentUser={
+                          (session && session.id === user.id) || false
+                        }
                         deleteUser={deleteUser}
                       />
                     )}
-                  </Mutation>
+                  />
                 )}
-              </SessionContext.Consumer>
+              </Mutation>
             )}
-          />
+          </SessionContext.Consumer>
         );
       }}
     </Query>

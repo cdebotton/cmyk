@@ -9,25 +9,20 @@ type Props = {
   keyProp?: string;
   keyPrefix?: string;
   items: any[];
-  label: (item: any) => ReactNode;
-  description: (item: any) => ReactNode;
+  listItem: (item: any) => ReactNode;
   children?: never;
 };
 
 const List: SFC<Props> = ({
   className,
-  description,
   items,
-  label,
+  listItem,
   keyProp = 'id',
   keyPrefix = 'LIST_ITEM_',
 }) => (
   <ul className={className}>
     {items.map(item => (
-      <ListItem key={`${keyPrefix}${item[keyProp]}`}>
-        {label(item)}
-        {description(item)}
-      </ListItem>
+      <ListItem key={`${keyPrefix}${item[keyProp]}`}>{listItem(item)}</ListItem>
     ))}
   </ul>
 );
