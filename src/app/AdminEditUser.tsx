@@ -22,7 +22,9 @@ type EditUserResponse = {
   };
 };
 
-type UpdateUserData = {};
+type UpdateUserData = {
+  updateUser: EditUserResponse;
+};
 
 type UpdateUserVariables = {
   where: { id: string };

@@ -6,7 +6,7 @@ declare module '@fortawesome/react-fontawesome' {
     IconPrefix,
   } from '@fortawesome/fontawesome-common-types';
 
-  interface Props {
+  export interface FontAwesomeIconProps {
     border?: boolean;
     className?: string;
     fixedWidth?: boolean;
@@ -36,7 +36,7 @@ declare module '@fortawesome/react-fontawesome' {
     transform?: string | { [x: string]: any };
   }
 
-  const FontAwesomeIcon: ComponentType<Props>;
+  const FontAwesomeIcon: ComponentType<FontAwesomeIconProps>;
 
   export default FontAwesomeIcon;
 }

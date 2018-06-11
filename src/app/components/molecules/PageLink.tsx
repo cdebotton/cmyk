@@ -1,13 +1,15 @@
 import React, { SFC, ReactNode } from 'react';
-import { NavLink, NavLinkProps } from 'react-router-dom';
-import FontAwesomeIcon from '@fortawesome/react-fontawesome';
+import { Link, NavLinkProps, Route } from 'react-router-dom';
+import FontAwesomeIcon, {
+  FontAwesomeIconProps,
+} from '@fortawesome/react-fontawesome';
 import {
   IconDefinition,
   IconName,
   IconPrefix,
 } from '@fortawesome/fontawesome-common-types';
 import styled from 'styled-components';
-import { rem, modularScale } from 'polished';
+import { rem } from 'polished';
 import colors from '../../theme/colors';
 import Reducer, { ReducerFn } from '../../containers/Reducer';
 
@@ -16,10 +18,17 @@ type Props = NavLinkProps & {
   icon: IconDefinition | IconName | [IconPrefix, IconName];
 };
 
-const Icon = styled(FontAwesomeIcon)`
+type IconLinkProps = FontAwesomeIconProps & { isActive: boolean };
+
+const IconWrapper: SFC<IconLinkProps> = ({ isActive: _, ...props }) => (
+  <FontAwesomeIcon {...props} />
+);
+
+const Icon = styled(IconWrapper)`
   position: relative;
   background-color: ${colors.palette.dark[1]};
-  color: ${colors.palette.dark[0]};
+  color: ${props =>
+    props.isActive ? colors.palette.light[0] : colors.palette.dark[0]};
   font-size: ${rem(34)};
 
   &:hover {
@@ -59,20 +68,38 @@ const hover: ReducerFn<boolean, HoverAction> = (state, action) => {
   }
 };
 
-const PageLink: SFC<Props> = ({ icon, label, ...props }) => (
-  <Reducer reducer={hover} initialValue={false}>
-    {({ value: isHovering, dispatch }) => (
-      <NavLink
-        {...props}
-        onMouseEnter={() => dispatch({ type: 'SET_HOVER', payload: true })}
-        onMouseLeave={() => dispatch({ type: 'SET_HOVER', payload: false })}
-      >
-        <Label show={isHovering}>{label}</Label>
-        <Icon transform="shrink-7" fixedWidth icon={icon} />
-      </NavLink>
-    )}
-  </Reducer>
-);
+const PageLink: SFC<Props> = ({ icon, label, to, ...props }) => {
+  const path = typeof to === 'object' ? to.pathname : to;
+
+  return (
+    <Route path={path} exact={props.exact} location={props.location}>
+      {({ match, location }) => (
+        <Reducer reducer={hover} initialValue={false}>
+          {({ value: isHovering, dispatch }) => (
+            <Link
+              {...props}
+              to={to}
+              onMouseEnter={() =>
+                dispatch({ type: 'SET_HOVER', payload: true })
+              }
+              onMouseLeave={() =>
+                dispatch({ type: 'SET_HOVER', payload: false })
+              }
+            >
+              <Label show={isHovering}>{label}</Label>
+              <Icon
+                transform="shrink-7"
+                fixedWidth
+                icon={icon}
+                isActive={match !== null}
+              />
+            </Link>
+          )}
+        </Reducer>
+      )}
+    </Route>
+  );
+};
 
 export default styled(PageLink)`
   position: relative;
