@@ -98,4 +98,4 @@ ssl
 !ssl/create-ssl.sh
 
 dist
-.migrations
+src/http/schema/generated
