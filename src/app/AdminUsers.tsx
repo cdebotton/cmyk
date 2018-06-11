@@ -5,9 +5,12 @@ import gql from 'graphql-tag';
 import Heading from './components/atoms/Heading';
 import PageLoader from './components/molecules/PageLoader';
 import AdminCreateUser from './AdminCreateUser';
-import { NavLink, RouteComponentProps, Route } from 'react-router-dom';
-import fromNow from './lib/fromNow';
-import SplitLayout from './components/layouts/SplitLayout';
+import { RouteComponentProps } from 'react-router-dom';
+import SessionContext from './containers/SessionContext';
+import Page from './components/atoms/Page';
+import List from './components/molecules/List';
+import UserLabel from './components/molecules/UserLabel';
+import UserDescription from './components/molecules/UserDescription';
 
 const AdminEditUser = Loadable({
   loader: () => import('./AdminEditUser'),
@@ -20,6 +23,10 @@ const getUsersQuery = gql`
       id
       email
       role
+      profile {
+        firstName
+        lastName
+      }
       lastLogin
     }
   }
@@ -33,70 +40,66 @@ const deleteUserMutation = gql`
   }
 `;
 
+type User = {
+  id: string;
+  email: string;
+  role: 'ADMIN' | 'EDITOR' | 'USER' | 'UNAUTHORIZED';
+  profile: {
+    firstName: string;
+    lastName: string;
+  };
+  lastLogin: string | null;
+};
+
 type Response = {
-  users: {
-    id: string;
-    email: string;
-    role: 'ADMIN' | 'EDITOR' | 'USER' | 'UNAUTHORIZED';
-    lastLogin: string | null;
-  }[];
+  users: User[];
 };
 
 type Props = RouteComponentProps<{}> & {};
 
 const AdminUsers: SFC<Props> = ({ match }) => (
-  <SplitLayout
-    left={
-      <div>
-        <Heading>Users</Heading>
-        <AdminCreateUser />
-        <Heading level={3}>All users</Heading>
-        <Query query={getUsersQuery}>
-          {({ data, error }: QueryResult<Response>) => {
-            if (error) {
-              return null;
-            }
+  <Page>
+    <Heading>Users</Heading>
+    {/* <AdminCreateUser /> */}
+    <Query query={getUsersQuery}>
+      {({ data, error }: QueryResult<Response>) => {
+        if (error) {
+          return null;
+        }
 
-            if (!data || !data.users) {
-              return <PageLoader />;
-            }
+        if (!data || !data.users) {
+          return <PageLoader />;
+        }
 
-            return (
-              <ul>
-                {data.users.map(user => (
-                  <li key={user.id}>
-                    <NavLink to={`${match.url}/${user.id}`}>
-                      {user.email}
-                    </NavLink>{' '}
-                    {user.role}
-                    {user.lastLogin ? fromNow(user.lastLogin) : 'Never'}
-                    <Mutation
-                      mutation={deleteUserMutation}
-                      update={updateOnDelete}
-                    >
-                      {mutationFn => (
-                        <button
-                          onClick={() =>
-                            mutationFn({
-                              variables: { where: { id: user.id } },
-                            })
-                          }
-                          type="button"
-                        >
-                          Delete
-                        </button>
-                      )}
-                    </Mutation>
-                  </li>
-                ))}
-              </ul>
-            );
-          }}
-        </Query>
-      </div>
-    }
-    right={<Route path={`${match.url}/:userId`} component={AdminEditUser} />}
-  />
+        return (
+          <List
+            items={data.users}
+            label={(user: User) => (
+              <UserLabel to={`${match.url}/${user.id}`} user={user} />
+            )}
+            description={(user: User) => (
+              <SessionContext.Consumer>
+                {({ session }) => (
+                  <Mutation
+                    mutation={deleteUserMutation}
+                    update={updateOnDelete}
+                  >
+                    {deleteUser => (
+                      <UserDescription
+                        isCurrentUser={session && session.id === user.id}
+                        user={user}
+                        deleteUser={deleteUser}
+                      />
+                    )}
+                  </Mutation>
+                )}
+              </SessionContext.Consumer>
+            )}
+          />
+        );
+      }}
+    </Query>
+  </Page>
 );
 
 type DeleteUserResponse = {

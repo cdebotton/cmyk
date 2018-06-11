@@ -28,7 +28,7 @@ const Icon = styled(IconWrapper)`
   position: relative;
   background-color: ${colors.palette.dark[1]};
   color: ${props =>
-    props.isActive ? colors.palette.light[0] : colors.palette.dark[0]};
+    props.isActive ? colors.palette.light[0] : colors.palette.dark[2]};
   font-size: ${rem(34)};
 
   &:hover {
@@ -52,9 +52,9 @@ const Label = styled(LabelComponent)`
   border-radius: 0 3px 3px 0;
   color: #fff;
   font-size: ${rem(12)};
-  transition: transform 175ms ease-in-out;
   transform: ${props =>
     props.show ? 'translate3d(0, 0, 0)' : 'translate3d(-100%, 0, 0)'};
+  transition: transform 175ms ease-in-out;
 `;
 
 type HoverAction = { type: 'SET_HOVER'; payload: boolean };
@@ -68,11 +68,11 @@ const hover: ReducerFn<boolean, HoverAction> = (state, action) => {
   }
 };
 
-const PageLink: SFC<Props> = ({ icon, label, to, ...props }) => {
+const PageLink: SFC<Props> = ({ icon, label, exact, to, ...props }) => {
   const path = typeof to === 'object' ? to.pathname : to;
 
   return (
-    <Route path={path} exact={props.exact} location={props.location}>
+    <Route path={path} exact={exact} location={props.location}>
       {({ match, location }) => (
         <Reducer reducer={hover} initialValue={false}>
           {({ value: isHovering, dispatch }) => (

@@ -2,21 +2,26 @@ import React, { SFC, ReactNode } from 'react';
 import styled from 'styled-components';
 import { rem } from 'polished';
 import Avatar from '../atoms/Avatar';
-import CMYKLogo from '../molecules/CMYKLogo';
-import PageLink from '../molecules/PageLink';
 import colors from '../../theme/colors';
 
 type Props = {
   className?: string;
+  flat?: boolean;
+  depth?: number;
   title: ReactNode;
   pages: ReactNode;
-  actions: ReactNode;
+  actions?: ReactNode;
 };
 
-const Title = styled.div`
+const TitleComponent: SFC<{ vertical?: boolean }> = ({
+  vertical: _,
+  ...props
+}) => <div {...props} />;
+
+const Title = styled(TitleComponent)`
   position: relative;
   margin: ${rem(10)} 0;
-  writing-mode: vertical-lr;
+  writing-mode: ${props => (props.vertical ? 'vertical-lr' : 'inherit')};
 `;
 
 const PagesContainer = styled.div`
@@ -27,14 +32,18 @@ const ActionsContainer = styled.div`
   position: relative;
 `;
 
-const AdminNavBar: SFC<Props> = ({ actions, className, pages, title }) => (
+const AdminNavBar: SFC<Props> = ({
+  actions,
+  className,
+  pages,
+  title,
+  flat,
+}) => (
   <nav className={className}>
-    <Title>
-      <CMYKLogo level={1}>{title}</CMYKLogo>
-    </Title>
+    <Title vertical={flat}>{title}</Title>
     <Avatar />
     <PagesContainer>{pages}</PagesContainer>
-    <ActionsContainer>{actions}</ActionsContainer>
+    {actions && <ActionsContainer>{actions}</ActionsContainer>}
   </nav>
 );
 

@@ -2,8 +2,15 @@ import { createContext } from 'react';
 import { ApolloQueryResult } from 'apollo-client';
 
 export type Session = {
-  userId: string;
-  iat: number;
+  id: string;
+  email: string;
+  profile: {
+    firstName: string;
+    lastName: string;
+  };
+  lastLogin: string;
+  createdAt: string;
+  updatedAt: string;
 };
 
 type Value = {

@@ -1,10 +1,11 @@
 import React, { SFC, Fragment } from 'react';
 import gql from 'graphql-tag';
 import { Query, QueryResult, Mutation, MutationFn } from 'react-apollo';
-import PageLoader from './components/molecules/PageLoader';
 import { RouteComponentProps } from 'react-router';
-import Heading from './components/atoms/Heading';
 import { Formik, Field } from 'formik';
+import * as yup from 'yup';
+import PageLoader from './components/molecules/PageLoader';
+import Heading from './components/atoms/Heading';
 
 type Props = RouteComponentProps<{
   userId: string;
@@ -40,6 +41,19 @@ type UpdateUserVariables = {
   };
 };
 
+const validationSchema = yup.object().shape({
+  email: yup
+    .string()
+    .required()
+    .email(),
+  role: yup
+    .string()
+    .oneOf(['ADMIN', 'EDITOR', 'USER', 'UNAUTHORIZED'])
+    .required(),
+  firstName: yup.string().required(),
+  lastName: yup.string().required(),
+});
+
 const AdminEditUser: SFC<Props> = ({
   match: {
     params: { userId },
@@ -65,6 +79,7 @@ const AdminEditUser: SFC<Props> = ({
               ) => (
                 <Formik
                   key={data.user.id}
+                  validationSchema={validationSchema}
                   initialValues={{
                     email: data.user.email,
                     role: data.user.role,
@@ -89,7 +104,7 @@ const AdminEditUser: SFC<Props> = ({
                     });
                   }}
                 >
-                  {({ handleSubmit }) => (
+                  {({ handleSubmit, isValid }) => (
                     <form onSubmit={handleSubmit}>
                       <Field type="email" component="input" name="email" />
                       <Field component="select" name="role">
@@ -100,7 +115,9 @@ const AdminEditUser: SFC<Props> = ({
                       </Field>
                       <Field type="text" component="input" name="firstName" />
                       <Field type="text" component="input" name="lastName" />
-                      <button type="submit">Save</button>
+                      <button type="submit" disabled={!isValid}>
+                        Save
+                      </button>
                     </form>
                   )}
                 </Formik>

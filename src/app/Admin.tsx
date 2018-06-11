@@ -22,6 +22,7 @@ import SessionContext from './containers/SessionContext';
 import { logout } from './lib/Auth';
 import AdminNavBar from './components/organisms/AdminNavBar';
 import Page from './components/atoms/Page';
+import CMYKLogo from './components/molecules/CMYKLogo';
 
 type Props = RouteComponentProps<{}>;
 
@@ -31,7 +32,8 @@ const Admin: SFC<Props> = ({ match }) => (
       <AdminLayout
         controls={
           <AdminNavBar
-            title="CMYK"
+            flat
+            title={<CMYKLogo level={1}>CMYK</CMYKLogo>}
             pages={
               <Fragment>
                 <PageLink
@@ -66,27 +68,25 @@ const Admin: SFC<Props> = ({ match }) => (
           />
         }
         content={
-          <Page>
-            <Switch>
-              <ProtectedRoute
-                exact
-                path={match.url}
-                component={AdminDashboard}
-                isBlocked={session === null}
-              />
-              <ProtectedRoute
-                path={`${match.url}/documents`}
-                component={AdminDocuments}
-                isBlocked={session === null}
-              />
-              <ProtectedRoute
-                path={`${match.url}/users`}
-                component={AdminUsers}
-                isBlocked={session === null}
-              />
-              <Route component={NotFound} />
-            </Switch>
-          </Page>
+          <Switch>
+            <ProtectedRoute
+              exact
+              path={match.url}
+              component={AdminDashboard}
+              isBlocked={session === null}
+            />
+            <ProtectedRoute
+              path={`${match.url}/documents`}
+              component={AdminDocuments}
+              isBlocked={session === null}
+            />
+            <ProtectedRoute
+              path={`${match.url}/users`}
+              component={AdminUsers}
+              isBlocked={session === null}
+            />
+            <Route component={NotFound} />
+          </Switch>
         }
       />
     )}

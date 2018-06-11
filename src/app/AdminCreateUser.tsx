@@ -11,6 +11,10 @@ const createUserMutation = gql`
       id
       email
       role
+      profile {
+        firstName
+        lastName
+      }
       lastLogin
     }
   }

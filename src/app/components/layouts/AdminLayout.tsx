@@ -20,7 +20,7 @@ const AdminLayout: SFC<Props> = ({ className, content, controls }) => (
 const getBackgroundColor = (props: ThemedStyledProps<Props, Theme>) => {
   switch (props.theme.mode) {
     case 'dark':
-      return colors.palette.dark[0];
+      return colors.palette.dark[2];
     default:
       return '#fff';
   }

@@ -19,5 +19,5 @@ export default styled(CMYKLogo)`
   position: relative;
   padding: ${rem(20)} 0;
   margin: 0;
-  color: ${colors.palette.dark[0]};
+  color: ${colors.palette.dark[2]};
 `;
