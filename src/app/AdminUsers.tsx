@@ -4,11 +4,12 @@ import Loadable from 'react-loadable';
 import gql from 'graphql-tag';
 import Heading from './components/atoms/Heading';
 import PageLoader from './components/molecules/PageLoader';
-import { RouteComponentProps } from 'react-router-dom';
+import { RouteComponentProps, Route } from 'react-router-dom';
 import SessionContext from './containers/SessionContext';
 import Page from './components/atoms/Page';
 import List from './components/molecules/List';
 import UserLabel from './components/molecules/UserLabel';
+import SplitLayout from './components/layouts/SplitLayout';
 
 const AdminEditUser = Loadable({
   loader: () => import('./AdminEditUser'),
@@ -26,14 +27,8 @@ const getUsersQuery = gql`
         lastName
       }
       lastLogin
-    }
-  }
-`;
-
-const deleteUserMutation = gql`
-  mutation DeleteUser($where: UserWhereUniqueInput!) {
-    deleteUser(where: $where) {
-      id
+      createdAt
+      updatedAt
     }
   }
 `;
@@ -42,6 +37,8 @@ type User = {
   id: string;
   email: string;
   role: 'ADMIN' | 'EDITOR' | 'USER' | 'UNAUTHORIZED';
+  createdAt: string;
+  updatedAt: string;
   profile: {
     firstName: string | null;
     lastName: string | null;
@@ -58,75 +55,41 @@ type Props = RouteComponentProps<{}> & {};
 const AdminUsers: SFC<Props> = ({ match }) => (
   <Page>
     <Heading>Users</Heading>
-    {/* <AdminCreateUser /> */}
-    <Query query={getUsersQuery}>
-      {({ data, error }: QueryResult<Response>) => {
-        if (error) {
-          return null;
-        }
+    <SplitLayout
+      left={
+        <Query query={getUsersQuery}>
+          {({ data, error }: QueryResult<Response>) => {
+            if (error) {
+              return null;
+            }
 
-        if (!data || !data.users) {
-          return <PageLoader />;
-        }
+            if (!data || !data.users) {
+              return <PageLoader />;
+            }
 
-        return (
-          <SessionContext.Consumer>
-            {({ session }) => (
-              <Mutation mutation={deleteUserMutation} update={updateOnDelete}>
-                {deleteUser => (
+            return (
+              <SessionContext.Consumer>
+                {({ session }) => (
                   <List
                     items={data.users}
-                    listItem={(user: User) => (
-                      <UserLabel
-                        to={`${match.url}/${user.id}`}
-                        user={user}
-                        isCurrentUser={
-                          (session && session.id === user.id) || false
-                        }
-                        deleteUser={deleteUser}
-                      />
-                    )}
+                    generateKey={props => `USER_${props.id}`}
+                    transformProps={props => ({
+                      ...props,
+                      to: `${match.url}/${props.id}`,
+                      isCurrentUser:
+                        (session && session.id === props.id) || false,
+                    })}
+                    renderItem={props => <UserLabel {...props} />}
                   />
                 )}
-              </Mutation>
-            )}
-          </SessionContext.Consumer>
-        );
-      }}
-    </Query>
+              </SessionContext.Consumer>
+            );
+          }}
+        </Query>
+      }
+      right={<Route path={`${match.url}/:userId`} component={AdminEditUser} />}
+    />
   </Page>
 );
-
-type DeleteUserResponse = {
-  deleteUser: {
-    id: string;
-  };
-};
-
-const updateOnDelete: MutationUpdaterFn<DeleteUserResponse> = (
-  cache,
-  result,
-) => {
-  if (!result.data) {
-    return;
-  }
-
-  const cacheResult = cache.readQuery<Response>({
-    query: getUsersQuery,
-  });
-
-  if (!cacheResult) {
-    return;
-  }
-
-  const removedId = result.data.deleteUser.id;
-
-  cache.writeQuery({
-    query: getUsersQuery,
-    data: {
-      users: cacheResult.users.filter(user => user.id !== removedId),
-    },
-  });
-};
 
 export default AdminUsers;

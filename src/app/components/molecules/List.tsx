@@ -1,31 +1,33 @@
-import React, { ReactNode, SFC } from 'react';
+import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 import { rem } from 'polished';
 
-type Node = { id: any };
-
 type Props = {
   className?: string;
-  keyProp?: string;
-  keyPrefix?: string;
+  transformProps?: (props: any) => any;
+  generateKey: (props: any) => string;
   items: any[];
-  listItem: (item: any) => ReactNode;
+  renderItem: (props: any) => ReactNode;
   children?: never;
 };
 
-const List: SFC<Props> = ({
-  className,
-  items,
-  listItem,
-  keyProp = 'id',
-  keyPrefix = 'LIST_ITEM_',
-}) => (
-  <ul className={className}>
-    {items.map(item => (
-      <ListItem key={`${keyPrefix}${item[keyProp]}`}>{listItem(item)}</ListItem>
-    ))}
-  </ul>
-);
+function List<T>(props: Props) {
+  const { className, items, renderItem, generateKey, transformProps } = props;
+
+  return (
+    <ul className={className}>
+      {items.map(item => {
+        const itemProps = transformProps ? transformProps(item) : item;
+
+        return (
+          <ListItem key={`${generateKey(item)}`}>
+            {renderItem(itemProps)}
+          </ListItem>
+        );
+      })}
+    </ul>
+  );
+}
 
 const ListItem = styled.li`
   display: flex;

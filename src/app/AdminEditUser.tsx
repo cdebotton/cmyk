@@ -104,7 +104,7 @@ const AdminEditUser: SFC<Props> = ({
                     });
                   }}
                 >
-                  {({ handleSubmit, isValid }) => (
+                  {({ handleSubmit, isValid, dirty }) => (
                     <form onSubmit={handleSubmit}>
                       <Field type="email" component="input" name="email" />
                       <Field component="select" name="role">
@@ -115,7 +115,7 @@ const AdminEditUser: SFC<Props> = ({
                       </Field>
                       <Field type="text" component="input" name="firstName" />
                       <Field type="text" component="input" name="lastName" />
-                      <button type="submit" disabled={!isValid}>
+                      <button type="submit" disabled={!isValid || !dirty}>
                         Save
                       </button>
                     </form>
@@ -163,3 +163,52 @@ const getEditUserQuery = gql`
 `;
 
 export default AdminEditUser;
+
+const deleteUserMutation = gql`
+  mutation DeleteUser($where: UserWhereUniqueInput!) {
+    deleteUser(where: $where) {
+      id
+    }
+  }
+`;
+
+{
+  /* <Mutation
+mutation={deleteUserMutation}
+update={updateOnDelete}
+>
+{deleteUser => (
+)}
+</Mutation>
+type DeleteUserResponse = {
+  deleteUser: {
+    id: string;
+  };
+};
+
+const updateOnDelete: MutationUpdaterFn<DeleteUserResponse> = (
+  cache,
+  result,
+) => {
+  if (!result.data) {
+    return;
+  }
+
+  const cacheResult = cache.readQuery<Response>({
+    query: getUsersQuery,
+  });
+
+  if (!cacheResult) {
+    return;
+  }
+
+  const removedId = result.data.deleteUser.id;
+
+  cache.writeQuery({
+    query: getUsersQuery,
+    data: {
+      users: cacheResult.users.filter(user => user.id !== removedId),
+    },
+  });
+}; */
+}
