@@ -1,5 +1,5 @@
 import React, { SFC } from 'react';
-import { Query, QueryResult, Mutation, MutationUpdaterFn } from 'react-apollo';
+import { Query, QueryResult } from 'react-apollo';
 import Loadable from 'react-loadable';
 import gql from 'graphql-tag';
 import Heading from './components/atoms/Heading';

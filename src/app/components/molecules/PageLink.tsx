@@ -73,7 +73,7 @@ const PageLink: SFC<Props> = ({ icon, label, exact, to, ...props }) => {
 
   return (
     <Route path={path} exact={exact} location={props.location}>
-      {({ match, location }) => (
+      {({ match }) => (
         <Reducer reducer={hover} initialValue={false}>
           {({ value: isHovering, dispatch }) => (
             <Link
