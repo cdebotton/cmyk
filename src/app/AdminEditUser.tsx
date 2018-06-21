@@ -2,10 +2,11 @@ import React, { SFC, Fragment } from 'react';
 import gql from 'graphql-tag';
 import { Query, QueryResult, Mutation, MutationFn } from 'react-apollo';
 import { RouteComponentProps } from 'react-router';
-import { Formik, Field } from 'formik';
+import { Formik, Field, FieldProps } from 'formik';
 import * as yup from 'yup';
 import PageLoader from './components/molecules/PageLoader';
-import Heading from './components/atoms/Heading';
+import Input from './components/molecules/Input';
+import Select from './components/molecules/Select';
 
 type Props = RouteComponentProps<{
   userId: string;
@@ -72,7 +73,6 @@ const AdminEditUser: SFC<Props> = ({
 
         return (
           <Fragment>
-            <Heading level={3}>Edit user {data.user.email}</Heading>
             <Mutation mutation={updateUserMutation}>
               {(
                 updateUser: MutationFn<UpdateUserData, UpdateUserVariables>,
@@ -105,16 +105,42 @@ const AdminEditUser: SFC<Props> = ({
                   }}
                 >
                   {({ handleSubmit, isValid, dirty }) => (
-                    <form onSubmit={handleSubmit}>
-                      <Field type="email" component="input" name="email" />
-                      <Field component="select" name="role">
-                        <option value="ADMIN">Admin</option>
-                        <option value="EDITOR">Editor</option>
-                        <option value="USER">User</option>
-                        <option value="UNAUTHORIZED">Unauthorized</option>
-                      </Field>
-                      <Field type="text" component="input" name="firstName" />
-                      <Field type="text" component="input" name="lastName" />
+                    <form onSubmit={handleSubmit} autoComplete="off">
+                      <Field
+                        type="email"
+                        component={Input}
+                        name="email"
+                        placeholder="Email"
+                      />
+                      <Field
+                        options={[{ label: 'Admin', value: 'ADMIN' }]}
+                        name="role"
+                        render={({ field, form }: FieldProps<any>) => (
+                          <Select
+                            placeholder="Role"
+                            field={field}
+                            form={form}
+                            options={[
+                              { label: 'Admin', value: 'ADMIN' },
+                              { label: 'Editor', value: 'EDITOR' },
+                              { label: 'User', value: 'USER' },
+                              { label: 'Unauthorized', value: 'UNAUTHORIZED' },
+                            ]}
+                          />
+                        )}
+                      />
+                      <Field
+                        type="text"
+                        component={Input}
+                        name="firstName"
+                        placeholder="First name"
+                      />
+                      <Field
+                        type="text"
+                        component={Input}
+                        name="lastName"
+                        placeholder="Last name"
+                      />
                       <button type="submit" disabled={!isValid || !dirty}>
                         Save
                       </button>

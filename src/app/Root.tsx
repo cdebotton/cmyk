@@ -7,33 +7,22 @@ import {
   ThemeProvider,
 } from 'styled-components';
 import { normalize } from 'polished';
-import Loadable from 'react-loadable';
+import universal from 'react-universal-component';
 import PageLoader from './components/molecules/PageLoader';
 import SessionContext, { Session } from './containers/SessionContext';
 import { Query, QueryResult } from 'react-apollo';
 import gql from 'graphql-tag';
 import ErrorBoundary from './ErrorBoundary';
 
-const Admin = Loadable({
-  loader: () => import('./Admin'),
-  loading: () => <PageLoader />,
-});
-
-const Login = Loadable({
-  loader: () => import('./Login'),
-  loading: () => <PageLoader />,
-});
-
-const Public = Loadable({
-  loader: () => import('./Public'),
-  loading: () => <PageLoader />,
-});
-
 injectGlobal`
   ${normalize() as SimpleInterpolation};
 
   body {
     font-family: 'Open sans', sans-serif;
+  }
+
+  a {
+    text-decoration: none;
   }
 
   *,
@@ -59,6 +48,10 @@ const getSessionQuery = gql`
 type SessionQueryResponse = {
   session: Session | null;
 };
+
+const Admin = universal(import('./Admin'));
+const Public = universal(import('./Public'));
+const Login = universal(import('./Login'));
 
 const Root: SFC = () => (
   <ErrorBoundary onError={error => console.log(error)}>

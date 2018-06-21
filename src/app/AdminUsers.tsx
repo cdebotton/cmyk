@@ -1,20 +1,17 @@
 import React, { SFC } from 'react';
 import { Query, QueryResult } from 'react-apollo';
-import Loadable from 'react-loadable';
+import universal from 'react-universal-component';
 import gql from 'graphql-tag';
 import Heading from './components/atoms/Heading';
 import PageLoader from './components/molecules/PageLoader';
-import { RouteComponentProps, Route } from 'react-router-dom';
+import { RouteComponentProps, Route, Link } from 'react-router-dom';
 import SessionContext from './containers/SessionContext';
 import Page from './components/atoms/Page';
 import List from './components/molecules/List';
 import UserLabel from './components/molecules/UserLabel';
 import SplitLayout from './components/layouts/SplitLayout';
 
-const AdminEditUser = Loadable({
-  loader: () => import('./AdminEditUser'),
-  loading: () => <PageLoader />,
-});
+const AdminEditUser = universal(import('./AdminEditUser'));
 
 const getUsersQuery = gql`
   query GetUsers {
@@ -73,13 +70,26 @@ const AdminUsers: SFC<Props> = ({ match }) => (
                   <List
                     items={data.users}
                     generateKey={props => `USER_${props.id}`}
-                    transformProps={props => ({
-                      ...props,
-                      to: `${match.url}/${props.id}`,
-                      isCurrentUser:
-                        (session && session.id === props.id) || false,
-                    })}
-                    renderItem={props => <UserLabel {...props} />}
+                    renderItem={(props, index) => {
+                      const url = `${match.url}/${props.id}`;
+                      const isCurrentUser =
+                        session && session.id ? session.id === props.id : false;
+
+                      return (
+                        <Route path={url}>
+                          {({ match }) => (
+                            <Link to={url}>
+                              <UserLabel
+                                {...props}
+                                isEven={index % 2 === 0}
+                                isCurrentUser={isCurrentUser}
+                                isActive={match !== null}
+                              />
+                            </Link>
+                          )}
+                        </Route>
+                      );
+                    }}
                   />
                 )}
               </SessionContext.Consumer>

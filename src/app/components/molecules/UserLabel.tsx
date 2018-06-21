@@ -1,8 +1,6 @@
 import React, { SFC } from 'react';
 import styled from 'styled-components';
-import { LocationDescriptor } from 'history';
-import { NavLink, Route } from 'react-router-dom';
-import { rem } from 'polished';
+import { rem, transparentize } from 'polished';
 import colors from '../../theme/colors';
 import fromNow from '../../lib/fromNow';
 import Badge from '../atoms/Badge';
@@ -10,9 +8,11 @@ import Avatar from '../atoms/Avatar';
 import { DateTime } from 'luxon';
 
 type Props = {
+  isActive?: boolean;
   className?: string;
   to: string;
   isCurrentUser: boolean;
+  isEven?: boolean;
   id: string;
   role: string;
   email: string;
@@ -41,28 +41,44 @@ const UserLabel: SFC<Props> = ({
   const updatedAtDate = DateTime.fromISO(updatedAt).toFormat('MMMM dd, yyyy');
 
   return (
-    <Route path={to}>
-      {({ match }) => (
-        <div className={className}>
-          <UserProfileImage to={to}>
-            <Avatar url="https://placeimg.com/64/64/people" />}
-            <UserRoleBadge>{role}</UserRoleBadge>
-          </UserProfileImage>
-          <Name to={to}>
-            {hasName ? `${profile.firstName} ${profile.lastName}` : email}
-          </Name>
-          {hasName && <Email to={to}>{email}</Email>}
-          <LastLogin>
-            {lastLogin ? 'Last seen ' + fromNow(lastLogin) : "Hasn't logged in"}
-          </LastLogin>
-          <CreatedAt>
-            Created {createdAtDate}, Updated {updatedAtDate}
-          </CreatedAt>
-          <ActiveSlate isActive={match !== null} />
-        </div>
-      )}
-    </Route>
+    <div className={className}>
+      <UserProfileImage>
+        <Avatar url="https://placeimg.com/64/64/people" />
+        <UserRoleBadge>{role}</UserRoleBadge>
+      </UserProfileImage>
+      <Name>
+        {hasName ? `${profile.firstName} ${profile.lastName}` : email}
+      </Name>
+      {hasName && <Email>{email}</Email>}
+      <LastLogin>
+        {lastLogin ? 'Last seen ' + fromNow(lastLogin) : "Hasn't logged in"}
+      </LastLogin>
+      <CreatedAt>
+        <span>Created {createdAtDate}</span>
+        <span>Updated {updatedAtDate}</span>
+      </CreatedAt>
+    </div>
   );
+};
+
+const getBackgroundColor = (props: Props) => {
+  if (props.isCurrentUser) {
+    return transparentize(0.8, colors.palette.light[2]);
+  }
+
+  if (props.isEven) {
+    return colors.palette.dark[1];
+  }
+
+  return colors.palette.dark[2];
+};
+
+const getBorderRight = (props: Props) => {
+  if (props.isActive) {
+    return `8px solid ${colors.palette.light[0]}`;
+  }
+
+  return `0 solid ${colors.palette.light[0]}`;
 };
 
 export default styled(UserLabel)`
@@ -71,12 +87,13 @@ export default styled(UserLabel)`
   overflow: hidden;
   align-items: end;
   padding: ${rem(16)} ${rem(32)};
-  background-color: ${props =>
-    props.isCurrentUser ? colors.palette.dark[0] : 'inherit'};
+  border-right: ${getBorderRight};
+  background-color: ${getBackgroundColor};
   grid-gap: ${rem(16)};
   grid-template-columns: ${rem(64)} 1fr 1fr;
   grid-template-rows: 1fr 1fr;
   text-decoration: none;
+  transition: all 175ms ease-in-out;
 `;
 
 const UserRoleBadge = Badge.extend`
@@ -85,13 +102,13 @@ const UserRoleBadge = Badge.extend`
   left: 5%;
 `;
 
-const UserProfileImage = styled(NavLink)`
+const UserProfileImage = styled.div`
   position: relative;
   grid-column: 1;
   grid-row: 1 / span 2;
 `;
 
-const Name = styled(NavLink)`
+const Name = styled.div`
   align-self: end;
   color: ${colors.palette.light[0]};
   font-weight: 800;
@@ -99,7 +116,7 @@ const Name = styled(NavLink)`
   text-decoration: none;
 `;
 
-const Email = styled(NavLink)`
+const Email = styled.div`
   align-self: start;
   color: ${colors.palette.light[1]};
   font-size: ${rem(12)};
@@ -108,6 +125,8 @@ const Email = styled(NavLink)`
 `;
 
 const CreatedAt = styled.div`
+  display: flex;
+  flex-flow: column nowrap;
   align-self: start;
   color: ${colors.palette.light[2]};
   font-size: ${rem(10)};
@@ -122,26 +141,4 @@ const LastLogin = styled.span`
   font-weight: 800;
   grid-column: 3 / span 1;
   grid-row: 1;
-`;
-
-/**
- * Replace this with react pose
- */
-
-const ActiveSlate = styled(
-  (props: { className?: string; isActive: boolean }) => (
-    <span className={props.className} />
-  ),
-)`
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(255, 255, 255, 0.4);
-  transition: transform 175ms ease-in-out;
-  transform: ${props =>
-    `translate3d(${props.isActive ? 0 : '100%'}, ${
-      props.isActive ? 0 : '100%'
-    }, 0)`};
 `;

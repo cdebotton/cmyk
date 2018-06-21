@@ -15,4 +15,5 @@ module.exports = {
     ['@babel/stage-0', { decoratorsLegacy: true, loose: true }],
     '@babel/typescript',
   ],
+  plugins: ['universal-import'],
 };

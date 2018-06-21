@@ -7,7 +7,7 @@ type Props = {
   transformProps?: (props: any) => any;
   generateKey: (props: any) => string;
   items: any[];
-  renderItem: (props: any) => ReactNode;
+  renderItem: (props: any, index: number) => ReactNode;
   children?: never;
 };
 
@@ -16,12 +16,12 @@ function List<T>(props: Props) {
 
   return (
     <ul className={className}>
-      {items.map(item => {
+      {items.map((item, index) => {
         const itemProps = transformProps ? transformProps(item) : item;
 
         return (
           <ListItem key={`${generateKey(item)}`}>
-            {renderItem(itemProps)}
+            {renderItem(itemProps, index)}
           </ListItem>
         );
       })}
@@ -32,14 +32,6 @@ function List<T>(props: Props) {
 const ListItem = styled.li`
   display: flex;
   flex-flow: column nowrap;
-
-  & + & {
-    margin-top: ${rem(8)};
-  }
-
-  &:nth-child(odd) {
-    background-color: hsla(0, 0%, 100%, 0.05);
-  }
 `;
 
 export default styled(List)`
