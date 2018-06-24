@@ -6,7 +6,7 @@ import InputPlaceholder from '../atoms/InputPlaceholder';
 import InputBorder from '../atoms/InputBorder';
 import FieldState from '../../containers/FieldState';
 import Reducer, { ReducerFn } from '../../containers/Reducer';
-import List from './List';
+import posed, { PoseGroup } from 'react-pose';
 import colors from '../../theme/colors';
 
 type Option = {
@@ -44,6 +44,9 @@ const Select: SFC<Props> = ({
         <FieldState>
           {({ value: { isHovering }, dispatch: dispatchField }) => (
             <div className={className}>
+              <InputPlaceholder isLabel={hasValue}>
+                {placeholder}
+              </InputPlaceholder>
               <SelectTarget
                 onClick={() =>
                   dispatchDropdown({
@@ -55,25 +58,27 @@ const Select: SFC<Props> = ({
                 {label}
               </SelectTarget>
               <InputBorder grow={isOpen} />
-              <InputPlaceholder isLabel={hasValue}>
-                {placeholder}
-              </InputPlaceholder>
               {isOpen && (
-                <Dropdown
-                  items={options}
-                  generateKey={option => `OPTION_${option.value}`}
-                  renderItem={(option, index) => (
-                    <DropdownItem
+                <Dropdown initialPose="hidden" pose="visible">
+                  {options.map((option, index) => (
+                    <DropdownListItem
+                      key={`ITEM_${option.value}`}
                       accent={index % 2 === 0}
-                      onClick={() => {
-                        form.setFieldValue(field.name, option.value);
-                        dispatchDropdown({ type: 'SET_OPEN', payload: false });
-                      }}
                     >
-                      {option.label}
-                    </DropdownItem>
-                  )}
-                />
+                      <DropdownButton
+                        onClick={() => {
+                          form.setFieldValue(field.name, option.value);
+                          dispatchDropdown({
+                            type: 'SET_OPEN',
+                            payload: false,
+                          });
+                        }}
+                      >
+                        {option.label}
+                      </DropdownButton>
+                    </DropdownListItem>
+                  ))}
+                </Dropdown>
               )}
             </div>
           )}
@@ -89,7 +94,7 @@ export default styled(Select)`
   margin: ${rem(32)} 0;
 `;
 
-const SelectTarget = styled.span`
+const SelectTarget = styled.div`
   position: relative;
   width: 100%;
   padding: ${rem(5)};
@@ -114,7 +119,24 @@ const dropdown: ReducerFn<DropdownState, DropdownAction> = (state, action) => {
   }
 };
 
-const Dropdown = List.extend`
+const DropdownPoses = posed.ul({
+  visible: {
+    y: 0,
+    z: 0,
+    opacity: 1,
+    delayChildren: 100,
+    staggerChildren: 100,
+  },
+  hidden: {
+    y: 15,
+    z: 50,
+    opacity: 0,
+    delay: 400,
+    staggerChildren: 100,
+  },
+});
+
+const Dropdown = styled(DropdownPoses)`
   position: absolute;
   z-index: 100;
   top: calc(100% + ${rem(5)});
@@ -122,8 +144,12 @@ const Dropdown = List.extend`
   overflow: hidden;
   width: 100%;
   flex-flow: column nowrap;
+  padding: 0;
+  margin: 0;
   background-color: ${colors.palette.dark[0]};
   border-radius: 5px;
+  box-shadow: 2px 5px 10px rgba(0, 0, 0, 0.15);
+  list-style: none;
 `;
 
 const getDropdownItemBackgroundColor = (props: { accent: boolean }) => {
@@ -134,15 +160,11 @@ const getDropdownItemBackgroundColor = (props: { accent: boolean }) => {
   return colors.palette.light[0];
 };
 
-const DropdownItem = styled.button.attrs({ type: 'button' })`
+const DropdownListItem = styled.li`
   display: flex;
-  flex-flow: row nowrap;
-  padding: ${rem(10)};
-  border: none;
+  overflow: hidden;
   background-color: ${getDropdownItemBackgroundColor};
   color: ${colors.palette.dark[0]};
-  cursor: pointer;
-  user-select: none;
 
   &:focus {
     outline: none;
@@ -152,4 +174,26 @@ const DropdownItem = styled.button.attrs({ type: 'button' })`
     background-color: ${colors.palette.dark[2]};
     color: ${colors.palette.light[0]};
   }
+`;
+
+const DropdownButtonPoses = posed.button({
+  visible: {
+    x: 0,
+  },
+  hidden: {
+    x: -50,
+  },
+});
+
+const DropdownButton = styled(DropdownButtonPoses).attrs({ type: 'button' })`
+  width: 100%;
+  flex-flow: row nowrap;
+  padding: ${rem(10)};
+  border: none;
+  background-color: transparent;
+  color: inherit;
+  cursor: pointer;
+  font-size: ${rem(14)};
+  text-align: left;
+  user-select: none;
 `;

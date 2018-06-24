@@ -41,7 +41,7 @@ const AdminNavBar: SFC<Props> = ({
 }) => (
   <nav className={className}>
     <Title vertical={flat}>{title}</Title>
-    <Avatar />
+    <Avatar url="https://placeimg.com/64/64" />
     <PagesContainer>{pages}</PagesContainer>
     {actions && <ActionsContainer>{actions}</ActionsContainer>}
   </nav>
