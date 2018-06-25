@@ -2,7 +2,6 @@ import React, { createElement, SFC, ComponentType } from 'react';
 import styled from 'styled-components';
 import { CssHelperFn } from '../../theme';
 import colors from '../../theme/colors';
-import { EPROTONOSUPPORT } from 'constants';
 
 interface Props {
   className?: string;
@@ -13,18 +12,6 @@ interface Props {
   bgShade?: number;
   fgShade?: number;
 }
-
-const Block: SFC<Props> = ({
-  component = 'div',
-  row: _0,
-  column: _1,
-  format: _2,
-  bgShade: _3,
-  fgShade: _4,
-  ...props
-}) => {
-  return createElement(component, props);
-};
 
 const getRow: CssHelperFn<Props> = props => {
   if (props.row) {
@@ -70,7 +57,7 @@ const getColor: CssHelperFn<Props> = ({
   return colors[colorPalette][fgShade];
 };
 
-export default styled(Block)`
+export default styled.div`
   position: relative;
   background: ${getBackground};
   color: ${getColor};

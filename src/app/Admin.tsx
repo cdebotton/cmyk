@@ -9,6 +9,7 @@ import { GET_SESSION_QUERY } from './queries';
 import BaseLayout from './components/layouts/BaseLayout';
 import Block from './components/atoms/Block';
 import Heading from './components/atoms/Heading';
+import Button from './components/molecules/Button';
 
 const NotFound = universal(import('./NotFound'));
 
@@ -34,6 +35,7 @@ const Admin: SFC<Props> = ({ match }) => (
               <Heading vertical level={1}>
                 CMYK
               </Heading>
+              <Button format="neutral">Logout</Button>
             </Block>
             <Switch>
               <Route component={NotFound} />
