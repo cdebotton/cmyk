@@ -23,8 +23,8 @@ injectGlobal`
   }
 `;
 
-const Admin = universal(import('./pages/Admin'));
-const Public = universal(import('./pages/Public'));
+const Admin = universal(import('./Admin'));
+const Public = universal(import('./Public'));
 
 const Root: SFC = () => (
   <Switch>
