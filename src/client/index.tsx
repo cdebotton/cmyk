@@ -9,11 +9,10 @@ import React from 'react';
 import { ApolloProvider } from 'react-apollo';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import Root from '../app/Root';
+import Root from '../app';
 
 const mount = document.getElementById('app');
-const data = (window as any).__APOLLO_STATE__;
-const cache = new InMemoryCache().restore(data);
+const cache = new InMemoryCache();
 
 const httpLink = new HttpLink({
   uri: '/graphql',

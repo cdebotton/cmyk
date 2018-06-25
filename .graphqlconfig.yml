@@ -8,6 +8,3 @@ projects:
         generator: prisma-ts
   app:
     schemaPath: src/http/schema/schema.graphql
-    extensions:
-      endpoints:
-        default: http://localhost:3030/graphql
