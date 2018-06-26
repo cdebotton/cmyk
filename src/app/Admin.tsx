@@ -7,7 +7,6 @@ import styled, { ThemeProvider } from 'styled-components';
 import { GetSession } from './generated/operation-result-types';
 import { GET_SESSION_QUERY } from './queries';
 import BaseLayout from './components/layouts/BaseLayout';
-import Block from './components/atoms/Block';
 import Heading from './components/atoms/Heading';
 import Button from './components/molecules/Button';
 
@@ -30,13 +29,10 @@ const Admin: SFC<Props> = ({ match }) => (
 
       return (
         <ThemeProvider theme={{ mode: 'light' }}>
-          <BaseLayout templateColumns="min-content auto">
-            <Block bgShade={1}>
-              <Heading vertical level={1}>
-                CMYK
-              </Heading>
-              <Button format="neutral">Logout</Button>
-            </Block>
+          <BaseLayout templateColumns={['min-content', 'auto']} shade={0}>
+            <Heading vertical level={1}>
+              CMYK
+            </Heading>
             <Switch>
               <Route component={NotFound} />
             </Switch>
