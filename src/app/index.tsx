@@ -21,6 +21,10 @@ injectGlobal`
     width: 100vw;
     min-height: 100vh;
   }
+
+  a {
+    color: inherit;
+  }
 `;
 
 const Admin = universal(import('./Admin'));

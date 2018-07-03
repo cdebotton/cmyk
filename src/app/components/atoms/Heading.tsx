@@ -1,6 +1,5 @@
 import React, { createElement, SFC } from 'react';
 import styled from 'styled-components';
-import { CssHelperFn } from '../../theme';
 
 interface Props {
   className?: string;
@@ -12,7 +11,7 @@ const Heading: SFC<Props> = ({ level = 2, vertical: _0, ...props }) => {
   return createElement(`h${level}`, props);
 };
 
-const getWritingMode: CssHelperFn<Props> = props => {
+const getWritingMode = (props: any) => {
   if (props.vertical) {
     return 'vertical-lr';
   }

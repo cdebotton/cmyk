@@ -1,7 +1,10 @@
-import React, { Component, ReactNode } from 'react';
+import React, { Component, ReactNode, SFC } from 'react';
 import styled from 'styled-components';
 import faBars from '@fortawesome/fontawesome-free-solid/faBars';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import Button from '../atoms/Button';
+import { rem } from '../../../../node_modules/polished';
+import { Format } from '../../styles/theme';
 
 interface Props {
   className?: string;
@@ -14,43 +17,27 @@ interface State {
 }
 
 const Controls = styled.div`
-  display: flex;
-  flex-flow: column nowrap;
+  display: grid;
+  grid-gap: ${rem(10)};
+  grid-template-rows: min-content auto;
 `;
 
 const Navigation = styled.nav`
   display: grid;
   align-content: start;
-  grid-column: 2 / span 1;
-  justify-items: center;
+  justify-items: stretch;
 `;
 
-class Sidebar extends Component<Props, State> {
-  state = { open: false };
-
-  render() {
-    const { className, label, navigation } = this.props;
-
-    return (
-      <div className={className}>
-        <Controls>
-          <button onClick={this._toggleOpen}>
-            <FontAwesomeIcon icon={faBars} />
-          </button>
-          {label}
-        </Controls>
-        {this.state.open && <Navigation>{navigation}</Navigation>}
-      </div>
-    );
-  }
-
-  _toggleOpen = () => {
-    this.setState(state => ({ ...state, open: !state.open }));
-  };
-}
+const Sidebar: SFC<Props> = ({ className, label, navigation }) => (
+  <div className={className}>
+    <Controls>{label}</Controls>
+    <Navigation>{navigation}</Navigation>
+  </div>
+);
 
 export default styled(Sidebar)`
   display: grid;
-  grid-template-columns: min-content min-content;
+  padding: ${rem(10)};
+  grid-template-rows: min-content auto;
   justify-items: center;
 `;

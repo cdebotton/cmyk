@@ -4,4 +4,3 @@ datamodel:
 hooks:
   post-deploy:
     - graphql get-schema
-    - graphql prepare

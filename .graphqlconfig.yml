@@ -3,8 +3,5 @@ projects:
     schemaPath: src/http/schema/generated/prisma.graphql
     extensions:
       prisma: database/prisma.yml
-      prepare-binding:
-        output: src/http/schema/generated/prisma.ts
-        generator: prisma-ts
   app:
     schemaPath: src/http/schema/schema.graphql
