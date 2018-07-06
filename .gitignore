@@ -101,3 +101,5 @@ dist
 src/http/schema/generated
 
 *.bs.js
+.cache
+lib/bs
