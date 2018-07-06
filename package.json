@@ -1,12 +1,12 @@
 {
   "name": "cmyk",
   "version": "1.0.0",
-  "main": "dist/http/index.js",
   "author": "Christian de Botton <cdebotton@gmail.com>",
   "private": true,
   "license": "MIT",
   "scripts": {
-    "start:app": "parcel --out-dir app/dist app/src/index.re",
+    "prestart:app": "rm -rf .cache",
+    "start:app": "parcel app/src/index.re --out-dir app/dist --https --cert ./ssl/localhost.crt --key ./ssl/localhost.key",
     "start:http": "nodemon http/src/index.ts",
     "start": "npm-run-all --parallel 'start:http' 'start:app'"
   },
@@ -39,6 +39,7 @@
     "react-apollo": "2.1.9",
     "react-dom": "16.4.1",
     "react-pose": "2.1.2",
+    "reason-apollo": "^0.9.1",
     "reason-react": "^0.4.2"
   },
   "devDependencies": {
@@ -52,6 +53,7 @@
     "@types/koa-router": "7.0.30",
     "@types/koa-static": "4.0.0",
     "bs-platform": "^3.1.5",
+    "bsb-js": "^1.1.6",
     "graphql_ppx": "^0.2.4",
     "nodemon": "1.17.5",
     "npm-run-all": "4.1.3",

@@ -9,14 +9,8 @@
     "*-error.log": true,
     "dist": true
   },
-  "stylelint.enable": true,
-  "tslint.enable": false,
-  "eslint.enable": true,
-  "eslint.autoFixOnSave": true,
-  "eslint.validate": [
-    "javascript",
-    "javascriptreact",
-    "typescript",
-    "typescriptreact"
+  "reason.path.bsb": "./node_modules/bs-platform/lib/bsb",
+  "reason.diagnostics.tools": [
+    "bsb"
   ]
 }

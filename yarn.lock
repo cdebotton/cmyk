@@ -1156,6 +1156,10 @@ bs-platform@^3.1.5:
   version "3.1.5"
   resolved "https://registry.yarnpkg.com/bs-platform/-/bs-platform-3.1.5.tgz#fb34ee4702bc9163848d5537096c4f31ebaeed40"
 
+bsb-js@^1.1.6:
+  version "1.1.6"
+  resolved "https://registry.yarnpkg.com/bsb-js/-/bsb-js-1.1.6.tgz#cd59b2b85e1717ac023293f80aceda421730eb67"
+
 buffer-equal-constant-time@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/buffer-equal-constant-time/-/buffer-equal-constant-time-1.0.1.tgz#f8e71132f7ffe6e01a5c9697a4c6f3e48d5cc819"
@@ -4494,6 +4498,10 @@ readdirp@^2.0.0:
     minimatch "^3.0.2"
     readable-stream "^2.0.2"
     set-immediate-shim "^1.0.1"
+
+reason-apollo@^0.9.1:
+  version "0.9.1"
+  resolved "https://registry.yarnpkg.com/reason-apollo/-/reason-apollo-0.9.1.tgz#a699bb4b44dbaa667dcb5ca84912045ea67540f0"
 
 reason-react@^0.4.2:
   version "0.4.2"

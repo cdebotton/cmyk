@@ -8,7 +8,7 @@ import { Prisma } from 'prisma-binding';
 import getTokenFromAuthorization from './libs/getTokenFromHeader';
 import { InvalidCredentialsError } from './errors';
 
-const typeDefs = importSchema('./src/http/schema/schema.graphql');
+const typeDefs = importSchema('./http/src/schema/schema.graphql');
 const { JWT_SECRET } = process.env;
 
 if (!JWT_SECRET) {
@@ -36,7 +36,7 @@ const resolvers: IResolvers<{}, Context> = {
       }
 
       try {
-        const { iat, userId } = jwt.verify(token, JWT_SECRET) as SessionData;
+        const { userId } = jwt.verify(token, JWT_SECRET) as SessionData;
 
         return context.db.query.user({ where: { id: userId } }, info);
       } catch (err) {

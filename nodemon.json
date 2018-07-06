@@ -1,7 +1,7 @@
 {
   "ext": "ts,graphql",
-  "watch": "src",
+  "watch": "http/src",
   "execMap": {
-    "ts": "BABEL_TARGET=node babel-node --extensions '.ts'"
+    "ts": "ts-node"
   }
 }
