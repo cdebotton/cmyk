@@ -2,10 +2,13 @@ import React, { SFC } from 'react';
 import { RouteComponentProps } from 'react-router';
 import gql from 'graphql-tag';
 import { Query, QueryResult } from 'react-apollo';
-import { Formik, Form, Field } from 'formik';
+import { Formik, Form, Field, FieldProps } from 'formik';
 import Heading from './components/atoms/Heading';
 import { GetUser } from './generated/operation-result-types';
 import NotFound from './NotFound';
+import grid from './styles/grid';
+import gridItem from './styles/gridItem';
+import Input from './components/molecules/Input';
 
 const GET_USER_QUERY = gql`
   query GetUser($where: UserWhereUniqueInput!) {
@@ -21,6 +24,9 @@ const GET_USER_QUERY = gql`
     }
   }
 `;
+
+const EditUserForm = grid(Form);
+const EditUserInput = gridItem(Input);
 
 interface Props extends RouteComponentProps<{ userId: string }> {}
 
@@ -55,21 +61,57 @@ const AdminUsersEdit: SFC<Props> = ({
           );
         }
 
+        const { email, role, profile } = data.user;
+
         return (
           <div>
             <Heading level={3}>{data.user.email}</Heading>
             <Formik
-              initialValues={data.user}
+              initialValues={{ email, role, profile }}
               onSubmit={values => console.log(values)}
             >
               {() => (
-                <Form>
-                  <Field type="text" component="input" name="email" />
+                <EditUserForm
+                  gridTemplateColumns={['1fr', '1fr']}
+                  gridTemplateRows={['repeat(3, min-content)']}
+                  gridGap={20}
+                >
+                  <Field
+                    name="email"
+                    render={(props: FieldProps) => (
+                      <EditUserInput
+                        {...props}
+                        type="email"
+                        gridRow={[1, 'span 1']}
+                        gridColumn={[1, 'span 2']}
+                      />
+                    )}
+                  />
+                  <Field
+                    name="profile.firstName"
+                    render={(props: FieldProps) => (
+                      <EditUserInput
+                        {...props}
+                        gridRow={[2, 'span 1']}
+                        gridColumn={[1, 'span 1']}
+                      />
+                    )}
+                  />
+                  <Field
+                    name="profile.lastName"
+                    render={(props: FieldProps) => (
+                      <EditUserInput
+                        {...props}
+                        gridRow={[2, 'span 1']}
+                        gridColumn={[2, 'span 1']}
+                      />
+                    )}
+                  />
                   <button type="submit">Save</button>
-                </Form>
+                  <button type="reset">Reset</button>
+                </EditUserForm>
               )}
             </Formik>
-            <pre>{JSON.stringify(data.user, null, 2)}</pre>
           </div>
         );
       }}

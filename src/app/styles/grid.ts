@@ -1,6 +1,7 @@
 import { ComponentType } from 'react';
 import styled, { ThemedStyledProps } from 'styled-components';
 import { Theme } from './theme';
+import { rem } from 'polished';
 
 type Styleable = { className?: string };
 
@@ -10,6 +11,7 @@ interface Props {
   alignItems?: string;
   alignContent?: string;
   justifyContent?: string;
+  gridGap?: number;
 }
 
 function gridTemplateRows<T extends Props>(props: ThemedStyledProps<T, Theme>) {
@@ -54,6 +56,14 @@ function justifyContent<T extends Props>(props: ThemedStyledProps<T, Theme>) {
   return null;
 }
 
+function gridGap<T extends Props>(props: ThemedStyledProps<T, Theme>) {
+  if (props.gridGap) {
+    return `grid-gap: ${rem(props.gridGap)}`;
+  }
+
+  return null;
+}
+
 export default function grid<T extends Styleable>(component: ComponentType<T>) {
   return styled<T>(component)`
     display: grid;
@@ -62,5 +72,6 @@ export default function grid<T extends Styleable>(component: ComponentType<T>) {
     ${alignContent};
     ${alignItems};
     ${justifyContent};
+    ${gridGap};
   `;
 }
