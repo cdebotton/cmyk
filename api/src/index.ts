@@ -6,14 +6,14 @@ const { PRISMA_SECRET, NODE_ENV = 'development' } = process.env;
 
 const server = new ApolloServer({
   schema,
-  context: () => {
+  context: () => ({
     db: new Prisma({
       typeDefs: 'api/generated/prisma.graphql',
       endpoint: 'http://localhost:4466',
       debug: NODE_ENV === 'development',
       secret: PRISMA_SECRET,
-    });
-  },
+    }),
+  }),
 });
 
 const run = async () => {
