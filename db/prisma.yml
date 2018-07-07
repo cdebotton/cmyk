@@ -1,6 +1,7 @@
 endpoint: http://localhost:4466
-datamodel:
-  - datamodel.graphql
+datamodel: datamodel.graphql
 hooks:
   post-deploy:
-    - graphql get-schema
+    - echo "Deployment finished"
+    - graphql get-schema --project prisma
+    - yarn send-introspection-query http://localhost:3030/graphql

@@ -105,3 +105,4 @@ src/http/schema/generated
 lib/bs
 .merlin
 lib
+graphql_schema.json
