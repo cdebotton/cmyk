@@ -13,4 +13,14 @@ S /Users/cdebotton/Projects/cmyk/node_modules/bs-css/lib/ocaml
 B /Users/cdebotton/Projects/cmyk/node_modules/bs-css/lib/ocaml
 S app/src
 B lib/bs/app/src
+S app/src/bindings
+B lib/bs/app/src/bindings
+S app/src/public
+B lib/bs/app/src/public
+S app/src/components
+B lib/bs/app/src/components
+S app/src/utils
+B lib/bs/app/src/utils
+S app/src/admin
+B lib/bs/app/src/admin
 ####BSB GENERATED: NO EDIT}
