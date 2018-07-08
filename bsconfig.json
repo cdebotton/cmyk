@@ -8,7 +8,7 @@
   ],
   "suffix": ".bs.js",
   "package-specs": {
-    "module": "es6",
+    "module": "commonjs",
     "in-source": true
   },
   "reason": {
@@ -20,7 +20,7 @@
     "reason-react",
     "bs-css"
   ],
-  "bs-flags": [
+  "ppx-flags": [
     "graphql_ppx/ppx"
   ]
 }
