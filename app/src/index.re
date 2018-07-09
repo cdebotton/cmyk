@@ -7,8 +7,8 @@ Css.(
 );
 
 ReactDOMRe.renderToElementWithId(
-  <ApolloProvider client=Client.instance>
+  <ReasonApollo.Provider client=Client.instance>
     <Router.Provider> <App /> </Router.Provider>
-  </ApolloProvider>,
+  </ReasonApollo.Provider>,
   "app",
 );

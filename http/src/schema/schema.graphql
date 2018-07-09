@@ -1,7 +1,7 @@
-# import User from "../generated/prisma.graphql"
-# import UserCreateInput from "../generated/prisma.graphql"
-# import UserUpdateInput from "../generated/prisma.graphql"
-# import UserWhereUniqueInput from "../generated/prisma.graphql"
+# import User from "../../generated/prisma.graphql"
+# import UserCreateInput from "../../generated/prisma.graphql"
+# import UserUpdateInput from "../../generated/prisma.graphql"
+# import UserWhereUniqueInput from "../../generated/prisma.graphql"
 
 type Query {
   session: User
