@@ -1,6 +1,5 @@
 let inMemoryCache = ApolloInMemoryCache.createInMemoryCache();
-let httpLink =
-  ApolloLinks.createHttpLink(~uri="https://localhost:3000/graphql", ());
+let httpLink = ApolloLinks.createHttpLink(~uri="http://localhost:3001", ());
 let instance =
   ReasonApollo.createApolloClient(
     ~link=httpLink,
