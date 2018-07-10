@@ -6,10 +6,11 @@
   "license": "MIT",
   "scripts": {
     "prestart:app": "rm -rf .cache .merlin lib",
+    "start:db": "prisma deploy --watch",
     "start:api": "nodemon api/src/index.ts",
     "start:app": "parcel app/src/index.re --out-dir app/dist --https --cert ./ssl/localhost.crt --key ./ssl/localhost.key",
     "start:http": "nodemon http/src/index.ts",
-    "start": "npm-run-all --parallel 'start:http' 'start:app' 'start:api'"
+    "start": "npm-run-all --parallel 'start:http' 'start:app' 'start:api' 'start:db'"
   },
   "dependencies": {
     "apollo-cache-inmemory": "^1.2.5",

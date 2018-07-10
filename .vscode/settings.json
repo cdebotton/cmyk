@@ -12,5 +12,6 @@
   "reason.path.bsb": "./node_modules/bs-platform/lib/bsb",
   "reason.diagnostics.tools": [
     "bsb"
-  ]
+  ],
+  "reason.format.width": 80
 }

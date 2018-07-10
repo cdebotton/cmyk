@@ -33,13 +33,14 @@ module Provider = {
   };
 };
 
-module Consumer = {
-  let component = ReasonReact.statelessComponent("RouterConsumer");
-  let make = (children: state => 'a) => {
+module Switch = {
+  let component = ReasonReact.statelessComponent("RouterSwitch");
+
+  let make = (~mapUrlToRoute, children) => {
     ...component,
     render: _self =>
       <RouterContext.Consumer>
-        ...(route => children(route))
+        ...(({route}) => children(route.path |> mapUrlToRoute))
       </RouterContext.Consumer>,
   };
 };
