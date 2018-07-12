@@ -30,6 +30,7 @@ module Styles = {
 };
 
 type route =
+  | Login
   | Dashboard
   | Documents
   | Users
@@ -44,6 +45,7 @@ let mapUrlToRoute =
   | [_, "users"] => Users
   | [_, "users", id] => User(int_of_string(id))
   | [_, "settings"] => Settings
+  | [_, "login"] => Login
   | _ => NotFound;
 
 module LazyDashboardConfig = {
@@ -86,35 +88,50 @@ let make = _children => {
         </Link>
       </nav>
       <div className=Styles.content>
-        <Router.Switch mapUrlToRoute>
+        <Session>
           ...(
-               route =>
-                 switch (route) {
-                 | Dashboard =>
-                   <LazyDashboard
-                     loader=(() => DynamicImport.import("./Dashboard"))
-                     render=(((module Dashboard)) => <Dashboard />)
-                   />
-                 | Documents =>
-                   <LazyDocuments
-                     loader=(() => DynamicImport.import("./Documents"))
-                     render=(((module Documents)) => <Documents />)
-                   />
-                 | Users =>
-                   <LazyUsers
-                     loader=(() => DynamicImport.import("./Users"))
-                     render=(((module Users)) => <Users />)
-                   />
-                 | User(_id) => ReasonReact.null
-                 | Settings =>
-                   <LazySettings
-                     loader=(() => DynamicImport.import("./Settings"))
-                     render=(((module Settings)) => <Settings />)
-                   />
-                 | NotFound => <p> ("Not found" |> ReasonReact.string) </p>
-                 }
+               (_login, session) =>
+                 <Router.Switch mapUrlToRoute>
+                   ...(
+                        route =>
+                          switch (route, session) {
+                          | (Login, _) => <Login />
+                          | (_, Unauthorized) =>
+                            <Redirect href="/admin/login" />
+                          | (Dashboard, Authorized(_session)) =>
+                            <LazyDashboard
+                              loader=(
+                                () => DynamicImport.import("./Dashboard")
+                              )
+                              render=(((module Dashboard)) => <Dashboard />)
+                            />
+                          | (Documents, Authorized(_session)) =>
+                            <LazyDocuments
+                              loader=(
+                                () => DynamicImport.import("./Documents")
+                              )
+                              render=(((module Documents)) => <Documents />)
+                            />
+                          | (Users, Authorized(_session)) =>
+                            <LazyUsers
+                              loader=(() => DynamicImport.import("./Users"))
+                              render=(((module Users)) => <Users />)
+                            />
+                          | (User(_id), Authorized(_session)) => ReasonReact.null
+                          | (Settings, Authorized(_session)) =>
+                            <LazySettings
+                              loader=(
+                                () => DynamicImport.import("./Settings")
+                              )
+                              render=(((module Settings)) => <Settings />)
+                            />
+                          | (_, _) =>
+                            <p> ("Not found" |> ReasonReact.string) </p>
+                          }
+                      )
+                 </Router.Switch>
              )
-        </Router.Switch>
+        </Session>
       </div>
     </div>,
 };
