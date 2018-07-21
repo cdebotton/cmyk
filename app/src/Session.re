@@ -6,7 +6,7 @@ module SessionQuery = {
 
   module GetSession = [%graphql
     {|
-    query getSession {
+    query Session {
       session {
         id
         email
@@ -39,53 +39,10 @@ module SessionQuery = {
   };
 };
 
-module LoginMutation = {
-  module Authenticate = [%graphql
-    {|
-  mutation authenticate($input: AuthenticateInput!) {
-    authenticate(input: $input) {
-      token
-    }
-  }
-|}
-  ];
-
-  module AuthenticateMutation = ReasonApollo.CreateMutation(Authenticate);
-  let component = ReasonReact.statelessComponent("SessionProvider");
-
-  let make = children => {
-    ...component,
-    render: _self =>
-      <AuthenticateMutation>
-        ...(
-             (mutation, _) => {
-               let login = (~email, ~password) => {
-                 let login =
-                   Authenticate.make(
-                     ~input={"email": email, "password": password},
-                     (),
-                   );
-
-                 mutation(~variables=login##variables, ()) |> ignore;
-               };
-               children(login);
-             }
-           )
-      </AuthenticateMutation>,
-  };
-};
-
 let component = ReasonReact.statelessComponent("SessionProvider");
 
 let make = children => {
   ...component,
   render: _self =>
-    <LoginMutation>
-      ...(
-           login =>
-             <SessionQuery>
-               ...(session => children(login, session))
-             </SessionQuery>
-         )
-    </LoginMutation>,
+    <SessionQuery> ...(session => children(session)) </SessionQuery>,
 };

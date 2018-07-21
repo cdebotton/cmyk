@@ -14,3 +14,6 @@ let getTokenValueFromStorage = () => {
   | Some(value) => value |> Js.Json.parseExn |> storageToAbstract |> token
   };
 };
+
+let setTokenValueToStorage = token =>
+  Dom.Storage.(localStorage |> setItem(tokenNameSpace, token));

@@ -1,7 +1,8 @@
 {
-  "ext": "ts,graphql",
+  "ext": "ts,tsx,graphql",
   "watch": ["http/src", "api/src"],
   "execMap": {
-    "ts": "ts-node"
+    "ts": "ts-node",
+    "tsx": "ts-node"
   }
 }

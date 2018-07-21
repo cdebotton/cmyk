@@ -90,7 +90,7 @@ let make = _children => {
       <div className=Styles.content>
         <Session>
           ...(
-               (_login, session) =>
+               session =>
                  <Router.Switch mapUrlToRoute>
                    ...(
                         route =>

@@ -1,5 +1,9 @@
 let make:
-  (~href: string, array(ReasonReact.reactElement)) =>
+  (
+    ~href: string,
+    ~className: option(string)=?,
+    array(ReasonReact.reactElement)
+  ) =>
   ReasonReact.component(
     ReasonReact.stateless,
     ReasonReact.noRetainedProps,

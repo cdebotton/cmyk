@@ -3,7 +3,7 @@ module Styles = {
 };
 
 let component = ReasonReact.statelessComponent("Link");
-let make = (~href, children) => {
+let make = (~href, ~className=None, children) => {
   let onClick = event => {
     ReactEventRe.Mouse.preventDefault(event);
     let target = ReactEventRe.Mouse.target(event);
@@ -11,11 +11,11 @@ let make = (~href, children) => {
     ReasonReact.Router.push(value);
   };
 
+  let className = Styles.main |> Styled.concat(className);
+
   {
     ...component,
     render: _self =>
-      <a className=Styles.main href onClick>
-        (children |> ReasonReact.array)
-      </a>,
+      <a className href onClick> (children |> ReasonReact.array) </a>,
   };
 };
