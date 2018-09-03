@@ -1,0 +1,7 @@
+{
+  "extension": [".ts"],
+  "watch": ["src/http"],
+  "execMap": {
+    "ts": "babel-node --extensions .ts"
+  }
+}
