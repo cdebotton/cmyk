@@ -5,8 +5,9 @@
   "license": "MIT",
   "scripts": {
     "start:http": "PORT=3000 NODE_ENV=development BABEL_TARGET=node nodemon src/http/index.ts",
+    "start:graphql": "PORT=3002 NODE_ENV=development BABEL_TARGET=node nodemon src/graphql/index.ts",
     "start:webpack": "PORT=3001 NODE_ENV=development BABEL_TARGET=web webpack-serve",
-    "start": "npm-run-all --parallel 'start:http' 'start:webpack'"
+    "start": "npm-run-all --parallel 'start:http' 'start:webpack' 'start:graphql'"
   },
   "devDependencies": {
     "@babel/cli": "^7.0.0",
@@ -33,10 +34,22 @@
     "webpack-serve": "^2.0.2"
   },
   "dependencies": {
+    "apollo-cache-inmemory": "^1.2.9",
+    "apollo-client": "^2.4.1",
+    "apollo-link": "^1.2.2",
+    "apollo-link-context": "^1.0.8",
+    "apollo-link-error": "^1.1.0",
+    "apollo-link-http": "^1.5.4",
+    "apollo-link-ws": "^1.0.8",
+    "apollo-server": "^2.0.5",
+    "graphql": "^14.0.0",
+    "graphql-import": "^0.6.0",
     "koa": "^2.5.2",
     "polished": "^2.0.3",
+    "react-apollo": "^2.1.11",
     "react-hot-loader": "^4.3.5",
     "react-router-dom": "^4.3.1",
+    "simple-cache-provider": "^0.7.0",
     "styled-components": "^3.4.5"
   }
 }

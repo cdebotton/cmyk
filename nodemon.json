@@ -1,6 +1,6 @@
 {
-  "extension": [".ts"],
-  "watch": ["src/http"],
+  "extension": [".ts", ".graphql"],
+  "watch": ["src/http", "src/graphql"],
   "execMap": {
     "ts": "babel-node --extensions .ts"
   }

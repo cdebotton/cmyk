@@ -1,6 +1,9 @@
 import React from 'react';
 import { unstable_createRoot as createRoot } from 'react-dom';
+import { ApolloProvider } from 'react-apollo';
+import { BrowserRouter } from 'react-router-dom';
 import Root from './Root';
+import client from './client';
 
 const element = document.getElementById('app');
 
@@ -11,7 +14,13 @@ if (!element) {
 const root = createRoot(element);
 
 function app() {
-  return <Root />;
+  return (
+    <ApolloProvider client={client}>
+      <BrowserRouter>
+        <Root />
+      </BrowserRouter>
+    </ApolloProvider>
+  );
 }
 
 root.render(app());

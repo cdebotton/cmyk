@@ -1,10 +1,11 @@
-import React from 'react';
+import React, { Placeholder } from 'react';
 import { hot } from 'react-hot-loader';
+import Heading from './components/Heading';
 
 function Root() {
   return (
     <div>
-      <h1>👋🏻 🌎</h1>
+      <Heading level={1}>👋🏻 🌎!</Heading>
     </div>
   );
 }
