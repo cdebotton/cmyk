@@ -1,5 +1,5 @@
 import { createResource, createCache } from 'simple-cache-provider';
-import { ComponentType, ReactNode } from 'react';
+import { ComponentType } from 'react';
 
 type Loader<Props> = () => Promise<{ default: ComponentType<Props> }>;
 
