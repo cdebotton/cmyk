@@ -1,12 +1,12 @@
-import React, { ReactNode, HTMLProps } from 'react';
+import React, { HTMLProps, ReactNode } from 'react';
 import styled from 'styled-components';
 
-interface Props extends HTMLProps<HTMLHeadingElement> {
+interface IProps extends HTMLProps<HTMLHeadingElement> {
   level?: number;
   children?: ReactNode;
 }
 
-function Heading({ level = 2, children, ...props }: Props) {
+function Heading({ level = 2, children, ...props }: IProps) {
   if (level < 1 || level > 6) {
     throw new Error('<Heading level /> must be between 1 and 6');
   }

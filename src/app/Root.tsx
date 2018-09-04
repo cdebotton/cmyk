@@ -1,8 +1,8 @@
 import React, { Placeholder } from 'react';
 import { hot } from 'react-hot-loader';
 import { Switch } from 'react-router';
-import DynamicRoute from './containers/DynamicRoute';
 import Loader, { LoaderSize } from './components/Loader';
+import DynamicRoute from './containers/DynamicRoute';
 
 function Root() {
   return (

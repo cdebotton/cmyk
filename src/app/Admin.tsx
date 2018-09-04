@@ -2,11 +2,11 @@ import React from 'react';
 import styled from 'styled-components';
 import Heading from './components/Heading';
 
-interface Props {
+interface IProps {
   className?: string;
 }
 
-function Admin({ className }: Props) {
+function Admin({ className }: IProps) {
   return (
     <div className={className}>
       <Heading>👋🏻, 🌎!</Heading>

@@ -1,9 +1,16 @@
+import { normalize } from 'polished';
 import React from 'react';
-import { unstable_createRoot as createRoot } from 'react-dom';
 import { ApolloProvider } from 'react-apollo';
+import { unstable_createRoot as createRoot } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
-import Root from './Root';
+import { injectGlobal } from 'styled-components';
 import client from './client';
+import Root from './Root';
+
+// tslint:disable-next-line no-unused-expression
+injectGlobal`
+  ${normalize()}
+`;
 
 const element = document.getElementById('app');
 

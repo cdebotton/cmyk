@@ -7,12 +7,12 @@ export enum LoaderSize {
   Large,
 }
 
-interface Props {
+interface IProps {
   className?: string;
   size?: LoaderSize;
 }
 
-function Loader({ className, size = LoaderSize.Medium }: Props) {
+function Loader({ className, size = LoaderSize.Medium }: IProps) {
   return (
     <span className={className}>
       [Loader...]

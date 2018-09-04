@@ -1,7 +1,7 @@
-import { createResource, createCache } from 'simple-cache-provider';
 import { ComponentType } from 'react';
+import { createCache, createResource } from 'simple-cache-provider';
 
-type Loader<Props> = () => Promise<{ default: ComponentType<Props> }>;
+type Loader<P> = () => Promise<{ default: ComponentType<P> }>;
 
 const cache = createCache();
 
@@ -21,9 +21,8 @@ const Resource = createResource(
   loader => loader.toString(),
 );
 
-function componentFetcher<Props>(loader: Loader<Props>) {
-  return Resource.read<{ default: ComponentType<Props> }>(cache, loader)
-    .default;
+function componentFetcher<P>(loader: Loader<P>) {
+  return Resource.read<{ default: ComponentType<P> }>(cache, loader).default;
 }
 
 export default componentFetcher;

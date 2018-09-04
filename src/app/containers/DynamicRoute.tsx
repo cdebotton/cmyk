@@ -1,14 +1,17 @@
 import React, { ComponentType } from 'react';
-import { RouteProps, Route } from 'react-router';
+import { Route, RouteComponentProps, RouteProps } from 'react-router';
 import componentFetcher from '../utils/componentFetcher';
 
-type Loader<Props> = () => Promise<{ default: ComponentType<Props> }>;
+type Loader<P> = () => Promise<{ default: ComponentType<P> }>;
 
-interface Props<P> extends RouteProps {
+interface IProps<P> extends RouteProps {
   loader: Loader<P>;
 }
 
-function DynamicRoute<P>({ loader, ...props }: Props<P>) {
+function DynamicRoute<P extends Partial<RouteComponentProps<any, any, any>>>({
+  loader,
+  ...props
+}: IProps<P>) {
   const Component = componentFetcher(loader);
   return (
     <Route
