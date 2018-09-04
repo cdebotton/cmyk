@@ -9,6 +9,7 @@ function Root() {
     <Placeholder delayMs={300} fallback={<Loader size={LoaderSize.Large} />}>
       <Switch>
         <DynamicRoute path="/admin" loader={() => import('./Admin')} />
+        <DynamicRoute loader={() => import('./NotFound')} />
       </Switch>
     </Placeholder>
   );
