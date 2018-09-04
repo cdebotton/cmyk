@@ -1,9 +1,9 @@
-import Koa from 'koa';
-import mount from 'koa-mount';
-import compress from 'koa-compress';
-import serve from 'koa-static';
-import http from 'http2';
 import fs from 'fs';
+import http from 'http2';
+import Koa from 'koa';
+import compress from 'koa-compress';
+import mount from 'koa-mount';
+import serve from 'koa-static';
 import path from 'path';
 import render from './middleware/render';
 

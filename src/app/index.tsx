@@ -9,7 +9,17 @@ import Root from './Root';
 
 // tslint:disable-next-line no-unused-expression
 injectGlobal`
-  ${normalize()}
+  ${normalize()};
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Roboto, sans-serif;
+  }
 `;
 
 const element = document.getElementById('app');
