@@ -5,7 +5,9 @@ import compress from 'koa-compress';
 import mount from 'koa-mount';
 import serve from 'koa-static';
 import path from 'path';
+import errorReporting from './middleware/errorReporting';
 import render from './middleware/render';
+import responseTime from './middleware/responseTime';
 
 const cwd = process.cwd();
 const {
@@ -24,6 +26,9 @@ const server = http.createSecureServer(
   },
   app.callback(),
 );
+
+app.use(errorReporting());
+app.use(responseTime());
 
 if (__PROD__) {
   app.use(compress());
