@@ -54,6 +54,8 @@ export default styled(Heading)`
   margin: 0;
   padding: 0;
   font-family: Oswald, sans-serif;
+  user-select: none;
+
   ${writingMode};
   ${fontSize};
 `;
