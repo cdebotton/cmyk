@@ -1,20 +1,31 @@
 const path = require('path');
 const webpack = require('webpack');
 
-const { NODE_ENV = 'development' } = process.env;
+const { NODE_ENV = 'development', PUBLIC_PATH = 'dist/' } = process.env;
 const __PROD__ = NODE_ENV === 'production';
 
 const mode = __PROD__ ? 'production' : 'development';
-const publicPath = __PROD__ ? 'dist/' : 'https://localhost:3001/';
 const build = __PROD__ ? 'production.min' : 'development';
 
 module.exports = {
   mode,
   entry: path.join(__dirname, 'src/app/index.tsx'),
   output: {
-    publicPath,
+    publicPath: PUBLIC_PATH,
     filename: 'bundle.js',
+    chunkFilename: '[name].bundle.js',
     path: path.join(__dirname, 'dist/app'),
+  },
+  optimization: {
+    splitChunks: {
+      cacheGroups: {
+        commons: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          chunks: 'initial',
+        },
+      },
+    },
   },
   module: {
     rules: [

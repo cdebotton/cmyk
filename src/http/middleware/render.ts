@@ -1,6 +1,10 @@
 import { Middleware } from 'koa';
 
-function render(): Middleware {
+interface Options {
+  publicPath: string;
+}
+
+function render({ publicPath }: Options): Middleware {
   return ctx => {
     ctx.body =
       '<!doctype html>' +
@@ -10,7 +14,8 @@ function render(): Middleware {
       '</head>' +
       '<body>' +
       '<main id="app"></main>' +
-      '<script src="https://localhost:3001/bundle.js"></script>' +
+      `<script src="${publicPath}vendor.bundle.js"></script>` +
+      `<script src="${publicPath}bundle.js"></script>` +
       '</body>' +
       '</html>';
   };
