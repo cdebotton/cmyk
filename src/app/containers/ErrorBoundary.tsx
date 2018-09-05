@@ -1,14 +1,49 @@
-import React, { Component } from 'react';
+import { Component, ErrorInfo, ReactNode } from 'react';
 
-interface IState {}
+interface IProps {
+  handleError: ReactNode | ((error: Error, info: ErrorInfo) => ReactNode);
+}
 
-class ErrorBoundary extends Component<{}, IState> {
-  public constructor(props: {}, context: any) {
+interface IValid {
+  variant: 'ok';
+}
+
+interface IError {
+  variant: 'error';
+  error: Error;
+  info: ErrorInfo;
+}
+
+type State = IValid | IError;
+
+class ErrorBoundary extends Component<IProps, State> {
+  public constructor(props: IProps, context: any) {
     super(props, context);
-    this.state = {};
+    this.state = {
+      variant: 'ok',
+    };
+  }
+
+  public componentDidCatch(error: Error, info: ErrorInfo) {
+    this.setState(state => ({
+      ...state,
+      error,
+      info,
+      variant: 'error',
+    }));
   }
 
   public render() {
-    return this.props.children;
+    switch (this.state.variant) {
+      case 'ok':
+        return this.props.children;
+      case 'error':
+        if (typeof this.props.handleError === 'function') {
+          return this.props.handleError(this.state.error, this.state.info);
+        }
+        return this.props.handleError;
+    }
   }
 }
+
+export default ErrorBoundary;

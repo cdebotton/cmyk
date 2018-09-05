@@ -4,6 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
+    "apollo:generate": "apollo codegen:generate --addTypename --target typescript",
     "prebuild:http": "rm -rf dist/http",
     "build:http": "PUBLIC_PATH=/dist/ NODE_ENV=development BABEL_TARGET=node babel -d dist/http src/http --extensions .ts",
     "prebuild:graphql": "rm -rf dist/graphql",
@@ -67,6 +68,7 @@
     "apollo-server": "^2.0.5",
     "graphql": "^14.0.0",
     "graphql-import": "^0.6.0",
+    "graphql-tag": "^2.9.2",
     "koa": "^2.5.2",
     "koa-compress": "^3.0.0",
     "koa-mount": "^3.0.0",

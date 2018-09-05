@@ -1,4 +1,6 @@
 import React from 'react';
+import { hot } from 'react-hot-loader';
+import styled from 'styled-components';
 import Heading from './components/Heading';
 
 function Dashboard() {
@@ -9,4 +11,6 @@ function Dashboard() {
   );
 }
 
-export default Dashboard;
+export default hot(module)(styled(Dashboard)`
+  position: relative;
+`);

@@ -1,4 +1,4 @@
-import { modularScale } from 'polished';
+import { rem } from 'polished';
 import React, { HTMLProps, ReactNode } from 'react';
 import styled from 'styled-components';
 
@@ -8,8 +8,14 @@ interface IProps extends HTMLProps<HTMLHeadingElement> {
   children?: ReactNode;
 }
 
+function modularScale(steps: number) {
+  return rem(16 * 1.414 ** steps);
+}
+
+const DEFAULT_LEVEL = 2;
+
 function Heading({
-  level = 2,
+  level = DEFAULT_LEVEL,
   children,
   vertical: _vertical,
   ...props
@@ -28,21 +34,24 @@ function writingMode(props: IProps) {
   return null;
 }
 
-function fontSize(props: IProps) {
+function fontSize({ level = DEFAULT_LEVEL }: IProps) {
   let size: string;
 
-  switch (props.level) {
+  switch (level) {
     case 1:
-      size = modularScale(2.5);
+      size = modularScale(3);
       break;
     case 2:
-      size = modularScale(3);
+      size = modularScale(4);
+      break;
     case 3:
-      size = modularScale(2);
+      size = modularScale(3);
+      break;
     case 2:
-      size = modularScale(1);
+      size = modularScale(2);
+      break;
     default:
-      size = modularScale(0);
+      size = modularScale(1);
       break;
   }
 
