@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 import React, { Placeholder } from 'react';
 import { Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
-import { Redirect, Switch } from 'react-router';
+import { Redirect, RouteProps, Switch } from 'react-router';
 import { Session } from './__generated__/Session';
 import Loader, { LoaderSize } from './components/Loader';
 import DynamicRoute from './containers/DynamicRoute';
@@ -20,9 +20,18 @@ const SESSION_QUERY = gql`
 `;
 
 function isLoggedIn(data: Session | null) {
-  return () => {
+  return (props: RouteProps) => {
     if (!data || data.session === null) {
-      return <Redirect to="/login" />;
+      return (
+        <Redirect
+          to={{
+            pathname: '/login',
+            state: {
+              attempt: props.location,
+            },
+          }}
+        />
+      );
     }
   };
 }

@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import React from 'react';
 import { Mutation, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
-import { Redirect } from 'react-router';
+import { Redirect, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import { Login as LoginMutation, LoginVariables } from './__generated__/Login';
 import Heading from './components/Heading';
@@ -15,7 +15,7 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
-interface IProps {
+interface IProps extends RouteComponentProps<{}> {
   className?: string;
 }
 
@@ -24,12 +24,17 @@ interface IValues {
   password: string;
 }
 
-function Login({ className }: IProps) {
+function Login({ className, location }: IProps) {
   return (
     <Session>
       {({ session, client }) => {
         if (session) {
-          return <Redirect to="/admin" />;
+          const to =
+            location.state && location.state.attempt
+              ? location.state.attempt
+              : '/admin';
+
+          return <Redirect to={to} />;
         }
 
         return (
