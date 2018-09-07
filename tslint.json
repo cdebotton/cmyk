@@ -1,8 +1,10 @@
 {
   "extends": ["tslint:recommended", "tslint-react", "tslint-config-prettier"],
   "rules": {
+    "only-arrow-functions": [false],
     "jsx-no-lambda": [false],
     "jsx-boolean-value": [false],
-    "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"]
+    "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"],
+    "object-literal-sort-keys": [true, "shorthand-first"]
   }
 }

@@ -2,5 +2,20 @@
 # import UserWhereInput from "./prisma.graphql"
 
 type Query {
+  session: Session
   users(where: UserWhereInput): [User!]!
+}
+
+type Mutation {
+  login(data: LoginInput!): String
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+type Session {
+  iat: Int!
+  user: User!
 }

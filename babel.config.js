@@ -20,5 +20,12 @@ module.exports = {
     '@babel/syntax-dynamic-import',
     '@babel/proposal-object-rest-spread',
     '@babel/proposal-class-properties',
+    [
+      'babel-plugin-styled-components',
+      {
+        displayName: process.env.NODE_ENV === 'development',
+        fileName: process.env.NODE_ENV === 'development',
+      },
+    ],
   ],
 };

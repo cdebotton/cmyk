@@ -16,6 +16,7 @@ import ClientError from './ClientError';
 import Heading from './components/Heading';
 import DynamicRoute from './containers/DynamicRoute';
 import ErrorBoundary from './containers/ErrorBoundary';
+import Session from './containers/Session';
 
 interface IProps extends RouteComponentProps<{}> {
   className?: string;
@@ -34,10 +35,6 @@ const Navigation = styled.nav`
   display: flex;
   flex-flow: column nowrap;
   padding: ${rem(16)};
-`;
-
-const Viewport = styled.div`
-  grid-column: 2 / span 1;
 `;
 
 function Admin({ className, match }: IProps) {
@@ -66,19 +63,38 @@ function Admin({ className, match }: IProps) {
             <NavLink to={`${match.url}/settings`}>
               <FontAwesomeIcon icon={faCogs} />
             </NavLink>
+            <Session>
+              {({ session, client }) => {
+                if (!session) {
+                  return null;
+                }
+
+                return (
+                  <button
+                    onClick={() => {
+                      localStorage.removeItem('jwt');
+                      client.resetStore();
+                    }}
+                  >
+                    Out
+                  </button>
+                );
+              }}
+            </Session>
           </Navigation>
         </Header>
-        <Viewport>
-          <Switch>
-            <DynamicRoute
-              exact
-              path={`${match.url}`}
-              loader={() => import('./AdminDashboard')}
-            />
-            <DynamicRoute loader={() => import('./AdminUsers')} />
-            <DynamicRoute loader={() => import('./NotFound')} />
-          </Switch>
-        </Viewport>
+        <Switch>
+          <DynamicRoute
+            exact
+            path={`${match.url}`}
+            loader={() => import('./AdminDashboard')}
+          />
+          <DynamicRoute
+            path={`${match.url}/users`}
+            loader={() => import('./AdminUsers')}
+          />
+          <DynamicRoute loader={() => import('./NotFound')} />
+        </Switch>
       </div>
     </ErrorBoundary>
   );

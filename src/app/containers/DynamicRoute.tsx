@@ -1,15 +1,17 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, ReactNode } from 'react';
 import { Route, RouteComponentProps, RouteProps } from 'react-router';
 import componentFetcher from '../utils/componentFetcher';
 
 type Loader<P> = () => Promise<{ default: ComponentType<P> }>;
 
 interface IProps<P> extends RouteProps {
+  protect?: () => ReactNode | undefined;
   loader: Loader<P>;
 }
 
 function DynamicRoute<P extends Partial<RouteComponentProps<any, any, any>>>({
   loader,
+  protect,
   ...props
 }: IProps<P>) {
   const Component = componentFetcher(loader);
@@ -17,6 +19,13 @@ function DynamicRoute<P extends Partial<RouteComponentProps<any, any, any>>>({
     <Route
       {...props}
       render={routeProps => {
+        if (protect) {
+          const blocked = protect();
+          if (blocked) {
+            return blocked;
+          }
+        }
+
         return <Component {...routeProps} />;
       }}
     />
