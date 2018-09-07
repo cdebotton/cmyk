@@ -90,6 +90,10 @@ function Admin({ className, match }: IProps) {
             loader={() => import('./AdminDashboard')}
           />
           <DynamicRoute
+            path={`${match.url}/users/:userId`}
+            loader={() => import('./AdminEditUser')}
+          />
+          <DynamicRoute
             path={`${match.url}/users`}
             loader={() => import('./AdminUsers')}
           />

@@ -2,10 +2,10 @@ import { ApolloClient } from 'apollo-client';
 import gql from 'graphql-tag';
 import React, { ReactNode } from 'react';
 import { Query } from 'react-apollo';
-import { Session as ISession } from '../__generated__/Session';
+import { Session_Session } from './__generated__/Session_Session';
 
 const SESSION_QUERY = gql`
-  query Session {
+  query Session_Session {
     session {
       iat
       user {
@@ -17,7 +17,7 @@ const SESSION_QUERY = gql`
 `;
 
 interface IResult {
-  session: ISession | null;
+  session: Session_Session | null;
   client: ApolloClient<any>;
 }
 

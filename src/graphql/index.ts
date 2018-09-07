@@ -41,6 +41,7 @@ const resolvers: IResolvers<{}, IContext> = {
   },
   Query: {
     session: (parent, args, ctx, info) => ctx.session,
+    user: (parent, args, ctx, info) => ctx.db.query.user(args, info),
     users: (parent, args, ctx, info) => ctx.db.query.users(args, info),
   },
 };
