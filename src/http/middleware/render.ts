@@ -15,6 +15,7 @@ function render({ publicPath }: IOptions): Middleware {
       '</head>' +
       '<body>' +
       '<main id="app"></main>' +
+      '<span id="portal"></span>' +
       `<script src="${publicPath}vendor.bundle.js"></script>` +
       `<script src="${publicPath}bundle.js"></script>` +
       '</body>' +
