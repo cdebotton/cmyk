@@ -38,6 +38,11 @@ const resolvers: IResolvers<{}, IContext> = {
 
       return token;
     },
+    updateUser: async (parent, args, ctx, info) => {
+      const user = await ctx.db.mutation.updateUser(args, info);
+
+      return user;
+    },
   },
   Query: {
     session: (parent, args, ctx, info) => ctx.session,
@@ -47,6 +52,11 @@ const resolvers: IResolvers<{}, IContext> = {
 };
 
 const schema = makeExecutableSchema({ typeDefs, resolvers });
+
+interface IToken {
+  iat: string;
+  userId: string;
+}
 
 async function getSession(db: Prisma, authorization?: string) {
   if (!authorization) {
@@ -64,11 +74,13 @@ async function getSession(db: Prisma, authorization?: string) {
     decoded = JSON.parse(decoded);
   }
 
-  const user = await db.query.user({ where: { id: decoded.userId } });
+  const t = decoded as IToken;
+
+  const user = await db.query.user({ where: { id: t.userId } });
 
   return {
     user,
-    iat: decoded.iat,
+    iat: t.iat,
   };
 }
 
