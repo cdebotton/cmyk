@@ -20,6 +20,14 @@ injectGlobal`
   body {
     font-family: Roboto, sans-serif;
   }
+
+  ::selection {
+    background-color: hsla(300, 100%, 50%, 0.5);
+  }
+
+  a {
+    color: hsla(212, 50%, 50%, 1.0);
+  }
 `;
 
 const element = document.getElementById('app');

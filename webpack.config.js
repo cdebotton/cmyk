@@ -9,7 +9,7 @@ const build = __PROD__ ? 'production.min' : 'development';
 
 module.exports = {
   mode,
-  entry: path.join(__dirname, 'src/app/index.tsx'),
+  entry: ['@babel/polyfill', path.join(__dirname, 'src/app/index.tsx')],
   output: {
     publicPath: PUBLIC_PATH,
     filename: 'bundle.js',

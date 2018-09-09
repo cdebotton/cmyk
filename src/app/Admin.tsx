@@ -28,13 +28,20 @@ const Header = styled.header`
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
+  padding: ${rem(24)} ${rem(16)};
 `;
 
 const Navigation = styled.nav`
   position: relative;
   display: flex;
+  align-items: stretch;
   flex-flow: column nowrap;
-  padding: ${rem(16)};
+  margin-top: ${rem(16)};
+`;
+
+const PageLink = styled(NavLink)`
+  padding: ${rem(12)};
+  text-align: center;
 `;
 
 function Admin({ className, match }: IProps) {
@@ -48,21 +55,21 @@ function Admin({ className, match }: IProps) {
             CMYK
           </Heading>
           <Navigation>
-            <NavLink exact to={match.url}>
+            <PageLink exact to={match.url}>
               <FontAwesomeIcon icon={faHome} />
-            </NavLink>
-            <NavLink to={`${match.url}/documents`}>
+            </PageLink>
+            <PageLink to={`${match.url}/documents`}>
               <FontAwesomeIcon icon={faFolder} />
-            </NavLink>
-            <NavLink to={`${match.url}/media`}>
+            </PageLink>
+            <PageLink to={`${match.url}/media`}>
               <FontAwesomeIcon icon={faCamera} />
-            </NavLink>
-            <NavLink to={`${match.url}/users`}>
+            </PageLink>
+            <PageLink to={`${match.url}/users`}>
               <FontAwesomeIcon icon={faUser} />
-            </NavLink>
-            <NavLink to={`${match.url}/settings`}>
+            </PageLink>
+            <PageLink to={`${match.url}/settings`}>
               <FontAwesomeIcon icon={faCogs} />
-            </NavLink>
+            </PageLink>
             <Session>
               {({ session, client }) => {
                 if (!session) {

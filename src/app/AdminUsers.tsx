@@ -9,6 +9,7 @@ import { Users } from './__generated__/Users';
 import Heading from './components/Heading';
 import List, { Item } from './components/List';
 import Loader from './components/Loader';
+import PageLayout from './components/PageLayout';
 
 const USERS_QUERY = gql`
   query Users {
@@ -29,7 +30,7 @@ interface IProps extends RouteComponentProps<{}> {
 
 function AdminUsers({ className, match }: IProps) {
   return (
-    <div className={className}>
+    <PageLayout className={className}>
       <Heading>Users</Heading>
       <Query<Users, {}> query={USERS_QUERY}>
         {({ data, loading, error }) => {
@@ -52,7 +53,7 @@ function AdminUsers({ className, match }: IProps) {
           );
         }}
       </Query>
-    </div>
+    </PageLayout>
   );
 }
 
