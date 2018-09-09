@@ -56,8 +56,20 @@ export function foreground(
 
     const inverseMode = theme.mode === 'light' ? 'dark' : 'light';
     const colorGroup = format ? colors.light : colors[inverseMode];
-    const color = colorGroup[shade];
+    const clr = colorGroup[shade];
 
-    return `color: ${color}`;
+    return `color: ${clr}`;
+  };
+}
+
+export function color(
+  options: { color: Theme['mode'] | Format; shade?: number } = {
+    color: 'neutral',
+    shade: 1,
+  },
+) {
+  return function<P>(_props: ThemedOuterStyledProps<P, Theme>) {
+    const { color: clr, shade = 1 } = options;
+    return colors[clr][shade];
   };
 }

@@ -12,6 +12,7 @@ import Heading from './components/Heading';
 import List, { Item } from './components/List';
 import Loader from './components/Loader';
 import PageLayout from './components/PageLayout';
+import DynamicRoute from './containers/DynamicRoute';
 import { foreground, gradient } from './styles/helpers';
 
 const USERS_QUERY = gql`
@@ -64,6 +65,10 @@ function AdminUsers({ className, match }: IProps) {
           );
         }}
       </Query>
+      <DynamicRoute
+        path={`${match.url}/:userId`}
+        loader={() => import('./AdminEditUser')}
+      />
     </AdminUsersLayout>
   );
 }
