@@ -3,6 +3,7 @@
   "rules": {
     "only-arrow-functions": [false],
     "jsx-no-lambda": [false],
+    "interface-name": [false],
     "jsx-boolean-value": [false],
     "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"],
     "object-literal-sort-keys": [true, "shorthand-first"]

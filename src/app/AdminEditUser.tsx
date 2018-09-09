@@ -95,7 +95,7 @@ function AdminEditUser({ className, ...props }: IProps) {
         }
 
         return (
-          <PageLayout className={className}>
+          <AdminEditUserLayout className={className}>
             <Heading>Edit User {user.email}</Heading>
             <Mutation<UpdateUserMutation, UpdateUserMutationVariables>
               mutation={USER_UPDATE_MUTATION}
@@ -155,23 +155,25 @@ function AdminEditUser({ className, ...props }: IProps) {
                         component={Input}
                         label="Last name"
                       />
-                      <SaveButton>Save</SaveButton>
+                      <SaveButton format="neutral">Save</SaveButton>
                       <CancelButton>Cancel</CancelButton>
                     </UserForm>
                   )}
                 </Formik>
               )}
             </Mutation>
-          </PageLayout>
+          </AdminEditUserLayout>
         );
       }}
     </Query>
   );
 }
 
-export default hot(module)(styled(AdminEditUser)`
+export default hot(module)(AdminEditUser);
+
+const AdminEditUserLayout = styled(PageLayout)`
   position: relative;
-`);
+`;
 
 const UserForm = styled.form`
   grid-gap: ${rem(16)};

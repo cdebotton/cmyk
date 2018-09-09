@@ -10,6 +10,7 @@ const List = styled.ul`
 
 const Item = styled.li`
   margin-bottom: ${rem(5)};
+  padding: ${rem(6)};
 
   &:last-child {
     margin-bottom: 0;
