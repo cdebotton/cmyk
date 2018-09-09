@@ -1,13 +1,22 @@
-import React, { Component } from 'react';
+import React, { Component, ReactNode } from 'react';
+import styled from 'styled-components';
 
-interface IProps {
+interface IProps<T> {
   className?: string;
+  items: T[];
+  renderItem: (item: T, index: number) => ReactNode;
 }
 
-class Grid extends Component<IProps> {
+const GridContainer = styled.ul``;
+
+class Grid<T> extends Component<IProps<T>> {
   public render() {
-    const { className } = this.props;
-    return <ul className={className} />;
+    const { className, items, renderItem } = this.props;
+    return (
+      <GridContainer className={className}>
+        {items.map(renderItem)}
+      </GridContainer>
+    );
   }
 }
 
