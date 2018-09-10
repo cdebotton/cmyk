@@ -20,6 +20,9 @@ const USERS_QUERY = gql`
     users {
       id
       email
+      lastLogin
+      createdAt
+      updatedAt
       profile {
         firstName
         lastName

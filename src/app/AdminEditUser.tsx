@@ -102,6 +102,7 @@ function AdminEditUser({ className, ...props }: IProps) {
             >
               {mutate => (
                 <Formik<IValues>
+                  key={user.id}
                   validationSchema={UserSchema}
                   onSubmit={async values => {
                     // tslint:disable-next-line no-console
