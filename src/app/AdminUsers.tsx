@@ -1,3 +1,7 @@
+import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
+import format from 'date-fns/format';
+import isValid from 'date-fns/is_valid';
+import parse from 'date-fns/parse';
 import gql from 'graphql-tag';
 import { rem } from 'polished';
 import React from 'react';
@@ -7,7 +11,9 @@ import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
 import { Users } from './__generated__/Users';
+import Badge from './components/Badge';
 import Button from './components/Button';
+import Card from './components/Card';
 import Heading from './components/Heading';
 import List, { Item } from './components/List';
 import Loader from './components/Loader';
@@ -20,9 +26,9 @@ const USERS_QUERY = gql`
     users {
       id
       email
+      role
       lastLogin
       createdAt
-      updatedAt
       profile {
         firstName
         lastName
@@ -38,6 +44,7 @@ interface IProps extends RouteComponentProps<{}> {
 function AdminUsers({ className, match }: IProps) {
   return (
     <AdminUsersLayout className={className}>
+      <AdminUserFilters format="neutral" />
       <Header format="neutral">
         <Heading>Users</Heading>
         <Button format="neutral">New user</Button>
@@ -53,36 +60,55 @@ function AdminUsers({ className, match }: IProps) {
           }
 
           return (
-            <UsersList>
-              {data.users.map(user => (
-                <User key={user.id}>
-                  <ClickableArea to={`${match.url}/${user.id}`}>
-                    <Email>{user.email}</Email>
-                    <Name>
-                      {user.profile.firstName} {user.profile.lastName}
-                    </Name>
-                  </ClickableArea>
-                </User>
-              ))}
-            </UsersList>
+            <>
+              <UsersList>
+                {data.users.map(user => (
+                  <Item key={user.id}>
+                    <ClickableArea to={`${match.url}/${user.id}`}>
+                      <Card
+                        imageUrl="http://placeimg.com/128/128/any"
+                        title={
+                          <>
+                            {user.profile.firstName} {user.profile.lastName}
+                          </>
+                        }
+                        subtitle={user.email}
+                        badge={<Badge format="neutral">{user.role}</Badge>}
+                      />
+                      <span>{getFormattedDate(user.createdAt)}</span>
+                      <span>{getTimeAgo(user.lastLogin)}</span>
+                    </ClickableArea>
+                  </Item>
+                ))}
+              </UsersList>
+              <DynamicRoute
+                path={`${match.url}/:userId`}
+                loader={() => import('./AdminEditUser')}
+                renderComponent={(Component, routeProps) => (
+                  <EditUserContainer>
+                    <Component {...routeProps} />
+                  </EditUserContainer>
+                )}
+              />
+            </>
           );
         }}
       </Query>
-      <DynamicRoute
-        path={`${match.url}/:userId`}
-        loader={() => import('./AdminEditUser')}
-      />
     </AdminUsersLayout>
   );
 }
 
 const AdminUsersLayout = styled(PageLayout)`
   width: 100%;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: repeat(8, 1fr);
+  grid-template-rows: min-content auto;
+  min-height: 100vh;
+  align-content: stretch;
 `;
 
 const Header = styled.header`
-  grid-column: 1 / span 4;
+  grid-column: 1 / span 8;
+  grid-row: 1 / span 1;
   display: flex;
   align-items: flex-end;
   justify-content: space-between;
@@ -102,23 +128,47 @@ const Header = styled.header`
   }
 `;
 
-const User = styled(Item)`
-  position: relative;
+const AdminUserFilters = styled.nav`
+  grid-column: 1 / span 2;
+  grid-row: 2 / span 1;
+  border-radius: 3px;
+  ${gradient({ offset: 3, steps: 2 })};
 `;
 
 const UsersList = styled(List)`
-  grid-column: 1 / span 4;
+  grid-column: 3 / span 6;
+  grid-row: 2 / span 1;
 `;
 
 const ClickableArea = styled(Link)`
   display: grid;
   grid-gap: ${rem(16)};
-  grid-template-columns: min-content max-content;
+  grid-template-columns: 2fr repeat(3, 1fr);
   align-items: baseline;
   text-decoration: none;
   ${foreground()};
 `;
-const Email = styled.span``;
-const Name = styled.span``;
+
+const EditUserContainer = styled.div`
+  grid-column: 1 / span 8;
+`;
+
+function getFormattedDate(date: string) {
+  const parsed = parse(date);
+  if (!isValid(parsed)) {
+    return null;
+  }
+  return format(parsed, 'MMMM DD, YYYY');
+}
+
+function getTimeAgo(date: string | null) {
+  if (date == null) {
+    return 'Never';
+  }
+
+  const parsed = parse(date);
+
+  return distanceInWordsToNow(parsed);
+}
 
 export default hot(module)(AdminUsers);

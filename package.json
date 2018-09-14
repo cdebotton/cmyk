@@ -73,6 +73,7 @@
     "apollo-link-ws": "^1.0.8",
     "apollo-server": "^2.0.5",
     "bcryptjs": "^2.4.3",
+    "date-fns": "^1.29.0",
     "formik": "^1.2.0",
     "graphql": "^14.0.0",
     "graphql-import": "^0.7.0",

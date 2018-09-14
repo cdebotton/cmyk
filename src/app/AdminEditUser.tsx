@@ -65,11 +65,11 @@ interface IValues {
   lastName: string;
 }
 
-interface IProps extends RouteComponentProps<{ userId: string }> {
+interface Props extends RouteComponentProps<{ userId: string }> {
   className?: string;
 }
 
-function AdminEditUser({ className, ...props }: IProps) {
+function AdminEditUser({ className, ...props }: Props) {
   const { match, history } = props;
 
   return (
