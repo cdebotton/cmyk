@@ -1,6 +1,6 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 
-interface IProps {
+interface Props {
   handleError: ReactNode | ((error: Error, info: ErrorInfo) => ReactNode);
 }
 
@@ -16,8 +16,8 @@ interface IError {
 
 type State = IValid | IError;
 
-class ErrorBoundary extends Component<IProps, State> {
-  public constructor(props: IProps, context: any) {
+class ErrorBoundary extends Component<Props, State> {
+  public constructor(props: Props, context: any) {
     super(props, context);
     this.state = {
       variant: 'ok',

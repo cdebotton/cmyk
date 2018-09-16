@@ -8,15 +8,7 @@ interface IProps extends HTMLProps<HTMLButtonElement> {
   format?: Format;
 }
 
-function Button({ className, format: _format, ...props }: IProps) {
-  return (
-    <>
-      <button className={className} {...props} />
-    </>
-  );
-}
-
-export default styled(Button)`
+export default styled.button`
   position: relative;
   border: none;
   cursor: pointer;
@@ -24,4 +16,9 @@ export default styled(Button)`
   border-radius: 3px;
   ${gradient()};
   ${foreground()};
+
+  :disabled {
+    opacity: 0.25;
+    cursor: default;
+  }
 `;

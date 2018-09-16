@@ -7,6 +7,7 @@ import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as Yup from 'yup';
+import { Role } from '../../__generated__/globalTypes';
 import { EditUserQuery } from './__generated__/EditUserQuery';
 import {
   UpdateUserMutation,
@@ -16,13 +17,15 @@ import Button from './components/Button';
 import Heading from './components/Heading';
 import Input from './components/Input';
 import PageLayout from './components/PageLayout';
+import Select from './components/Select';
 import DynamicComponent from './containers/DynamicComponent';
 
-const USER_QUERY = gql`
+const EDIT_USER_QUERY = gql`
   query EditUserQuery($where: UserWhereUniqueInput!) {
     user(where: $where) {
       id
       email
+      role
       profile {
         firstName
         lastName
@@ -39,6 +42,7 @@ const USER_UPDATE_MUTATION = gql`
     updateUser(data: $data, where: $where) {
       id
       email
+      role
       profile {
         firstName
         lastName
@@ -63,6 +67,7 @@ interface IValues {
   email: string;
   firstName: string;
   lastName: string;
+  role: Role;
 }
 
 interface Props extends RouteComponentProps<{ userId: string }> {
@@ -74,7 +79,7 @@ function AdminEditUser({ className, ...props }: Props) {
 
   return (
     <Query<EditUserQuery, {}>
-      query={USER_QUERY}
+      query={EDIT_USER_QUERY}
       variables={{ where: { id: match.params.userId } }}
     >
       {({ data, loading, error }) => {
@@ -105,27 +110,23 @@ function AdminEditUser({ className, ...props }: Props) {
                   key={user.id}
                   validationSchema={UserSchema}
                   onSubmit={async values => {
-                    // tslint:disable-next-line no-console
-                    try {
-                      await mutate({
-                        variables: {
-                          data: {
-                            email: values.email,
-                            profile: {
-                              update: {
-                                firstName: values.firstName,
-                                lastName: values.lastName,
-                              },
+                    await mutate({
+                      variables: {
+                        data: {
+                          email: values.email,
+                          profile: {
+                            update: {
+                              firstName: values.firstName,
+                              lastName: values.lastName,
                             },
                           },
-                          where: { id: user.id },
+                          role: values.role,
                         },
-                      });
+                        where: { id: user.id },
+                      },
+                    });
 
-                      history.push('/admin/users');
-                      // tslint:disable-next-line no-empty
-                    } finally {
-                    }
+                    history.push('/admin/users');
                   }}
                   initialValues={{
                     email: user.email,
@@ -137,6 +138,7 @@ function AdminEditUser({ className, ...props }: Props) {
                       user.profile && user.profile.lastName !== null
                         ? user.profile.lastName
                         : '',
+                    role: user.role,
                   }}
                 >
                   {({ handleSubmit }) => (
@@ -155,6 +157,17 @@ function AdminEditUser({ className, ...props }: Props) {
                         name="lastName"
                         component={Input}
                         label="Last name"
+                      />
+                      <Field
+                        name="role"
+                        component={Select}
+                        label="Role"
+                        options={[
+                          { label: 'Admin', value: Role.ADMIN },
+                          { label: 'Editor', value: Role.EDITOR },
+                          { label: 'User', value: Role.USER },
+                          { label: 'Unauthorized', value: Role.UNAUTHORIZED },
+                        ]}
                       />
                       <SaveButton format="neutral">Save</SaveButton>
                       <CancelButton>Cancel</CancelButton>

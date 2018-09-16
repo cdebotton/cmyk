@@ -6,7 +6,7 @@ const PageLayout = styled.div`
   display: grid;
   padding: ${rem(16)};
   align-content: start;
-  justify-content: start;
+  justify-content: stretch;
   background-color: ${color({ color: 'light', shade: 0 })};
 `;
 

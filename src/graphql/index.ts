@@ -20,6 +20,25 @@ const BadCredentials = new Error('Bad credentials');
 const typeDefs = importSchema('src/graphql/schema/typeDefs.graphql');
 const resolvers: IResolvers<{}, IContext> = {
   Mutation: {
+    createUser: async (parent, args, ctx, info) => {
+      const { data } = args;
+
+      const salt = await bcrypt.genSalt(10);
+      const hashedPassword = await bcrypt.hash(data.password, salt);
+
+      return ctx.db.mutation.createUser(
+        {
+          data: {
+            ...data,
+            password: hashedPassword,
+          },
+        },
+        info,
+      );
+    },
+    deleteUser: async (parent, args, ctx, info) => {
+      return ctx.db.mutation.deleteUser({ where: args.where }, info);
+    },
     login: async (parent, args, ctx, info) => {
       const { email, password } = args.data;
       const user = await ctx.db.query.user({ where: { email } });

@@ -1,27 +1,32 @@
+import { faTimesCircle } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
 import format from 'date-fns/format';
 import isValid from 'date-fns/is_valid';
 import parse from 'date-fns/parse';
 import gql from 'graphql-tag';
-import { rem } from 'polished';
+// import { rem } from 'polished';
 import React from 'react';
-import { Query } from 'react-apollo';
+import { Mutation, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { Users } from './__generated__/Users';
+import {
+  DeleteUserMutation,
+  DeleteUserMutationVariables,
+} from './__generated__/DeleteUserMutation';
+import { Users, Users_users } from './__generated__/Users';
 import Badge from './components/Badge';
 import Button from './components/Button';
+import ButtonLink from './components/ButtonLink';
 import Card from './components/Card';
 import Heading from './components/Heading';
-import List, { Item } from './components/List';
 import Loader from './components/Loader';
 import PageLayout from './components/PageLayout';
-import DynamicRoute from './containers/DynamicRoute';
-import { foreground, gradient } from './styles/helpers';
+import { Table, TableRow } from './components/Table';
 
-const USERS_QUERY = gql`
+export const USERS_QUERY = gql`
   query Users {
     users {
       id
@@ -37,18 +42,27 @@ const USERS_QUERY = gql`
   }
 `;
 
-interface IProps extends RouteComponentProps<{}> {
+const DELETE_USER_MUTATION = gql`
+  mutation DeleteUserMutation($where: UserWhereUniqueInput!) {
+    deleteUser(where: $where) {
+      id
+    }
+  }
+`;
+
+interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
 
-function AdminUsers({ className, match }: IProps) {
+function AdminUsers({ className, match }: Props) {
   return (
-    <AdminUsersLayout className={className}>
-      <AdminUserFilters format="neutral" />
-      <Header format="neutral">
-        <Heading>Users</Heading>
-        <Button format="neutral">New user</Button>
-      </Header>
+    <PageLayout className={className}>
+      <Heading>
+        Users{' '}
+        <ButtonLink format="neutral" to={`${match.url}/new`}>
+          New user
+        </ButtonLink>
+      </Heading>
       <Query<Users, {}> query={USERS_QUERY}>
         {({ data, loading, error }) => {
           if (error) {
@@ -60,98 +74,88 @@ function AdminUsers({ className, match }: IProps) {
           }
 
           return (
-            <>
-              <UsersList>
-                {data.users.map(user => (
-                  <Item key={user.id}>
-                    <ClickableArea to={`${match.url}/${user.id}`}>
-                      <Card
-                        imageUrl="http://placeimg.com/128/128/any"
-                        title={
-                          <>
-                            {user.profile.firstName} {user.profile.lastName}
-                          </>
+            <Table>
+              {data.users.map(user => (
+                <UsersRow key={`USER_${user.id}`}>
+                  <Link to={`${match.url}/${user.id}`}>
+                    <Card
+                      imageUrl="http://placehold.it/100x100"
+                      badge={<Badge format="neutral">{user.role}</Badge>}
+                      title={getUserTitle(user)}
+                      subtitle={getUserSubtitle(user)}
+                    />
+                  </Link>
+                  <span>{getFormattedDate(user.createdAt)}</span>
+                  <span>{getTimeAgo(user.lastLogin)}</span>
+                  <Mutation<DeleteUserMutation, DeleteUserMutationVariables>
+                    mutation={DELETE_USER_MUTATION}
+                  >
+                    {mutate => (
+                      <Button
+                        onClick={() =>
+                          mutate({
+                            update: (cache, { data: mutationData }) => {
+                              const cacheUsers = cache.readQuery<Users>({
+                                query: USERS_QUERY,
+                              });
+
+                              if (!(cacheUsers && cacheUsers.users)) {
+                                return;
+                              }
+
+                              cache.writeQuery({
+                                data: {
+                                  users: cacheUsers.users.filter(u => {
+                                    if (
+                                      !(mutationData && mutationData.deleteUser)
+                                    ) {
+                                      return true;
+                                    }
+
+                                    return u.id !== mutationData.deleteUser.id;
+                                  }),
+                                },
+                                query: USERS_QUERY,
+                              });
+                            },
+                            variables: { where: { id: user.id } },
+                          })
                         }
-                        subtitle={user.email}
-                        badge={<Badge format="neutral">{user.role}</Badge>}
-                      />
-                      <span>{getFormattedDate(user.createdAt)}</span>
-                      <span>{getTimeAgo(user.lastLogin)}</span>
-                    </ClickableArea>
-                  </Item>
-                ))}
-              </UsersList>
-              <DynamicRoute
-                path={`${match.url}/:userId`}
-                loader={() => import('./AdminEditUser')}
-                renderComponent={(Component, routeProps) => (
-                  <EditUserContainer>
-                    <Component {...routeProps} />
-                  </EditUserContainer>
-                )}
-              />
-            </>
+                      >
+                        <FontAwesomeIcon icon={faTimesCircle} />
+                      </Button>
+                    )}
+                  </Mutation>
+                </UsersRow>
+              ))}
+            </Table>
           );
         }}
       </Query>
-    </AdminUsersLayout>
+    </PageLayout>
   );
 }
 
-const AdminUsersLayout = styled(PageLayout)`
-  width: 100%;
-  grid-template-columns: repeat(8, 1fr);
-  grid-template-rows: min-content auto;
-  min-height: 100vh;
-  align-content: stretch;
-`;
-
-const Header = styled.header`
-  grid-column: 1 / span 8;
-  grid-row: 1 / span 1;
-  display: flex;
-  align-items: flex-end;
-  justify-content: space-between;
-  position: relative;
-  padding-bottom: ${rem(8)};
-  margin-bottom: ${rem(8)};
-
-  &::after {
-    position: absolute;
-    display: block;
-    content: ' ';
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 4px;
-    ${gradient()};
-  }
-`;
-
-const AdminUserFilters = styled.nav`
-  grid-column: 1 / span 2;
-  grid-row: 2 / span 1;
-  border-radius: 3px;
-  ${gradient({ offset: 3, steps: 2 })};
-`;
-
-const UsersList = styled(List)`
-  grid-column: 3 / span 6;
-  grid-row: 2 / span 1;
-`;
-
-const ClickableArea = styled(Link)`
+const UsersRow = styled(TableRow)`
   display: grid;
-  grid-gap: ${rem(16)};
-  grid-template-columns: 2fr repeat(3, 1fr);
-  align-items: baseline;
-  text-decoration: none;
-  ${foreground()};
+  grid-template-columns: 3fr repeat(2, 1fr) min-content;
 `;
 
-const EditUserContainer = styled.div`
-  grid-column: 1 / span 8;
-`;
+function getUserTitle(user: Users_users) {
+  if (user.profile.firstName && user.profile.lastName) {
+    return `${user.profile.firstName} ${user.profile.lastName}`;
+  }
+
+  return user.email;
+}
+
+function getUserSubtitle(user: Users_users) {
+  if (user.profile.firstName && user.profile.lastName) {
+    return user.email;
+  }
+
+  return null;
+}
 
 function getFormattedDate(date: string) {
   const parsed = parse(date);
