@@ -7,8 +7,15 @@ import { UserWhereUniqueInput, Role } from "./../../../__generated__/globalTypes
 // GraphQL query operation: EditUserQuery
 // ====================================================
 
+export interface EditUserQuery_user_profile_avatar {
+  __typename: "File";
+  id: string;
+  filename: string;
+}
+
 export interface EditUserQuery_user_profile {
   __typename: "Profile";
+  avatar: EditUserQuery_user_profile_avatar | null;
   firstName: string | null;
   lastName: string | null;
 }

@@ -3,6 +3,9 @@
 # import UserWhereUniqueInput from "./prisma.graphql"
 # import UserUpdateInput from "./prisma.graphql"
 # import UserCreateInput from "./prisma.graphql"
+# import File from "./prisma.graphql"
+
+scalar Upload
 
 type Query {
   session: Session
@@ -12,6 +15,7 @@ type Query {
 
 type Mutation {
   login(data: LoginInput!): String
+  uploadFile(file: Upload!): File!
   createUser(data: UserCreateInput!): User!
   deleteUser(where: UserWhereUniqueInput!): User
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User

@@ -1,11 +1,15 @@
 # source: http://localhost:4466
-# timestamp: Sun Sep 02 2018 22:33:21 GMT-0400 (Eastern Daylight Time)
+# timestamp: Sun Sep 16 2018 22:17:17 GMT-0400 (EDT)
 
 type AggregateDocument {
   count: Int!
 }
 
 type AggregateDocumentType {
+  count: Int!
+}
+
+type AggregateFile {
   count: Int!
 }
 
@@ -626,6 +630,476 @@ input DocumentWhereUniqueInput {
   id: ID
 }
 
+type File implements Node {
+  id: ID!
+  mimetype: String!
+  encoding: String!
+  key: String!
+  etag: String!
+  bucket: String!
+  size: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""A connection to a list of items."""
+type FileConnection {
+  """Information to aid in pagination."""
+  pageInfo: PageInfo!
+
+  """A list of edges."""
+  edges: [FileEdge]!
+  aggregate: AggregateFile!
+}
+
+input FileCreateInput {
+  mimetype: String!
+  encoding: String!
+  key: String!
+  etag: String!
+  bucket: String!
+  size: Int!
+}
+
+input FileCreateOneInput {
+  create: FileCreateInput
+  connect: FileWhereUniqueInput
+}
+
+"""An edge in a connection."""
+type FileEdge {
+  """The item at the end of the edge."""
+  node: File!
+
+  """A cursor for use in pagination."""
+  cursor: String!
+}
+
+enum FileOrderByInput {
+  id_ASC
+  id_DESC
+  mimetype_ASC
+  mimetype_DESC
+  encoding_ASC
+  encoding_DESC
+  key_ASC
+  key_DESC
+  etag_ASC
+  etag_DESC
+  bucket_ASC
+  bucket_DESC
+  size_ASC
+  size_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type FilePreviousValues {
+  id: ID!
+  mimetype: String!
+  encoding: String!
+  key: String!
+  etag: String!
+  bucket: String!
+  size: Int!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type FileSubscriptionPayload {
+  mutation: MutationType!
+  node: File
+  updatedFields: [String!]
+  previousValues: FilePreviousValues
+}
+
+input FileSubscriptionWhereInput {
+  """Logical AND on all given filters."""
+  AND: [FileSubscriptionWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [FileSubscriptionWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [FileSubscriptionWhereInput!]
+
+  """
+  The subscription event gets dispatched when it's listed in mutation_in
+  """
+  mutation_in: [MutationType!]
+
+  """
+  The subscription event gets only dispatched when one of the updated fields names is included in this list
+  """
+  updatedFields_contains: String
+
+  """
+  The subscription event gets only dispatched when all of the field names included in this list have been updated
+  """
+  updatedFields_contains_every: [String!]
+
+  """
+  The subscription event gets only dispatched when some of the field names included in this list have been updated
+  """
+  updatedFields_contains_some: [String!]
+  node: FileWhereInput
+}
+
+input FileUpdateDataInput {
+  mimetype: String
+  encoding: String
+  key: String
+  etag: String
+  bucket: String
+  size: Int
+}
+
+input FileUpdateInput {
+  mimetype: String
+  encoding: String
+  key: String
+  etag: String
+  bucket: String
+  size: Int
+}
+
+input FileUpdateOneInput {
+  create: FileCreateInput
+  connect: FileWhereUniqueInput
+  disconnect: Boolean
+  delete: Boolean
+  update: FileUpdateDataInput
+  upsert: FileUpsertNestedInput
+}
+
+input FileUpsertNestedInput {
+  update: FileUpdateDataInput!
+  create: FileCreateInput!
+}
+
+input FileWhereInput {
+  """Logical AND on all given filters."""
+  AND: [FileWhereInput!]
+
+  """Logical OR on all given filters."""
+  OR: [FileWhereInput!]
+
+  """Logical NOT on all given filters combined by AND."""
+  NOT: [FileWhereInput!]
+  id: ID
+
+  """All values that are not equal to given value."""
+  id_not: ID
+
+  """All values that are contained in given list."""
+  id_in: [ID!]
+
+  """All values that are not contained in given list."""
+  id_not_in: [ID!]
+
+  """All values less than the given value."""
+  id_lt: ID
+
+  """All values less than or equal the given value."""
+  id_lte: ID
+
+  """All values greater than the given value."""
+  id_gt: ID
+
+  """All values greater than or equal the given value."""
+  id_gte: ID
+
+  """All values containing the given string."""
+  id_contains: ID
+
+  """All values not containing the given string."""
+  id_not_contains: ID
+
+  """All values starting with the given string."""
+  id_starts_with: ID
+
+  """All values not starting with the given string."""
+  id_not_starts_with: ID
+
+  """All values ending with the given string."""
+  id_ends_with: ID
+
+  """All values not ending with the given string."""
+  id_not_ends_with: ID
+  mimetype: String
+
+  """All values that are not equal to given value."""
+  mimetype_not: String
+
+  """All values that are contained in given list."""
+  mimetype_in: [String!]
+
+  """All values that are not contained in given list."""
+  mimetype_not_in: [String!]
+
+  """All values less than the given value."""
+  mimetype_lt: String
+
+  """All values less than or equal the given value."""
+  mimetype_lte: String
+
+  """All values greater than the given value."""
+  mimetype_gt: String
+
+  """All values greater than or equal the given value."""
+  mimetype_gte: String
+
+  """All values containing the given string."""
+  mimetype_contains: String
+
+  """All values not containing the given string."""
+  mimetype_not_contains: String
+
+  """All values starting with the given string."""
+  mimetype_starts_with: String
+
+  """All values not starting with the given string."""
+  mimetype_not_starts_with: String
+
+  """All values ending with the given string."""
+  mimetype_ends_with: String
+
+  """All values not ending with the given string."""
+  mimetype_not_ends_with: String
+  encoding: String
+
+  """All values that are not equal to given value."""
+  encoding_not: String
+
+  """All values that are contained in given list."""
+  encoding_in: [String!]
+
+  """All values that are not contained in given list."""
+  encoding_not_in: [String!]
+
+  """All values less than the given value."""
+  encoding_lt: String
+
+  """All values less than or equal the given value."""
+  encoding_lte: String
+
+  """All values greater than the given value."""
+  encoding_gt: String
+
+  """All values greater than or equal the given value."""
+  encoding_gte: String
+
+  """All values containing the given string."""
+  encoding_contains: String
+
+  """All values not containing the given string."""
+  encoding_not_contains: String
+
+  """All values starting with the given string."""
+  encoding_starts_with: String
+
+  """All values not starting with the given string."""
+  encoding_not_starts_with: String
+
+  """All values ending with the given string."""
+  encoding_ends_with: String
+
+  """All values not ending with the given string."""
+  encoding_not_ends_with: String
+  key: String
+
+  """All values that are not equal to given value."""
+  key_not: String
+
+  """All values that are contained in given list."""
+  key_in: [String!]
+
+  """All values that are not contained in given list."""
+  key_not_in: [String!]
+
+  """All values less than the given value."""
+  key_lt: String
+
+  """All values less than or equal the given value."""
+  key_lte: String
+
+  """All values greater than the given value."""
+  key_gt: String
+
+  """All values greater than or equal the given value."""
+  key_gte: String
+
+  """All values containing the given string."""
+  key_contains: String
+
+  """All values not containing the given string."""
+  key_not_contains: String
+
+  """All values starting with the given string."""
+  key_starts_with: String
+
+  """All values not starting with the given string."""
+  key_not_starts_with: String
+
+  """All values ending with the given string."""
+  key_ends_with: String
+
+  """All values not ending with the given string."""
+  key_not_ends_with: String
+  etag: String
+
+  """All values that are not equal to given value."""
+  etag_not: String
+
+  """All values that are contained in given list."""
+  etag_in: [String!]
+
+  """All values that are not contained in given list."""
+  etag_not_in: [String!]
+
+  """All values less than the given value."""
+  etag_lt: String
+
+  """All values less than or equal the given value."""
+  etag_lte: String
+
+  """All values greater than the given value."""
+  etag_gt: String
+
+  """All values greater than or equal the given value."""
+  etag_gte: String
+
+  """All values containing the given string."""
+  etag_contains: String
+
+  """All values not containing the given string."""
+  etag_not_contains: String
+
+  """All values starting with the given string."""
+  etag_starts_with: String
+
+  """All values not starting with the given string."""
+  etag_not_starts_with: String
+
+  """All values ending with the given string."""
+  etag_ends_with: String
+
+  """All values not ending with the given string."""
+  etag_not_ends_with: String
+  bucket: String
+
+  """All values that are not equal to given value."""
+  bucket_not: String
+
+  """All values that are contained in given list."""
+  bucket_in: [String!]
+
+  """All values that are not contained in given list."""
+  bucket_not_in: [String!]
+
+  """All values less than the given value."""
+  bucket_lt: String
+
+  """All values less than or equal the given value."""
+  bucket_lte: String
+
+  """All values greater than the given value."""
+  bucket_gt: String
+
+  """All values greater than or equal the given value."""
+  bucket_gte: String
+
+  """All values containing the given string."""
+  bucket_contains: String
+
+  """All values not containing the given string."""
+  bucket_not_contains: String
+
+  """All values starting with the given string."""
+  bucket_starts_with: String
+
+  """All values not starting with the given string."""
+  bucket_not_starts_with: String
+
+  """All values ending with the given string."""
+  bucket_ends_with: String
+
+  """All values not ending with the given string."""
+  bucket_not_ends_with: String
+  size: Int
+
+  """All values that are not equal to given value."""
+  size_not: Int
+
+  """All values that are contained in given list."""
+  size_in: [Int!]
+
+  """All values that are not contained in given list."""
+  size_not_in: [Int!]
+
+  """All values less than the given value."""
+  size_lt: Int
+
+  """All values less than or equal the given value."""
+  size_lte: Int
+
+  """All values greater than the given value."""
+  size_gt: Int
+
+  """All values greater than or equal the given value."""
+  size_gte: Int
+  createdAt: DateTime
+
+  """All values that are not equal to given value."""
+  createdAt_not: DateTime
+
+  """All values that are contained in given list."""
+  createdAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  createdAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  createdAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  createdAt_lte: DateTime
+
+  """All values greater than the given value."""
+  createdAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+
+  """All values that are not equal to given value."""
+  updatedAt_not: DateTime
+
+  """All values that are contained in given list."""
+  updatedAt_in: [DateTime!]
+
+  """All values that are not contained in given list."""
+  updatedAt_not_in: [DateTime!]
+
+  """All values less than the given value."""
+  updatedAt_lt: DateTime
+
+  """All values less than or equal the given value."""
+  updatedAt_lte: DateTime
+
+  """All values greater than the given value."""
+  updatedAt_gt: DateTime
+
+  """All values greater than or equal the given value."""
+  updatedAt_gte: DateTime
+}
+
+input FileWhereUniqueInput {
+  id: ID
+}
+
 """
 The `Long` scalar type represents non-fractional signed whole numeric values.
 Long can represent values between -(2^63) and 2^63 - 1.
@@ -637,26 +1111,32 @@ type Mutation {
   createProfile(data: ProfileCreateInput!): Profile!
   createDocumentType(data: DocumentTypeCreateInput!): DocumentType!
   createDocument(data: DocumentCreateInput!): Document!
+  createFile(data: FileCreateInput!): File!
   updateUser(data: UserUpdateInput!, where: UserWhereUniqueInput!): User
   updateProfile(data: ProfileUpdateInput!, where: ProfileWhereUniqueInput!): Profile
   updateDocumentType(data: DocumentTypeUpdateInput!, where: DocumentTypeWhereUniqueInput!): DocumentType
   updateDocument(data: DocumentUpdateInput!, where: DocumentWhereUniqueInput!): Document
+  updateFile(data: FileUpdateInput!, where: FileWhereUniqueInput!): File
   deleteUser(where: UserWhereUniqueInput!): User
   deleteProfile(where: ProfileWhereUniqueInput!): Profile
   deleteDocumentType(where: DocumentTypeWhereUniqueInput!): DocumentType
   deleteDocument(where: DocumentWhereUniqueInput!): Document
+  deleteFile(where: FileWhereUniqueInput!): File
   upsertUser(where: UserWhereUniqueInput!, create: UserCreateInput!, update: UserUpdateInput!): User!
   upsertProfile(where: ProfileWhereUniqueInput!, create: ProfileCreateInput!, update: ProfileUpdateInput!): Profile!
   upsertDocumentType(where: DocumentTypeWhereUniqueInput!, create: DocumentTypeCreateInput!, update: DocumentTypeUpdateInput!): DocumentType!
   upsertDocument(where: DocumentWhereUniqueInput!, create: DocumentCreateInput!, update: DocumentUpdateInput!): Document!
+  upsertFile(where: FileWhereUniqueInput!, create: FileCreateInput!, update: FileUpdateInput!): File!
   updateManyUsers(data: UserUpdateInput!, where: UserWhereInput): BatchPayload!
   updateManyProfiles(data: ProfileUpdateInput!, where: ProfileWhereInput): BatchPayload!
   updateManyDocumentTypes(data: DocumentTypeUpdateInput!, where: DocumentTypeWhereInput): BatchPayload!
   updateManyDocuments(data: DocumentUpdateInput!, where: DocumentWhereInput): BatchPayload!
+  updateManyFiles(data: FileUpdateInput!, where: FileWhereInput): BatchPayload!
   deleteManyUsers(where: UserWhereInput): BatchPayload!
   deleteManyProfiles(where: ProfileWhereInput): BatchPayload!
   deleteManyDocumentTypes(where: DocumentTypeWhereInput): BatchPayload!
   deleteManyDocuments(where: DocumentWhereInput): BatchPayload!
+  deleteManyFiles(where: FileWhereInput): BatchPayload!
 }
 
 enum MutationType {
@@ -694,6 +1174,7 @@ type Profile implements Node {
   user(where: UserWhereInput): User!
   createdAt: DateTime!
   updatedAt: DateTime!
+  avatar(where: FileWhereInput): File
 }
 
 """A connection to a list of items."""
@@ -711,6 +1192,7 @@ input ProfileCreateInput {
   lastName: String
   dateOfBirth: DateTime
   user: UserCreateOneWithoutProfileInput!
+  avatar: FileCreateOneInput
 }
 
 input ProfileCreateOneWithoutUserInput {
@@ -722,6 +1204,7 @@ input ProfileCreateWithoutUserInput {
   firstName: String
   lastName: String
   dateOfBirth: DateTime
+  avatar: FileCreateOneInput
 }
 
 """An edge in a connection."""
@@ -801,6 +1284,7 @@ input ProfileUpdateInput {
   lastName: String
   dateOfBirth: DateTime
   user: UserUpdateOneWithoutProfileInput
+  avatar: FileUpdateOneInput
 }
 
 input ProfileUpdateOneWithoutUserInput {
@@ -815,6 +1299,7 @@ input ProfileUpdateWithoutUserDataInput {
   firstName: String
   lastName: String
   dateOfBirth: DateTime
+  avatar: FileUpdateOneInput
 }
 
 input ProfileUpsertWithoutUserInput {
@@ -1018,6 +1503,7 @@ input ProfileWhereInput {
   """All values greater than or equal the given value."""
   updatedAt_gte: DateTime
   user: UserWhereInput
+  avatar: FileWhereInput
 }
 
 input ProfileWhereUniqueInput {
@@ -1029,14 +1515,17 @@ type Query {
   profiles(where: ProfileWhereInput, orderBy: ProfileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Profile]!
   documentTypes(where: DocumentTypeWhereInput, orderBy: DocumentTypeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [DocumentType]!
   documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document]!
+  files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File]!
   user(where: UserWhereUniqueInput!): User
   profile(where: ProfileWhereUniqueInput!): Profile
   documentType(where: DocumentTypeWhereUniqueInput!): DocumentType
   document(where: DocumentWhereUniqueInput!): Document
+  file(where: FileWhereUniqueInput!): File
   usersConnection(where: UserWhereInput, orderBy: UserOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): UserConnection!
   profilesConnection(where: ProfileWhereInput, orderBy: ProfileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): ProfileConnection!
   documentTypesConnection(where: DocumentTypeWhereInput, orderBy: DocumentTypeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DocumentTypeConnection!
   documentsConnection(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DocumentConnection!
+  filesConnection(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FileConnection!
 
   """Fetches an object given its ID"""
   node(
@@ -1057,18 +1546,19 @@ type Subscription {
   profile(where: ProfileSubscriptionWhereInput): ProfileSubscriptionPayload
   documentType(where: DocumentTypeSubscriptionWhereInput): DocumentTypeSubscriptionPayload
   document(where: DocumentSubscriptionWhereInput): DocumentSubscriptionPayload
+  file(where: FileSubscriptionWhereInput): FileSubscriptionPayload
 }
 
 type User implements Node {
   id: ID!
   email: String!
   password: String!
-  role: Role!
-  profile(where: ProfileWhereInput): Profile!
-  documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document!]
   lastLogin: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
+  role: Role!
+  profile(where: ProfileWhereInput): Profile!
+  documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document!]
 }
 
 """A connection to a list of items."""
@@ -1084,8 +1574,8 @@ type UserConnection {
 input UserCreateInput {
   email: String!
   password: String!
-  role: Role
   lastLogin: DateTime
+  role: Role
   profile: ProfileCreateOneWithoutUserInput!
   documents: DocumentCreateManyWithoutAuthorInput
 }
@@ -1103,16 +1593,16 @@ input UserCreateOneWithoutProfileInput {
 input UserCreateWithoutDocumentsInput {
   email: String!
   password: String!
-  role: Role
   lastLogin: DateTime
+  role: Role
   profile: ProfileCreateOneWithoutUserInput!
 }
 
 input UserCreateWithoutProfileInput {
   email: String!
   password: String!
-  role: Role
   lastLogin: DateTime
+  role: Role
   documents: DocumentCreateManyWithoutAuthorInput
 }
 
@@ -1132,24 +1622,24 @@ enum UserOrderByInput {
   email_DESC
   password_ASC
   password_DESC
-  role_ASC
-  role_DESC
   lastLogin_ASC
   lastLogin_DESC
   createdAt_ASC
   createdAt_DESC
   updatedAt_ASC
   updatedAt_DESC
+  role_ASC
+  role_DESC
 }
 
 type UserPreviousValues {
   id: ID!
   email: String!
   password: String!
-  role: Role!
   lastLogin: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
+  role: Role!
 }
 
 type UserSubscriptionPayload {
@@ -1194,8 +1684,8 @@ input UserSubscriptionWhereInput {
 input UserUpdateInput {
   email: String
   password: String
-  role: Role
   lastLogin: DateTime
+  role: Role
   profile: ProfileUpdateOneWithoutUserInput
   documents: DocumentUpdateManyWithoutAuthorInput
 }
@@ -1220,16 +1710,16 @@ input UserUpdateOneWithoutProfileInput {
 input UserUpdateWithoutDocumentsDataInput {
   email: String
   password: String
-  role: Role
   lastLogin: DateTime
+  role: Role
   profile: ProfileUpdateOneWithoutUserInput
 }
 
 input UserUpdateWithoutProfileDataInput {
   email: String
   password: String
-  role: Role
   lastLogin: DateTime
+  role: Role
   documents: DocumentUpdateManyWithoutAuthorInput
 }
 
@@ -1372,16 +1862,6 @@ input UserWhereInput {
 
   """All values not ending with the given string."""
   password_not_ends_with: String
-  role: Role
-
-  """All values that are not equal to given value."""
-  role_not: Role
-
-  """All values that are contained in given list."""
-  role_in: [Role!]
-
-  """All values that are not contained in given list."""
-  role_not_in: [Role!]
   lastLogin: DateTime
 
   """All values that are not equal to given value."""
@@ -1448,6 +1928,16 @@ input UserWhereInput {
 
   """All values greater than or equal the given value."""
   updatedAt_gte: DateTime
+  role: Role
+
+  """All values that are not equal to given value."""
+  role_not: Role
+
+  """All values that are contained in given list."""
+  role_in: [Role!]
+
+  """All values that are not contained in given list."""
+  role_not_in: [Role!]
   profile: ProfileWhereInput
   documents_every: DocumentWhereInput
   documents_some: DocumentWhereInput

@@ -9,12 +9,12 @@ type User {
   id: ID! @unique
   email: String! @unique
   password: String!
-  role: Role! @default(value: USER)
-  profile: Profile! @relation(name: "UserProfile", onDelete: CASCADE)
-  documents: [Document!]! @relation(name: "UserDocuments", onDelete: SET_NULL)
   lastLogin: DateTime
   createdAt: DateTime!
   updatedAt: DateTime!
+  role: Role! @default(value: USER)
+  profile: Profile! @relation(name: "UserProfile", onDelete: CASCADE)
+  documents: [Document!]! @relation(name: "UserDocuments", onDelete: SET_NULL)
 }
 
 type Profile {
@@ -25,6 +25,7 @@ type Profile {
   user: User! @relation(name: "UserProfile")
   createdAt: DateTime!
   updatedAt: DateTime!
+  avatar: File
 }
 
 type DocumentType {
@@ -41,6 +42,18 @@ type Document {
   title: String!
   type: DocumentType!
   author: User @relation(name: "UserDocuments")
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type File {
+  id: ID! @unique
+  mimetype: String!
+  encoding: String!
+  key: String!
+  etag: String!
+  bucket: String!
+  size: Int!
   createdAt: DateTime!
   updatedAt: DateTime!
 }

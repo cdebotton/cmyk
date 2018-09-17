@@ -7,7 +7,7 @@ import parse from 'date-fns/parse';
 import gql from 'graphql-tag';
 // import { rem } from 'polished';
 import React from 'react';
-import { Mutation, Query } from 'react-apollo';
+import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -25,30 +25,6 @@ import Heading from './components/Heading';
 import Loader from './components/Loader';
 import PageLayout from './components/PageLayout';
 import { Table, TableRow } from './components/Table';
-
-export const USERS_QUERY = gql`
-  query Users {
-    users {
-      id
-      email
-      role
-      lastLogin
-      createdAt
-      profile {
-        firstName
-        lastName
-      }
-    }
-  }
-`;
-
-const DELETE_USER_MUTATION = gql`
-  mutation DeleteUserMutation($where: UserWhereUniqueInput!) {
-    deleteUser(where: $where) {
-      id
-    }
-  }
-`;
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
@@ -91,37 +67,7 @@ function AdminUsers({ className, match }: Props) {
                     mutation={DELETE_USER_MUTATION}
                   >
                     {mutate => (
-                      <Button
-                        onClick={() =>
-                          mutate({
-                            update: (cache, { data: mutationData }) => {
-                              const cacheUsers = cache.readQuery<Users>({
-                                query: USERS_QUERY,
-                              });
-
-                              if (!(cacheUsers && cacheUsers.users)) {
-                                return;
-                              }
-
-                              cache.writeQuery({
-                                data: {
-                                  users: cacheUsers.users.filter(u => {
-                                    if (
-                                      !(mutationData && mutationData.deleteUser)
-                                    ) {
-                                      return true;
-                                    }
-
-                                    return u.id !== mutationData.deleteUser.id;
-                                  }),
-                                },
-                                query: USERS_QUERY,
-                              });
-                            },
-                            variables: { where: { id: user.id } },
-                          })
-                        }
-                      >
+                      <Button onClick={deleteUser(mutate, user.id)}>
                         <FontAwesomeIcon icon={faTimesCircle} />
                       </Button>
                     )}
@@ -134,6 +80,63 @@ function AdminUsers({ className, match }: Props) {
       </Query>
     </PageLayout>
   );
+}
+
+export const USERS_QUERY = gql`
+  query Users {
+    users {
+      id
+      email
+      role
+      lastLogin
+      createdAt
+      profile {
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+const DELETE_USER_MUTATION = gql`
+  mutation DeleteUserMutation($where: UserWhereUniqueInput!) {
+    deleteUser(where: $where) {
+      id
+    }
+  }
+`;
+
+function deleteUser(
+  mutate: MutationFn<DeleteUserMutation, DeleteUserMutationVariables>,
+  id: string,
+) {
+  return () => {
+    mutate({
+      update: (cache, { data: mutationData }) => {
+        const cacheUsers = cache.readQuery<Users>({
+          query: USERS_QUERY,
+        });
+
+        if (!(cacheUsers && cacheUsers.users)) {
+          return;
+        }
+
+        cache.writeQuery({
+          data: {
+            users: cacheUsers.users.filter(u => {
+              if (!(mutationData && mutationData.deleteUser)) {
+                return true;
+              }
+
+              return u.id !== mutationData.deleteUser.id;
+            }),
+          },
+          query: USERS_QUERY,
+        });
+      },
+      variables: { where: { id } },
+    });
+  };
 }
 
 const UsersRow = styled(TableRow)`

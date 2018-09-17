@@ -83,6 +83,43 @@ export interface DocumentWhereUniqueInput {
   id?: string | null;
 }
 
+export interface FileCreateInput {
+  filename: string;
+  mimetype: string;
+  encoding: string;
+  size: number;
+}
+
+export interface FileCreateOneInput {
+  create?: FileCreateInput | null;
+  connect?: FileWhereUniqueInput | null;
+}
+
+export interface FileUpdateDataInput {
+  filename?: string | null;
+  mimetype?: string | null;
+  encoding?: string | null;
+  size?: number | null;
+}
+
+export interface FileUpdateOneInput {
+  create?: FileCreateInput | null;
+  connect?: FileWhereUniqueInput | null;
+  disconnect?: boolean | null;
+  delete?: boolean | null;
+  update?: FileUpdateDataInput | null;
+  upsert?: FileUpsertNestedInput | null;
+}
+
+export interface FileUpsertNestedInput {
+  update: FileUpdateDataInput;
+  create: FileCreateInput;
+}
+
+export interface FileWhereUniqueInput {
+  id?: string | null;
+}
+
 export interface LoginInput {
   email: string;
   password: string;
@@ -97,6 +134,7 @@ export interface ProfileCreateWithoutUserInput {
   firstName?: string | null;
   lastName?: string | null;
   dateOfBirth?: any | null;
+  avatar?: FileCreateOneInput | null;
 }
 
 export interface ProfileUpdateOneWithoutUserInput {
@@ -111,6 +149,7 @@ export interface ProfileUpdateWithoutUserDataInput {
   firstName?: string | null;
   lastName?: string | null;
   dateOfBirth?: any | null;
+  avatar?: FileUpdateOneInput | null;
 }
 
 export interface ProfileUpsertWithoutUserInput {
@@ -125,8 +164,8 @@ export interface ProfileWhereUniqueInput {
 export interface UserCreateInput {
   email: string;
   password: string;
-  role?: Role | null;
   lastLogin?: any | null;
+  role?: Role | null;
   profile: ProfileCreateOneWithoutUserInput;
   documents?: DocumentCreateManyWithoutAuthorInput | null;
 }
@@ -134,8 +173,8 @@ export interface UserCreateInput {
 export interface UserUpdateInput {
   email?: string | null;
   password?: string | null;
-  role?: Role | null;
   lastLogin?: any | null;
+  role?: Role | null;
   profile?: ProfileUpdateOneWithoutUserInput | null;
   documents?: DocumentUpdateManyWithoutAuthorInput | null;
 }

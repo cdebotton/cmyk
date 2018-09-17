@@ -1,8 +1,9 @@
 import { Field, Formik } from 'formik';
 import gql from 'graphql-tag';
+import { History } from 'history';
 import { rem } from 'polished';
 import React from 'react';
-import { Mutation } from 'react-apollo';
+import { Mutation, MutationFn } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
@@ -26,6 +27,100 @@ interface Values {
   lastName: string;
   password: string;
   role: Role;
+}
+
+interface Props extends RouteComponentProps<{}> {}
+
+function AdminNewUser({ history }: Props) {
+  return (
+    <PageLayout>
+      <Heading>New user</Heading>
+      <Mutation<CreateUserMutation, CreateUserMutationVariables>
+        mutation={CREATE_USER_MUTATION}
+      >
+        {mutate => (
+          <Formik<Values>
+            initialValues={{
+              email: '',
+              firstName: '',
+              lastName: '',
+              password: '',
+              role: Role.UNAUTHORIZED,
+            }}
+            onSubmit={onSubmit(mutate, history)}
+            validationSchema={validationSchema}
+          >
+            {({ handleSubmit, isValid }) => (
+              <NewUserForm onSubmit={handleSubmit}>
+                <EmailField name="email" component={Input} label="Email" />
+                <Field name="firstName" component={Input} label="First name" />
+                <Field name="lastName" component={Input} label="Last name" />
+                <Field name="password" component={Input} label="Password" />
+                <Field
+                  name="repeatPassword"
+                  component={Input}
+                  label="Repeat password"
+                />
+                <Field
+                  name="role"
+                  component={Select}
+                  label="Role"
+                  options={[
+                    { label: 'Admin', value: 'ADMIN' },
+                    { label: 'Editor', value: 'EDITOR' },
+                    { label: 'User', value: 'USER' },
+                    { label: 'Unauthorized', value: 'UNAUTHORIZED' },
+                  ]}
+                />
+                <Button type="submit" disabled={!isValid} format="neutral">
+                  Create
+                </Button>
+                <Button type="reset">Cancel</Button>
+              </NewUserForm>
+            )}
+          </Formik>
+        )}
+      </Mutation>
+    </PageLayout>
+  );
+}
+
+function onSubmit(
+  mutate: MutationFn<CreateUserMutation, CreateUserMutationVariables>,
+  history: History,
+): (values: Values) => Promise<void> {
+  return async values => {
+    await mutate({
+      update: (cache, { data }) => {
+        const cacheData = cache.readQuery<Users>({
+          query: USERS_QUERY,
+        });
+
+        if (!(cacheData && cacheData.users && data && data.createUser)) {
+          return;
+        }
+
+        cache.writeQuery({
+          data: { users: [...cacheData.users, data.createUser] },
+          query: USERS_QUERY,
+        });
+      },
+      variables: {
+        data: {
+          email: values.email,
+          password: values.password,
+          profile: {
+            create: {
+              firstName: values.firstName,
+              lastName: values.lastName,
+            },
+          },
+          role: values.role,
+        },
+      },
+    });
+    history.push('/admin/users');
+  };
 }
 
 const validationSchema = yup.object().shape({
@@ -66,95 +161,6 @@ const CREATE_USER_MUTATION = gql`
     }
   }
 `;
-
-interface Props extends RouteComponentProps<{}> {}
-
-function AdminNewUser({ history }: Props) {
-  return (
-    <PageLayout>
-      <Heading>New user</Heading>
-      <Mutation<CreateUserMutation, CreateUserMutationVariables>
-        mutation={CREATE_USER_MUTATION}
-      >
-        {mutate => (
-          <Formik<Values>
-            initialValues={{
-              email: '',
-              firstName: '',
-              lastName: '',
-              password: '',
-              role: Role.UNAUTHORIZED,
-            }}
-            onSubmit={async values => {
-              await mutate({
-                update: (cache, { data }) => {
-                  const cacheData = cache.readQuery<Users>({
-                    query: USERS_QUERY,
-                  });
-
-                  if (
-                    !(cacheData && cacheData.users && data && data.createUser)
-                  ) {
-                    return;
-                  }
-
-                  cache.writeQuery({
-                    data: { users: [...cacheData.users, data.createUser] },
-                    query: USERS_QUERY,
-                  });
-                },
-                variables: {
-                  data: {
-                    email: values.email,
-                    password: values.password,
-                    profile: {
-                      create: {
-                        firstName: values.firstName,
-                        lastName: values.lastName,
-                      },
-                    },
-                    role: values.role,
-                  },
-                },
-              });
-              history.push('/admin/users');
-            }}
-            validationSchema={validationSchema}
-          >
-            {({ handleSubmit, isValid }) => (
-              <NewUserForm onSubmit={handleSubmit}>
-                <EmailField name="email" component={Input} label="Email" />
-                <Field name="firstName" component={Input} label="First name" />
-                <Field name="lastName" component={Input} label="Last name" />
-                <Field name="password" component={Input} label="Password" />
-                <Field
-                  name="repeatPassword"
-                  component={Input}
-                  label="Repeat password"
-                />
-                <Field
-                  name="role"
-                  component={Select}
-                  label="Role"
-                  options={[
-                    { label: 'Admin', value: 'ADMIN' },
-                    { label: 'Editor', value: 'EDITOR' },
-                    { label: 'User', value: 'USER' },
-                    { label: 'Unauthorized', value: 'UNAUTHORIZED' },
-                  ]}
-                />
-                <Button type="submit" disabled={!isValid} format="neutral">
-                  Create
-                </Button>
-                <Button type="reset">Cancel</Button>
-              </NewUserForm>
-            )}
-          </Formik>
-        )}
-      </Mutation>
-    </PageLayout>
-  );
-}
 
 const NewUserForm = styled.form`
   display: grid;

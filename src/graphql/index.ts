@@ -1,76 +1,47 @@
-import { ApolloServer, IResolvers, makeExecutableSchema } from 'apollo-server';
+import {
+  ApolloServer,
+  GraphQLUpload,
+  makeExecutableSchema,
+} from 'apollo-server';
 import { Context } from 'apollo-server-core';
-import bcrypt from 'bcryptjs';
 import { importSchema } from 'graphql-import';
 import jwt from 'jsonwebtoken';
 import { Prisma } from 'prisma-binding';
+import { IResolvers } from './__generated__/resolvers';
+import Document from './resolvers/Document';
+import DocumentType from './resolvers/DocumentType';
+import File from './resolvers/File';
+import Mutation from './resolvers/Mutation';
+import Profile from './resolvers/Profile';
+import Query from './resolvers/Query';
+import Session from './resolvers/Session';
+import { TypeMap } from './resolvers/TypeMap';
+import User from './resolvers/User';
 
 const { PORT } = process.env;
 
-interface IContext {
-  db: Prisma;
-  session: {
-    iat: number;
-    user: any;
-  };
+interface Resolvers extends IResolvers<TypeMap> {
+  Upload: typeof GraphQLUpload;
 }
 
-const BadCredentials = new Error('Bad credentials');
-
 const typeDefs = importSchema('src/graphql/schema/typeDefs.graphql');
-const resolvers: IResolvers<{}, IContext> = {
-  Mutation: {
-    createUser: async (parent, args, ctx, info) => {
-      const { data } = args;
-
-      const salt = await bcrypt.genSalt(10);
-      const hashedPassword = await bcrypt.hash(data.password, salt);
-
-      return ctx.db.mutation.createUser(
-        {
-          data: {
-            ...data,
-            password: hashedPassword,
-          },
-        },
-        info,
-      );
-    },
-    deleteUser: async (parent, args, ctx, info) => {
-      return ctx.db.mutation.deleteUser({ where: args.where }, info);
-    },
-    login: async (parent, args, ctx, info) => {
-      const { email, password } = args.data;
-      const user = await ctx.db.query.user({ where: { email } });
-
-      if (!user) {
-        throw BadCredentials;
-      }
-
-      const ok = await bcrypt.compare(password, user.password);
-
-      if (!ok) {
-        throw BadCredentials;
-      }
-
-      const token = jwt.sign({ userId: user.id }, 'shh');
-
-      return token;
-    },
-    updateUser: async (parent, args, ctx, info) => {
-      const user = await ctx.db.mutation.updateUser(args, info);
-
-      return user;
-    },
-  },
-  Query: {
-    session: (parent, args, ctx, info) => ctx.session,
-    user: (parent, args, ctx, info) => ctx.db.query.user(args, info),
-    users: (parent, args, ctx, info) => ctx.db.query.users(args, info),
-  },
+const resolvers: Resolvers = {
+  Document,
+  DocumentType,
+  File,
+  Mutation,
+  Profile,
+  Query,
+  Session,
+  User,
+  Upload: GraphQLUpload,
 };
 
-const schema = makeExecutableSchema({ typeDefs, resolvers });
+// @ts-ignore
+const schema = makeExecutableSchema<TypeMap['Context']>({
+  resolvers,
+  typeDefs,
+});
 
 interface IToken {
   iat: string;
@@ -119,6 +90,7 @@ const server = new ApolloServer({
       session,
     };
   },
+  uploads: true,
 });
 
 server.listen(PORT);

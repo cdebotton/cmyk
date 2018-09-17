@@ -1,8 +1,9 @@
 import { Field, Formik } from 'formik';
 import gql from 'graphql-tag';
+import { History } from 'history';
 import { rem } from 'polished';
-import React from 'react';
-import { Mutation, Query } from 'react-apollo';
+import React, { FormEvent } from 'react';
+import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
@@ -13,62 +14,17 @@ import {
   UpdateUserMutation,
   UpdateUserMutationVariables,
 } from './__generated__/UpdateUserMutation';
+import {
+  UploadFileMutation,
+  UploadFileMutationVariables,
+} from './__generated__/UploadFileMutation';
 import Button from './components/Button';
 import Heading from './components/Heading';
+import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
 import PageLayout from './components/PageLayout';
 import Select from './components/Select';
 import DynamicComponent from './containers/DynamicComponent';
-
-const EDIT_USER_QUERY = gql`
-  query EditUserQuery($where: UserWhereUniqueInput!) {
-    user(where: $where) {
-      id
-      email
-      role
-      profile {
-        firstName
-        lastName
-      }
-    }
-  }
-`;
-
-const USER_UPDATE_MUTATION = gql`
-  mutation UpdateUserMutation(
-    $data: UserUpdateInput!
-    $where: UserWhereUniqueInput!
-  ) {
-    updateUser(data: $data, where: $where) {
-      id
-      email
-      role
-      profile {
-        firstName
-        lastName
-      }
-    }
-  }
-`;
-
-const UserSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Must be a valid email address')
-    .required('Email required'),
-  firstName: Yup.string()
-    .min(2, 'First name must be longer than 2 characters')
-    .required('First name is required'),
-  lastName: Yup.string()
-    .min(2, 'Last name must be longer than 2 characters')
-    .required('Last name is required'),
-});
-
-interface IValues {
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: Role;
-}
 
 interface Props extends RouteComponentProps<{ userId: string }> {
   className?: string;
@@ -106,28 +62,10 @@ function AdminEditUser({ className, ...props }: Props) {
               mutation={USER_UPDATE_MUTATION}
             >
               {mutate => (
-                <Formik<IValues>
+                <Formik<Values>
                   key={user.id}
                   validationSchema={UserSchema}
-                  onSubmit={async values => {
-                    await mutate({
-                      variables: {
-                        data: {
-                          email: values.email,
-                          profile: {
-                            update: {
-                              firstName: values.firstName,
-                              lastName: values.lastName,
-                            },
-                          },
-                          role: values.role,
-                        },
-                        where: { id: user.id },
-                      },
-                    });
-
-                    history.push('/admin/users');
-                  }}
+                  onSubmit={updateUser(user.id, mutate, history)}
                   initialValues={{
                     email: user.email,
                     firstName:
@@ -143,6 +81,32 @@ function AdminEditUser({ className, ...props }: Props) {
                 >
                   {({ handleSubmit }) => (
                     <UserForm onSubmit={handleSubmit}>
+                      <Mutation<UploadFileMutation, UploadFileMutationVariables>
+                        mutation={UPLOAD_FILE_MUTATION}
+                      >
+                        {uploadFile => (
+                          <Field
+                            name="avatar"
+                            component={ImageSelector}
+                            onFileChange={(
+                              event: FormEvent<HTMLInputElement>,
+                            ) => {
+                              if (!event.currentTarget.files) {
+                                return;
+                              }
+
+                              const file = event.currentTarget.files[0];
+
+                              uploadFile({
+                                variables: {
+                                  file,
+                                },
+                              });
+                            }}
+                            label="Avatar"
+                          />
+                        )}
+                      </Mutation>
                       <Field
                         name="email"
                         component={EmailInput}
@@ -184,6 +148,95 @@ function AdminEditUser({ className, ...props }: Props) {
 }
 
 export default hot(module)(AdminEditUser);
+
+const EDIT_USER_QUERY = gql`
+  query EditUserQuery($where: UserWhereUniqueInput!) {
+    user(where: $where) {
+      id
+      email
+      role
+      profile {
+        avatar {
+          id
+          key
+          bucket
+        }
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+const USER_UPDATE_MUTATION = gql`
+  mutation UpdateUserMutation(
+    $data: UserUpdateInput!
+    $where: UserWhereUniqueInput!
+  ) {
+    updateUser(data: $data, where: $where) {
+      id
+      email
+      role
+      profile {
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+const UPLOAD_FILE_MUTATION = gql`
+  mutation UploadFileMutation($file: Upload!) {
+    uploadFile(file: $file) {
+      id
+    }
+  }
+`;
+
+const UserSchema = Yup.object().shape({
+  email: Yup.string()
+    .email('Must be a valid email address')
+    .required('Email required'),
+  firstName: Yup.string()
+    .min(2, 'First name must be longer than 2 characters')
+    .required('First name is required'),
+  lastName: Yup.string()
+    .min(2, 'Last name must be longer than 2 characters')
+    .required('Last name is required'),
+});
+
+interface Values {
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: Role;
+}
+
+function updateUser(
+  id: string,
+  mutate: MutationFn<UpdateUserMutation, UpdateUserMutationVariables>,
+  history: History,
+): (values: Values) => Promise<void> {
+  return async values => {
+    await mutate({
+      variables: {
+        data: {
+          email: values.email,
+          profile: {
+            update: {
+              firstName: values.firstName,
+              lastName: values.lastName,
+            },
+          },
+          role: values.role,
+        },
+        where: { id },
+      },
+    });
+
+    history.push('/admin/users');
+  };
+}
 
 const AdminEditUserLayout = styled(PageLayout)`
   position: relative;
