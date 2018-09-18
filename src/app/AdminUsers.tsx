@@ -5,7 +5,6 @@ import format from 'date-fns/format';
 import isValid from 'date-fns/is_valid';
 import parse from 'date-fns/parse';
 import gql from 'graphql-tag';
-// import { rem } from 'polished';
 import React from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
@@ -55,7 +54,11 @@ function AdminUsers({ className, match }: Props) {
                 <UsersRow key={`USER_${user.id}`}>
                   <Link to={`${match.url}/${user.id}`}>
                     <Card
-                      imageUrl="http://placehold.it/100x100"
+                      imageUrl={
+                        user.profile.avatar
+                          ? user.profile.avatar.url
+                          : undefined
+                      }
                       badge={<Badge format="neutral">{user.role}</Badge>}
                       title={getUserTitle(user)}
                       subtitle={getUserSubtitle(user)}
@@ -91,6 +94,10 @@ export const USERS_QUERY = gql`
       lastLogin
       createdAt
       profile {
+        avatar {
+          id
+          url
+        }
         firstName
         lastName
       }

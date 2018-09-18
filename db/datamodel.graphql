@@ -22,10 +22,10 @@ type Profile {
   firstName: String
   lastName: String
   dateOfBirth: DateTime
-  user: User! @relation(name: "UserProfile")
   createdAt: DateTime!
   updatedAt: DateTime!
-  avatar: File
+  user: User! @relation(name: "UserProfile")
+  avatar: File @relation(name: "Avatar")
 }
 
 type DocumentType {
@@ -54,6 +54,7 @@ type File {
   etag: String!
   bucket: String!
   size: Int!
+  url: String!
   createdAt: DateTime!
   updatedAt: DateTime!
 }

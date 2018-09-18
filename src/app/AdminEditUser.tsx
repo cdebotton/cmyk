@@ -9,7 +9,10 @@ import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as Yup from 'yup';
 import { Role } from '../../__generated__/globalTypes';
-import { EditUserQuery } from './__generated__/EditUserQuery';
+import {
+  EditUserQuery,
+  EditUserQuery_user_profile_avatar,
+} from './__generated__/EditUserQuery';
 import {
   UpdateUserMutation,
   UpdateUserMutationVariables,
@@ -25,6 +28,14 @@ import Input from './components/Input';
 import PageLayout from './components/PageLayout';
 import Select from './components/Select';
 import DynamicComponent from './containers/DynamicComponent';
+
+interface Values {
+  avatar: EditUserQuery_user_profile_avatar | null;
+  email: string;
+  firstName: string;
+  lastName: string;
+  role: Role;
+}
 
 interface Props extends RouteComponentProps<{ userId: string }> {
   className?: string;
@@ -67,6 +78,7 @@ function AdminEditUser({ className, ...props }: Props) {
                   validationSchema={UserSchema}
                   onSubmit={updateUser(user.id, mutate, history)}
                   initialValues={{
+                    avatar: user.profile.avatar,
                     email: user.email,
                     firstName:
                       user.profile && user.profile.firstName !== null
@@ -79,7 +91,7 @@ function AdminEditUser({ className, ...props }: Props) {
                     role: user.role,
                   }}
                 >
-                  {({ handleSubmit }) => (
+                  {({ handleSubmit, setFieldValue }) => (
                     <UserForm onSubmit={handleSubmit}>
                       <Mutation<UploadFileMutation, UploadFileMutationVariables>
                         mutation={UPLOAD_FILE_MUTATION}
@@ -88,7 +100,8 @@ function AdminEditUser({ className, ...props }: Props) {
                           <Field
                             name="avatar"
                             component={ImageSelector}
-                            onFileChange={(
+                            file={user.profile.avatar}
+                            onFileChange={async (
                               event: FormEvent<HTMLInputElement>,
                             ) => {
                               if (!event.currentTarget.files) {
@@ -97,11 +110,20 @@ function AdminEditUser({ className, ...props }: Props) {
 
                               const file = event.currentTarget.files[0];
 
-                              uploadFile({
+                              const uploadResult = await uploadFile({
                                 variables: {
                                   file,
                                 },
                               });
+
+                              if (!(uploadResult && uploadResult.data)) {
+                                return;
+                              }
+
+                              setFieldValue(
+                                'avatar',
+                                uploadResult.data.uploadFile,
+                              );
                             }}
                             label="Avatar"
                           />
@@ -160,6 +182,7 @@ const EDIT_USER_QUERY = gql`
           id
           key
           bucket
+          url
         }
         firstName
         lastName
@@ -178,6 +201,11 @@ const USER_UPDATE_MUTATION = gql`
       email
       role
       profile {
+        avatar {
+          id
+          bucket
+          key
+        }
         firstName
         lastName
       }
@@ -189,6 +217,8 @@ const UPLOAD_FILE_MUTATION = gql`
   mutation UploadFileMutation($file: Upload!) {
     uploadFile(file: $file) {
       id
+      bucket
+      key
     }
   }
 `;
@@ -205,25 +235,25 @@ const UserSchema = Yup.object().shape({
     .required('Last name is required'),
 });
 
-interface Values {
-  email: string;
-  firstName: string;
-  lastName: string;
-  role: Role;
-}
-
 function updateUser(
   id: string,
   mutate: MutationFn<UpdateUserMutation, UpdateUserMutationVariables>,
   history: History,
 ): (values: Values) => Promise<void> {
   return async values => {
+    const avatar = values.avatar
+      ? {
+          connect: { id: values.avatar.id },
+        }
+      : null;
+
     await mutate({
       variables: {
         data: {
           email: values.email,
           profile: {
             update: {
+              avatar,
               firstName: values.firstName,
               lastName: values.lastName,
             },

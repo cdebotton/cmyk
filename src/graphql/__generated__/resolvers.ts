@@ -3,16 +3,15 @@ import { GraphQLResolveInfo } from 'graphql';
 export interface ITypeMap {
   Context: any;
   Role: any;
-  DocumentOrderByInput: any;
 
   QueryParent: any;
   MutationParent: any;
   SessionParent: any;
   UserParent: any;
-  FileParent: any;
   ProfileParent: any;
   DocumentParent: any;
   DocumentTypeParent: any;
+  FileParent: any;
 }
 
 export interface LoginInput {
@@ -117,6 +116,29 @@ export interface UserUpdateInput {
   role: string;
   profile: string;
   documents: string;
+}
+export interface ProfileCreateOneWithoutUserInput {
+  create: string;
+  connect: string;
+}
+export interface DocumentCreateManyWithoutAuthorInput {
+  create: string;
+  connect: string;
+}
+export interface ProfileUpdateOneWithoutUserInput {
+  create: string;
+  connect: string;
+  delete: boolean;
+  update: string;
+  upsert: string;
+}
+export interface DocumentUpdateManyWithoutAuthorInput {
+  create: string;
+  connect: string;
+  disconnect: string;
+  delete: string;
+  update: string;
+  upsert: string;
 }
 export interface ProfileWhereInput {
   AND: string;
@@ -250,28 +272,41 @@ export interface DocumentWhereInput {
   type: string;
   author: string;
 }
-export interface ProfileCreateOneWithoutUserInput {
-  create: string;
-  connect: string;
+export interface ProfileCreateWithoutUserInput {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  avatar: string;
 }
-export interface DocumentCreateManyWithoutAuthorInput {
-  create: string;
-  connect: string;
+export interface ProfileWhereUniqueInput {
+  id: string;
 }
-export interface ProfileUpdateOneWithoutUserInput {
-  create: string;
-  connect: string;
-  delete: boolean;
+export interface DocumentCreateWithoutAuthorInput {
+  publishDate: string;
+  title: string;
+  type: string;
+}
+export interface DocumentWhereUniqueInput {
+  id: string;
+}
+export interface ProfileUpdateWithoutUserDataInput {
+  firstName: string;
+  lastName: string;
+  dateOfBirth: string;
+  avatar: string;
+}
+export interface ProfileUpsertWithoutUserInput {
   update: string;
-  upsert: string;
-}
-export interface DocumentUpdateManyWithoutAuthorInput {
   create: string;
-  connect: string;
-  disconnect: string;
-  delete: string;
+}
+export interface DocumentUpdateWithWhereUniqueWithoutAuthorInput {
+  where: string;
+  data: string;
+}
+export interface DocumentUpsertWithWhereUniqueWithoutAuthorInput {
+  where: string;
   update: string;
-  upsert: string;
+  create: string;
 }
 export interface FileWhereInput {
   AND: string;
@@ -437,42 +472,6 @@ export interface DocumentTypeWhereInput {
   documents_every: string;
   documents_some: string;
   documents_none: string;
-}
-export interface ProfileCreateWithoutUserInput {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  avatar: string;
-}
-export interface ProfileWhereUniqueInput {
-  id: string;
-}
-export interface DocumentCreateWithoutAuthorInput {
-  publishDate: string;
-  title: string;
-  type: string;
-}
-export interface DocumentWhereUniqueInput {
-  id: string;
-}
-export interface ProfileUpdateWithoutUserDataInput {
-  firstName: string;
-  lastName: string;
-  dateOfBirth: string;
-  avatar: string;
-}
-export interface ProfileUpsertWithoutUserInput {
-  update: string;
-  create: string;
-}
-export interface DocumentUpdateWithWhereUniqueWithoutAuthorInput {
-  where: string;
-  data: string;
-}
-export interface DocumentUpsertWithWhereUniqueWithoutAuthorInput {
-  where: string;
-  update: string;
-  create: string;
 }
 export interface FileCreateOneInput {
   create: string;
@@ -714,12 +713,19 @@ export namespace SessionResolvers {
 }
 
 export namespace UserResolvers {
-  export type IdType<T extends ITypeMap> = (
+  export type CreatedAtType<T extends ITypeMap> = (
     parent: T['UserParent'],
     args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
   ) => string | Promise<string>;
+
+  export type DocumentsType<T extends ITypeMap> = (
+    parent: T['UserParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
 
   export type EmailType<T extends ITypeMap> = (
     parent: T['UserParent'],
@@ -728,7 +734,7 @@ export namespace UserResolvers {
     info: GraphQLResolveInfo,
   ) => string | Promise<string>;
 
-  export type PasswordType<T extends ITypeMap> = (
+  export type IdType<T extends ITypeMap> = (
     parent: T['UserParent'],
     args: {},
     ctx: T['Context'],
@@ -742,19 +748,19 @@ export namespace UserResolvers {
     info: GraphQLResolveInfo,
   ) => string | null | Promise<string | null>;
 
-  export type CreatedAtType<T extends ITypeMap> = (
+  export type PasswordType<T extends ITypeMap> = (
     parent: T['UserParent'],
     args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
   ) => string | Promise<string>;
 
-  export type UpdatedAtType<T extends ITypeMap> = (
+  export type ProfileType<T extends ITypeMap> = (
     parent: T['UserParent'],
     args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
+  ) => T['ProfileParent'] | Promise<T['ProfileParent']>;
 
   export type RoleType<T extends ITypeMap> = (
     parent: T['UserParent'],
@@ -763,48 +769,33 @@ export namespace UserResolvers {
     info: GraphQLResolveInfo,
   ) => T['Role'] | Promise<T['Role']>;
 
-  export interface ArgsProfile {
-    where: ProfileWhereInput | null;
-  }
-
-  export type ProfileType<T extends ITypeMap> = (
+  export type UpdatedAtType<T extends ITypeMap> = (
     parent: T['UserParent'],
-    args: ArgsProfile,
+    args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
-  ) => T['ProfileParent'] | Promise<T['ProfileParent']>;
-
-  export interface ArgsDocuments {
-    where: DocumentWhereInput | null;
-    orderBy: T['DocumentOrderByInput'] | null;
-    skip: number | null;
-    after: string | null;
-    before: string | null;
-    first: number | null;
-    last: number | null;
-  }
-
-  export type DocumentsType<T extends ITypeMap> = (
-    parent: T['UserParent'],
-    args: ArgsDocuments,
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
+  ) => string | null | Promise<string | null>;
 
   export interface Type<T extends ITypeMap> {
-    id: (
+    createdAt: (
       parent: T['UserParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => string | Promise<string>;
+    documents: (
+      parent: T['UserParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
     email: (
       parent: T['UserParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => string | Promise<string>;
-    password: (
+    id: (
       parent: T['UserParent'],
       args: {},
       ctx: T['Context'],
@@ -816,182 +807,47 @@ export namespace UserResolvers {
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => string | null | Promise<string | null>;
-    createdAt: (
+    password: (
       parent: T['UserParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => string | Promise<string>;
-    updatedAt: (
+    profile: (
       parent: T['UserParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
+    ) => T['ProfileParent'] | Promise<T['ProfileParent']>;
     role: (
       parent: T['UserParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => T['Role'] | Promise<T['Role']>;
-    profile: (
-      parent: T['UserParent'],
-      args: ArgsProfile,
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => T['ProfileParent'] | Promise<T['ProfileParent']>;
-    documents: (
-      parent: T['UserParent'],
-      args: ArgsDocuments,
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
-  }
-}
-
-export namespace FileResolvers {
-  export type IdType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type MimetypeType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type EncodingType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type KeyType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type EtagType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type BucketType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type SizeType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => number | Promise<number>;
-
-  export type CreatedAtType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type UpdatedAtType<T extends ITypeMap> = (
-    parent: T['FileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export interface Type<T extends ITypeMap> {
-    id: (
-      parent: T['FileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-    mimetype: (
-      parent: T['FileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-    encoding: (
-      parent: T['FileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-    key: (
-      parent: T['FileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-    etag: (
-      parent: T['FileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-    bucket: (
-      parent: T['FileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-    size: (
-      parent: T['FileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => number | Promise<number>;
-    createdAt: (
-      parent: T['FileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
     updatedAt: (
-      parent: T['FileParent'],
+      parent: T['UserParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
+    ) => string | null | Promise<string | null>;
   }
 }
 
 export namespace ProfileResolvers {
-  export type IdType<T extends ITypeMap> = (
+  export type AvatarType<T extends ITypeMap> = (
+    parent: T['ProfileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => T['FileParent'] | null | Promise<T['FileParent'] | null>;
+
+  export type CreatedAtType<T extends ITypeMap> = (
     parent: T['ProfileParent'],
     args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
   ) => string | Promise<string>;
-
-  export type FirstNameType<T extends ITypeMap> = (
-    parent: T['ProfileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | null | Promise<string | null>;
-
-  export type LastNameType<T extends ITypeMap> = (
-    parent: T['ProfileParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | null | Promise<string | null>;
 
   export type DateOfBirthType<T extends ITypeMap> = (
     parent: T['ProfileParent'],
@@ -1000,18 +856,21 @@ export namespace ProfileResolvers {
     info: GraphQLResolveInfo,
   ) => string | null | Promise<string | null>;
 
-  export interface ArgsUser {
-    where: UserWhereInput | null;
-  }
-
-  export type UserType<T extends ITypeMap> = (
+  export type FirstNameType<T extends ITypeMap> = (
     parent: T['ProfileParent'],
-    args: ArgsUser,
+    args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
-  ) => T['UserParent'] | Promise<T['UserParent']>;
+  ) => string | Promise<string>;
 
-  export type CreatedAtType<T extends ITypeMap> = (
+  export type IdType<T extends ITypeMap> = (
+    parent: T['ProfileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type LastNameType<T extends ITypeMap> = (
     parent: T['ProfileParent'],
     args: {},
     ctx: T['Context'],
@@ -1023,51 +882,47 @@ export namespace ProfileResolvers {
     args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
+  ) => string | null | Promise<string | null>;
 
-  export interface ArgsAvatar {
-    where: FileWhereInput | null;
-  }
-
-  export type AvatarType<T extends ITypeMap> = (
+  export type UserType<T extends ITypeMap> = (
     parent: T['ProfileParent'],
-    args: ArgsAvatar,
+    args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
-  ) => T['FileParent'] | null | Promise<T['FileParent'] | null>;
+  ) => T['UserParent'] | Promise<T['UserParent']>;
 
   export interface Type<T extends ITypeMap> {
-    id: (
+    avatar: (
+      parent: T['ProfileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => T['FileParent'] | null | Promise<T['FileParent'] | null>;
+    createdAt: (
       parent: T['ProfileParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => string | Promise<string>;
-    firstName: (
-      parent: T['ProfileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | null | Promise<string | null>;
-    lastName: (
-      parent: T['ProfileParent'],
-      args: {},
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => string | null | Promise<string | null>;
     dateOfBirth: (
       parent: T['ProfileParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => string | null | Promise<string | null>;
-    user: (
+    firstName: (
       parent: T['ProfileParent'],
-      args: ArgsUser,
+      args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
-    ) => T['UserParent'] | Promise<T['UserParent']>;
-    createdAt: (
+    ) => string | Promise<string>;
+    id: (
+      parent: T['ProfileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
+    lastName: (
       parent: T['ProfileParent'],
       args: {},
       ctx: T['Context'],
@@ -1078,17 +933,31 @@ export namespace ProfileResolvers {
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-    avatar: (
+    ) => string | null | Promise<string | null>;
+    user: (
       parent: T['ProfileParent'],
-      args: ArgsAvatar,
+      args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
-    ) => T['FileParent'] | null | Promise<T['FileParent'] | null>;
+    ) => T['UserParent'] | Promise<T['UserParent']>;
   }
 }
 
 export namespace DocumentResolvers {
+  export type AuthorType<T extends ITypeMap> = (
+    parent: T['DocumentParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => T['UserParent'] | Promise<T['UserParent']>;
+
+  export type CreatedAtType<T extends ITypeMap> = (
+    parent: T['DocumentParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
   export type IdType<T extends ITypeMap> = (
     parent: T['DocumentParent'],
     args: {},
@@ -1110,43 +979,33 @@ export namespace DocumentResolvers {
     info: GraphQLResolveInfo,
   ) => string | Promise<string>;
 
-  export interface ArgsType {
-    where: DocumentTypeWhereInput | null;
-  }
-
   export type TypeType<T extends ITypeMap> = (
-    parent: T['DocumentParent'],
-    args: ArgsType,
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => T['DocumentTypeParent'] | Promise<T['DocumentTypeParent']>;
-
-  export interface ArgsAuthor {
-    where: UserWhereInput | null;
-  }
-
-  export type AuthorType<T extends ITypeMap> = (
-    parent: T['DocumentParent'],
-    args: ArgsAuthor,
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => T['UserParent'] | null | Promise<T['UserParent'] | null>;
-
-  export type CreatedAtType<T extends ITypeMap> = (
     parent: T['DocumentParent'],
     args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
+  ) => T['DocumentTypeParent'] | Promise<T['DocumentTypeParent']>;
 
   export type UpdatedAtType<T extends ITypeMap> = (
     parent: T['DocumentParent'],
     args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
+  ) => string | null | Promise<string | null>;
 
   export interface Type<T extends ITypeMap> {
+    author: (
+      parent: T['DocumentParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => T['UserParent'] | Promise<T['UserParent']>;
+    createdAt: (
+      parent: T['DocumentParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
     id: (
       parent: T['DocumentParent'],
       args: {},
@@ -1167,32 +1026,34 @@ export namespace DocumentResolvers {
     ) => string | Promise<string>;
     type: (
       parent: T['DocumentParent'],
-      args: ArgsType,
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => T['DocumentTypeParent'] | Promise<T['DocumentTypeParent']>;
-    author: (
-      parent: T['DocumentParent'],
-      args: ArgsAuthor,
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => T['UserParent'] | null | Promise<T['UserParent'] | null>;
-    createdAt: (
-      parent: T['DocumentParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
+    ) => T['DocumentTypeParent'] | Promise<T['DocumentTypeParent']>;
     updatedAt: (
       parent: T['DocumentParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
+    ) => string | null | Promise<string | null>;
   }
 }
 
 export namespace DocumentTypeResolvers {
+  export type CreatedAtType<T extends ITypeMap> = (
+    parent: T['DocumentTypeParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type DocumentsType<T extends ITypeMap> = (
+    parent: T['DocumentTypeParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
+
   export type IdType<T extends ITypeMap> = (
     parent: T['DocumentTypeParent'],
     args: {},
@@ -1207,38 +1068,26 @@ export namespace DocumentTypeResolvers {
     info: GraphQLResolveInfo,
   ) => string | Promise<string>;
 
-  export interface ArgsDocuments {
-    where: DocumentWhereInput | null;
-    orderBy: T['DocumentOrderByInput'] | null;
-    skip: number | null;
-    after: string | null;
-    before: string | null;
-    first: number | null;
-    last: number | null;
-  }
-
-  export type DocumentsType<T extends ITypeMap> = (
-    parent: T['DocumentTypeParent'],
-    args: ArgsDocuments,
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
-
-  export type CreatedAtType<T extends ITypeMap> = (
-    parent: T['DocumentTypeParent'],
-    args: {},
-    ctx: T['Context'],
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
   export type UpdatedAtType<T extends ITypeMap> = (
     parent: T['DocumentTypeParent'],
     args: {},
     ctx: T['Context'],
     info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
+  ) => string | null | Promise<string | null>;
 
   export interface Type<T extends ITypeMap> {
+    createdAt: (
+      parent: T['DocumentTypeParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
+    documents: (
+      parent: T['DocumentTypeParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
     id: (
       parent: T['DocumentTypeParent'],
       args: {},
@@ -1251,20 +1100,143 @@ export namespace DocumentTypeResolvers {
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => string | Promise<string>;
-    documents: (
-      parent: T['DocumentTypeParent'],
-      args: ArgsDocuments,
-      ctx: T['Context'],
-      info: GraphQLResolveInfo,
-    ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
-    createdAt: (
+    updatedAt: (
       parent: T['DocumentTypeParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
+    ) => string | null | Promise<string | null>;
+  }
+}
+
+export namespace FileResolvers {
+  export type BucketType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type CreatedAtType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type EncodingType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type EtagType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type IdType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type KeyType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type MimetypeType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export type SizeType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => number | Promise<number>;
+
+  export type UpdatedAtType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | null | Promise<string | null>;
+
+  export type UrlType<T extends ITypeMap> = (
+    parent: T['FileParent'],
+    args: {},
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => string | Promise<string>;
+
+  export interface Type<T extends ITypeMap> {
+    bucket: (
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
     ) => string | Promise<string>;
+    createdAt: (
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
+    encoding: (
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
+    etag: (
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
+    id: (
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
+    key: (
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
+    mimetype: (
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | Promise<string>;
+    size: (
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => number | Promise<number>;
     updatedAt: (
-      parent: T['DocumentTypeParent'],
+      parent: T['FileParent'],
+      args: {},
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => string | null | Promise<string | null>;
+    url: (
+      parent: T['FileParent'],
       args: {},
       ctx: T['Context'],
       info: GraphQLResolveInfo,
@@ -1277,8 +1249,8 @@ export interface IResolvers<T extends ITypeMap> {
   Mutation: MutationResolvers.Type<T>;
   Session: SessionResolvers.Type<T>;
   User: UserResolvers.Type<T>;
-  File: FileResolvers.Type<T>;
   Profile: ProfileResolvers.Type<T>;
   Document: DocumentResolvers.Type<T>;
   DocumentType: DocumentTypeResolvers.Type<T>;
+  File: FileResolvers.Type<T>;
 }

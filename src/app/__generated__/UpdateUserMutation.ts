@@ -7,10 +7,18 @@ import { UserUpdateInput, UserWhereUniqueInput, Role } from "./../../../__genera
 // GraphQL mutation operation: UpdateUserMutation
 // ====================================================
 
+export interface UpdateUserMutation_updateUser_profile_avatar {
+  __typename: "File";
+  id: string;
+  bucket: string;
+  key: string;
+}
+
 export interface UpdateUserMutation_updateUser_profile {
   __typename: "Profile";
-  firstName: string | null;
-  lastName: string | null;
+  avatar: UpdateUserMutation_updateUser_profile_avatar | null;
+  firstName: string;
+  lastName: string;
 }
 
 export interface UpdateUserMutation_updateUser {

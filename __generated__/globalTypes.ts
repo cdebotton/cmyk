@@ -84,9 +84,11 @@ export interface DocumentWhereUniqueInput {
 }
 
 export interface FileCreateInput {
-  filename: string;
   mimetype: string;
   encoding: string;
+  key: string;
+  etag: string;
+  bucket: string;
   size: number;
 }
 
@@ -96,9 +98,11 @@ export interface FileCreateOneInput {
 }
 
 export interface FileUpdateDataInput {
-  filename?: string | null;
   mimetype?: string | null;
   encoding?: string | null;
+  key?: string | null;
+  etag?: string | null;
+  bucket?: string | null;
   size?: number | null;
 }
 

@@ -9,8 +9,8 @@ import { UserCreateInput, Role } from "./../../../__generated__/globalTypes";
 
 export interface CreateUserMutation_createUser_profile {
   __typename: "Profile";
-  firstName: string | null;
-  lastName: string | null;
+  firstName: string;
+  lastName: string;
 }
 
 export interface CreateUserMutation_createUser {
@@ -18,7 +18,7 @@ export interface CreateUserMutation_createUser {
   id: string;
   email: string;
   createdAt: any;
-  updatedAt: any;
+  updatedAt: any | null;
   role: Role;
   lastLogin: any | null;
   profile: CreateUserMutation_createUser_profile;

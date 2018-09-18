@@ -68,6 +68,7 @@ const Mutation: MutationResolvers.Type<TypeMap> = {
           etag: ETag,
           key: Key,
           size: 0,
+          url: `${Bucket}/${Key}`,
         },
       },
       info,

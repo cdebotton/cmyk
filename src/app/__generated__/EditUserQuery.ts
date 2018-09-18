@@ -10,14 +10,16 @@ import { UserWhereUniqueInput, Role } from "./../../../__generated__/globalTypes
 export interface EditUserQuery_user_profile_avatar {
   __typename: "File";
   id: string;
-  filename: string;
+  key: string;
+  bucket: string;
+  url: string;
 }
 
 export interface EditUserQuery_user_profile {
   __typename: "Profile";
   avatar: EditUserQuery_user_profile_avatar | null;
-  firstName: string | null;
-  lastName: string | null;
+  firstName: string;
+  lastName: string;
 }
 
 export interface EditUserQuery_user {

@@ -1,11 +1,11 @@
-# import User from "./prisma.graphql"
-# import UserWhereInput from "./prisma.graphql"
+# import Role from "./prisma.graphql"
 # import UserWhereUniqueInput from "./prisma.graphql"
+# import UserWhereInput from "./prisma.graphql"
 # import UserUpdateInput from "./prisma.graphql"
 # import UserCreateInput from "./prisma.graphql"
-# import File from "./prisma.graphql"
 
 scalar Upload
+scalar Date
 
 type Query {
   session: Session
@@ -29,4 +29,58 @@ input LoginInput {
 type Session {
   iat: Int!
   user: User!
+}
+
+type User {
+  createdAt: Date!
+  documents: [Document!]!
+  email: String!
+  id: ID!
+  lastLogin: Date
+  password: String!
+  profile: Profile!
+  role: Role!
+  updatedAt: Date
+}
+
+type Profile {
+  avatar: File
+  createdAt: Date!
+  dateOfBirth: Date
+  firstName: String!
+  id: ID!
+  lastName: String!
+  updatedAt: Date
+  user: User!
+}
+
+type Document {
+  author: User!
+  createdAt: Date!
+  id: ID!
+  publishDate: Date!
+  title: String!
+  type: DocumentType!
+  updatedAt: Date
+}
+
+type DocumentType {
+  createdAt: Date!
+  documents: [Document!]!
+  id: ID!
+  title: String!
+  updatedAt: Date
+}
+
+type File {
+  bucket: String!
+  createdAt: Date!
+  encoding: String!
+  etag: String!
+  id: ID!
+  key: String!
+  mimetype: String!
+  size: Int!
+  updatedAt: Date
+  url: String!
 }

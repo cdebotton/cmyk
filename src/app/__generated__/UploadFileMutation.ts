@@ -8,6 +8,8 @@
 export interface UploadFileMutation_uploadFile {
   __typename: "File";
   id: string;
+  bucket: string;
+  key: string;
 }
 
 export interface UploadFileMutation {
