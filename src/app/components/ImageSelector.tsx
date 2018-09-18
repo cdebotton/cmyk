@@ -22,10 +22,11 @@ class ImageSelector extends Component<Props, State> {
 
   public render() {
     const { className, file, onFileChange } = this.props;
-
+    const { currentUrl } = this.state;
+    const url = currentUrl || (file ? file.url : null);
     return (
       <ImageSelectorContainer className={className}>
-        {file && <Image src={this.state.currentUrl || file.url} />}
+        {url && <Image src={url} />}
         <input onChange={this.onFileChange} type="file" />
       </ImageSelectorContainer>
     );
@@ -52,6 +53,8 @@ class ImageSelector extends Component<Props, State> {
     };
 
     reader.readAsDataURL(file);
+
+    this.props.onFileChange(event);
   };
 }
 
