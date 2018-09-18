@@ -111,6 +111,7 @@ function AdminEditUser({ className, ...props }: Props) {
                               const file = event.currentTarget.files[0];
 
                               const uploadResult = await uploadFile({
+                                update: (cache, { data: uploadData }) => {},
                                 variables: {
                                   file,
                                 },
