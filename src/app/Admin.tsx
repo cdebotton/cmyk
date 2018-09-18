@@ -123,6 +123,10 @@ function Admin({ className, match }: IProps) {
               path={`${match.url}/users`}
               loader={() => import('./AdminUsers')}
             />
+            <DynamicRoute
+              path={`${match.url}/media`}
+              loader={() => import('./AdminFiles')}
+            />
             <DynamicRoute loader={() => import('./NotFound')} />
           </Switch>
         </Layout>

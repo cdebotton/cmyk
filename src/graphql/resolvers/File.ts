@@ -2,8 +2,6 @@ import { S3 } from 'aws-sdk';
 import { FileResolvers } from '../__generated__/resolvers';
 import { TypeMap } from './TypeMap';
 
-const s3 = new S3();
-
 const File: FileResolvers.Type<TypeMap> = {
   bucket: parent => parent.bucket,
   createdAt: parent => parent.createdAt,
@@ -15,6 +13,7 @@ const File: FileResolvers.Type<TypeMap> = {
   size: parent => parent.size,
   updatedAt: parent => parent.updatedAt,
   url: parent => {
+    const s3 = new S3();
     const [bucket, ...path] = parent.url.split('/');
     return s3.getSignedUrl('getObject', {
       Bucket: bucket,

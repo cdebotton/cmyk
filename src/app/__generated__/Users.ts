@@ -9,8 +9,7 @@ import { Role } from "./../../../__generated__/globalTypes";
 
 export interface Users_users_profile_avatar {
   __typename: "File";
-  key: string;
-  bucket: string;
+  id: string;
   url: string;
 }
 

@@ -22,6 +22,13 @@ const Mutation: MutationResolvers.Type<TypeMap> = {
       info,
     );
   },
+  deleteFile: async (parent, { where }, { db }, info) => {
+    const file = await db.mutation.deleteFile({ where });
+    const { key, bucket } = file;
+    const s3 = new S3();
+    await s3.deleteObject({ Key: key, Bucket: bucket }).promise();
+    return file;
+  },
   deleteUser: async (parent, { where }, { db }, info) => {
     return db.mutation.deleteUser({ where }, info);
   },

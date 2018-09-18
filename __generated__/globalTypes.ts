@@ -90,6 +90,7 @@ export interface FileCreateInput {
   etag: string;
   bucket: string;
   size: number;
+  url: string;
 }
 
 export interface FileCreateOneInput {
@@ -104,6 +105,7 @@ export interface FileUpdateDataInput {
   etag?: string | null;
   bucket?: string | null;
   size?: number | null;
+  url?: string | null;
 }
 
 export interface FileUpdateOneInput {

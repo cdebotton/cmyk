@@ -18,6 +18,133 @@ export interface LoginInput {
   email: string;
   password: string;
 }
+export interface FileWhereInput {
+  AND: string;
+  OR: string;
+  NOT: string;
+  id: string;
+  id_not: string;
+  id_in: string;
+  id_not_in: string;
+  id_lt: string;
+  id_lte: string;
+  id_gt: string;
+  id_gte: string;
+  id_contains: string;
+  id_not_contains: string;
+  id_starts_with: string;
+  id_not_starts_with: string;
+  id_ends_with: string;
+  id_not_ends_with: string;
+  mimetype: string;
+  mimetype_not: string;
+  mimetype_in: string;
+  mimetype_not_in: string;
+  mimetype_lt: string;
+  mimetype_lte: string;
+  mimetype_gt: string;
+  mimetype_gte: string;
+  mimetype_contains: string;
+  mimetype_not_contains: string;
+  mimetype_starts_with: string;
+  mimetype_not_starts_with: string;
+  mimetype_ends_with: string;
+  mimetype_not_ends_with: string;
+  encoding: string;
+  encoding_not: string;
+  encoding_in: string;
+  encoding_not_in: string;
+  encoding_lt: string;
+  encoding_lte: string;
+  encoding_gt: string;
+  encoding_gte: string;
+  encoding_contains: string;
+  encoding_not_contains: string;
+  encoding_starts_with: string;
+  encoding_not_starts_with: string;
+  encoding_ends_with: string;
+  encoding_not_ends_with: string;
+  key: string;
+  key_not: string;
+  key_in: string;
+  key_not_in: string;
+  key_lt: string;
+  key_lte: string;
+  key_gt: string;
+  key_gte: string;
+  key_contains: string;
+  key_not_contains: string;
+  key_starts_with: string;
+  key_not_starts_with: string;
+  key_ends_with: string;
+  key_not_ends_with: string;
+  etag: string;
+  etag_not: string;
+  etag_in: string;
+  etag_not_in: string;
+  etag_lt: string;
+  etag_lte: string;
+  etag_gt: string;
+  etag_gte: string;
+  etag_contains: string;
+  etag_not_contains: string;
+  etag_starts_with: string;
+  etag_not_starts_with: string;
+  etag_ends_with: string;
+  etag_not_ends_with: string;
+  bucket: string;
+  bucket_not: string;
+  bucket_in: string;
+  bucket_not_in: string;
+  bucket_lt: string;
+  bucket_lte: string;
+  bucket_gt: string;
+  bucket_gte: string;
+  bucket_contains: string;
+  bucket_not_contains: string;
+  bucket_starts_with: string;
+  bucket_not_starts_with: string;
+  bucket_ends_with: string;
+  bucket_not_ends_with: string;
+  size: number;
+  size_not: number;
+  size_in: number;
+  size_not_in: number;
+  size_lt: number;
+  size_lte: number;
+  size_gt: number;
+  size_gte: number;
+  url: string;
+  url_not: string;
+  url_in: string;
+  url_not_in: string;
+  url_lt: string;
+  url_lte: string;
+  url_gt: string;
+  url_gte: string;
+  url_contains: string;
+  url_not_contains: string;
+  url_starts_with: string;
+  url_not_starts_with: string;
+  url_ends_with: string;
+  url_not_ends_with: string;
+  createdAt: string;
+  createdAt_not: string;
+  createdAt_in: string;
+  createdAt_not_in: string;
+  createdAt_lt: string;
+  createdAt_lte: string;
+  createdAt_gt: string;
+  createdAt_gte: string;
+  updatedAt: string;
+  updatedAt_not: string;
+  updatedAt_in: string;
+  updatedAt_not_in: string;
+  updatedAt_lt: string;
+  updatedAt_lte: string;
+  updatedAt_gt: string;
+  updatedAt_gte: string;
+}
 export interface UserWhereUniqueInput {
   id: string;
   email: string;
@@ -100,6 +227,9 @@ export interface UserWhereInput {
   documents_every: string;
   documents_some: string;
   documents_none: string;
+}
+export interface FileWhereUniqueInput {
+  id: string;
 }
 export interface UserCreateInput {
   email: string;
@@ -308,119 +438,6 @@ export interface DocumentUpsertWithWhereUniqueWithoutAuthorInput {
   update: string;
   create: string;
 }
-export interface FileWhereInput {
-  AND: string;
-  OR: string;
-  NOT: string;
-  id: string;
-  id_not: string;
-  id_in: string;
-  id_not_in: string;
-  id_lt: string;
-  id_lte: string;
-  id_gt: string;
-  id_gte: string;
-  id_contains: string;
-  id_not_contains: string;
-  id_starts_with: string;
-  id_not_starts_with: string;
-  id_ends_with: string;
-  id_not_ends_with: string;
-  mimetype: string;
-  mimetype_not: string;
-  mimetype_in: string;
-  mimetype_not_in: string;
-  mimetype_lt: string;
-  mimetype_lte: string;
-  mimetype_gt: string;
-  mimetype_gte: string;
-  mimetype_contains: string;
-  mimetype_not_contains: string;
-  mimetype_starts_with: string;
-  mimetype_not_starts_with: string;
-  mimetype_ends_with: string;
-  mimetype_not_ends_with: string;
-  encoding: string;
-  encoding_not: string;
-  encoding_in: string;
-  encoding_not_in: string;
-  encoding_lt: string;
-  encoding_lte: string;
-  encoding_gt: string;
-  encoding_gte: string;
-  encoding_contains: string;
-  encoding_not_contains: string;
-  encoding_starts_with: string;
-  encoding_not_starts_with: string;
-  encoding_ends_with: string;
-  encoding_not_ends_with: string;
-  key: string;
-  key_not: string;
-  key_in: string;
-  key_not_in: string;
-  key_lt: string;
-  key_lte: string;
-  key_gt: string;
-  key_gte: string;
-  key_contains: string;
-  key_not_contains: string;
-  key_starts_with: string;
-  key_not_starts_with: string;
-  key_ends_with: string;
-  key_not_ends_with: string;
-  etag: string;
-  etag_not: string;
-  etag_in: string;
-  etag_not_in: string;
-  etag_lt: string;
-  etag_lte: string;
-  etag_gt: string;
-  etag_gte: string;
-  etag_contains: string;
-  etag_not_contains: string;
-  etag_starts_with: string;
-  etag_not_starts_with: string;
-  etag_ends_with: string;
-  etag_not_ends_with: string;
-  bucket: string;
-  bucket_not: string;
-  bucket_in: string;
-  bucket_not_in: string;
-  bucket_lt: string;
-  bucket_lte: string;
-  bucket_gt: string;
-  bucket_gte: string;
-  bucket_contains: string;
-  bucket_not_contains: string;
-  bucket_starts_with: string;
-  bucket_not_starts_with: string;
-  bucket_ends_with: string;
-  bucket_not_ends_with: string;
-  size: number;
-  size_not: number;
-  size_in: number;
-  size_not_in: number;
-  size_lt: number;
-  size_lte: number;
-  size_gt: number;
-  size_gte: number;
-  createdAt: string;
-  createdAt_not: string;
-  createdAt_in: string;
-  createdAt_not_in: string;
-  createdAt_lt: string;
-  createdAt_lte: string;
-  createdAt_gt: string;
-  createdAt_gte: string;
-  updatedAt: string;
-  updatedAt_not: string;
-  updatedAt_in: string;
-  updatedAt_not_in: string;
-  updatedAt_lt: string;
-  updatedAt_lte: string;
-  updatedAt_gt: string;
-  updatedAt_gte: string;
-}
 export interface DocumentTypeWhereInput {
   AND: string;
   OR: string;
@@ -501,9 +518,7 @@ export interface FileCreateInput {
   etag: string;
   bucket: string;
   size: number;
-}
-export interface FileWhereUniqueInput {
-  id: string;
+  url: string;
 }
 export interface DocumentTypeCreateWithoutDocumentsInput {
   title: string;
@@ -518,6 +533,7 @@ export interface FileUpdateDataInput {
   etag: string;
   bucket: string;
   size: number;
+  url: string;
 }
 export interface FileUpsertNestedInput {
   update: string;
@@ -545,6 +561,17 @@ export namespace QueryResolvers {
     ctx: T['Context'],
     info: GraphQLResolveInfo,
   ) => T['SessionParent'] | null | Promise<T['SessionParent'] | null>;
+
+  export interface ArgsFiles {
+    where: FileWhereInput | null;
+  }
+
+  export type FilesType<T extends ITypeMap> = (
+    parent: T['QueryParent'],
+    args: ArgsFiles,
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => T['FileParent'][] | Promise<T['FileParent'][]>;
 
   export interface ArgsUser {
     where: UserWhereUniqueInput;
@@ -575,6 +602,12 @@ export namespace QueryResolvers {
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => T['SessionParent'] | null | Promise<T['SessionParent'] | null>;
+    files: (
+      parent: T['QueryParent'],
+      args: ArgsFiles,
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => T['FileParent'][] | Promise<T['FileParent'][]>;
     user: (
       parent: T['QueryParent'],
       args: ArgsUser,
@@ -612,6 +645,17 @@ export namespace MutationResolvers {
     ctx: T['Context'],
     info: GraphQLResolveInfo,
   ) => T['FileParent'] | Promise<T['FileParent']>;
+
+  export interface ArgsDeleteFile {
+    where: FileWhereUniqueInput;
+  }
+
+  export type DeleteFileType<T extends ITypeMap> = (
+    parent: T['MutationParent'],
+    args: ArgsDeleteFile,
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => T['FileParent'] | null | Promise<T['FileParent'] | null>;
 
   export interface ArgsCreateUser {
     data: UserCreateInput;
@@ -660,6 +704,12 @@ export namespace MutationResolvers {
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => T['FileParent'] | Promise<T['FileParent']>;
+    deleteFile: (
+      parent: T['MutationParent'],
+      args: ArgsDeleteFile,
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => T['FileParent'] | null | Promise<T['FileParent'] | null>;
     createUser: (
       parent: T['MutationParent'],
       args: ArgsCreateUser,
