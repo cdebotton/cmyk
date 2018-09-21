@@ -3,19 +3,17 @@ import React, { HTMLProps } from 'react';
 import styled from 'styled-components';
 import { foreground, Format, gradient } from '../styles/helpers';
 
-interface IProps extends HTMLProps<HTMLButtonElement> {
+interface Props extends HTMLProps<HTMLButtonElement> {
   className?: string;
   format?: Format;
 }
 
-export default styled.button`
+export default styled.button<Props>`
   position: relative;
   border: none;
   cursor: pointer;
-  padding: ${rem(12)};
+  height: ${rem(32)};
   border-radius: 3px;
-  ${gradient()};
-  ${foreground()};
 
   :disabled {
     opacity: 0.25;

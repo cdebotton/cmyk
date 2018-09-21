@@ -38,6 +38,7 @@ const CardImage = styled.img`
   grid-row: 1 / span 4;
   grid-column: 1 / span 1;
   border-radius: 50%;
+  object-fit: cover;
   ${size(rem(64))};
 `;
 

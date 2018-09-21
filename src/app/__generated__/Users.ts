@@ -15,9 +15,10 @@ export interface Users_users_profile_avatar {
 
 export interface Users_users_profile {
   __typename: "Profile";
-  avatar: Users_users_profile_avatar | null;
+  id: string;
   firstName: string;
   lastName: string;
+  avatar: Users_users_profile_avatar | null;
 }
 
 export interface Users_users {

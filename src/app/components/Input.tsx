@@ -1,15 +1,17 @@
 import { FieldProps } from 'formik';
 import { modularScale, rem } from 'polished';
-import React from 'react';
+import React, { HTMLProps } from 'react';
 import styled from 'styled-components';
 
 interface Props extends FieldProps<any> {
   className?: string;
   label: string;
+  type?: HTMLProps<HTMLInputElement>['type'];
 }
 
 const InputField = styled.input`
   padding: ${rem(6)};
+  height: ${rem(32)};
   width: 100%;
 `;
 

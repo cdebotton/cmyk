@@ -11,10 +11,6 @@ const SESSION_QUERY = gql`
   query Session {
     session {
       iat
-      user {
-        id
-        email
-      }
     }
   }
 `;

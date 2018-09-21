@@ -111,7 +111,7 @@ function AdminEditUser({ className, ...props }: Props) {
                               const file = event.currentTarget.files[0];
 
                               const uploadResult = await uploadFile({
-                                update: (cache, { data: uploadData }) => {},
+                                // update: (cache, { data: uploadData }) => {},
                                 variables: {
                                   file,
                                 },
@@ -179,6 +179,7 @@ const EDIT_USER_QUERY = gql`
       email
       role
       profile {
+        id
         avatar {
           id
           key

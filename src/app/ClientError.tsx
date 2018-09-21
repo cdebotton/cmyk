@@ -20,7 +20,6 @@ const Report = styled.div`
   font-family: monospace;
   line-height: 1.6;
   background-color: hsla(0, 50%, 50%, 1);
-  color: #fff;
 `;
 
 function ClientError({ className, error, info }: IProps) {

@@ -42,7 +42,7 @@ function fontSize({ level = DEFAULT_LEVEL }: IProps) {
       size = modularScale(3);
       break;
     case 2:
-      size = modularScale(4);
+      size = rem(48);
       break;
     case 3:
       size = modularScale(3);
@@ -62,7 +62,8 @@ export default styled(Heading)`
   position: relative;
   margin: 0;
   padding: 0;
-  font-family: Oswald, sans-serif;
+  font-weight: 400;
+  font-family: 'Raleway', sans-serif;
   user-select: none;
 
   ${writingMode};

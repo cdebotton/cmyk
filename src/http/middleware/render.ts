@@ -11,7 +11,7 @@ function render({ publicPath }: IOptions): Middleware {
       '<html lang="en">' +
       '<head>' +
       '<title>CMYK</title>' +
-      '<link href="https://fonts.googleapis.com/css?family=Oswald:500|Roboto:400,400i" rel="stylesheet">' +
+      '<link href="https://fonts.googleapis.com/css?family=Raleway:100,300,400,600|Roboto:400,400i" rel="stylesheet">' +
       '</head>' +
       '<body>' +
       '<main id="app"></main>' +

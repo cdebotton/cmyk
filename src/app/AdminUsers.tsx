@@ -4,13 +4,15 @@ import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
 import format from 'date-fns/format';
 import isValid from 'date-fns/is_valid';
 import parse from 'date-fns/parse';
+import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
+import { margin, padding, rem } from 'polished';
 import React from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
-import styled from 'styled-components';
+import styled, { css } from 'styled-components';
 import {
   DeleteUserMutation,
   DeleteUserMutationVariables,
@@ -21,9 +23,26 @@ import Button from './components/Button';
 import ButtonLink from './components/ButtonLink';
 import Card from './components/Card';
 import Heading from './components/Heading';
+import Input from './components/Input';
 import Loader from './components/Loader';
 import PageLayout from './components/PageLayout';
 import { Table, TableRow } from './components/Table';
+
+const AdminUsersLayout = styled(PageLayout)`
+  display: grid;
+  grid-gap: ${rem(16)};
+  grid-template-rows: min-content auto;
+  align-content: stretch;
+  ${padding(rem(32), rem(16))};
+`;
+
+const UsersHeading = styled(Heading)`
+  ${padding(0, rem(32), 0, rem(32))};
+`;
+
+const AdminTable = styled(Table)`
+  ${margin(rem(16), 0, 0, 0)};
+`;
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
@@ -31,13 +50,8 @@ interface Props extends RouteComponentProps<{}> {
 
 function AdminUsers({ className, match }: Props) {
   return (
-    <PageLayout className={className}>
-      <Heading>
-        Users{' '}
-        <ButtonLink format="neutral" to={`${match.url}/new`}>
-          New user
-        </ButtonLink>
-      </Heading>
+    <AdminUsersLayout className={className}>
+      <UsersHeading>Users</UsersHeading>
       <Query<Users, {}> query={USERS_QUERY}>
         {({ data, loading, error }) => {
           if (error) {
@@ -49,7 +63,26 @@ function AdminUsers({ className, match }: Props) {
           }
 
           return (
-            <Table>
+            <AdminTable
+              controls={
+                <Formik
+                  initialValues={{ searchField: '' }}
+                  onSubmit={() => void 0}
+                >
+                  <Field
+                    name="searchField"
+                    render={({ field, form }: FieldProps<any>) => (
+                      <Input
+                        label="Search users"
+                        type="search"
+                        field={field}
+                        form={form}
+                      />
+                    )}
+                  />
+                </Formik>
+              }
+            >
               {data.users.map(user => (
                 <UsersRow key={`USER_${user.id}`}>
                   <Link to={`${match.url}/${user.id}`}>
@@ -77,11 +110,11 @@ function AdminUsers({ className, match }: Props) {
                   </Mutation>
                 </UsersRow>
               ))}
-            </Table>
+            </AdminTable>
           );
         }}
       </Query>
-    </PageLayout>
+    </AdminUsersLayout>
   );
 }
 
@@ -94,12 +127,13 @@ export const USERS_QUERY = gql`
       lastLogin
       createdAt
       profile {
+        id
+        firstName
+        lastName
         avatar {
           id
           url
         }
-        firstName
-        lastName
       }
     }
   }

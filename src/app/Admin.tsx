@@ -1,109 +1,205 @@
 import {
-  faCamera,
-  faCogs,
+  faAngry,
   faFolder,
-  faHome,
-  faSignOutAlt,
+  faImages,
+  faMehBlank,
+  faSun,
   faUser,
-} from '@fortawesome/free-solid-svg-icons';
+} from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { rem } from 'polished';
+import gql from 'graphql-tag';
+import { darken, lighten, margin, padding, rem } from 'polished';
 import React from 'react';
+import { Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps, Switch } from 'react-router';
-import { NavLink } from 'react-router-dom';
-import styled, { ThemeProvider } from 'styled-components';
+import { Link, NavLink } from 'react-router-dom';
+import styled, { css, ThemeProvider } from 'styled-components';
+import { CurrentUserQuery } from './__generated__/CurrentUserQuery';
 import ClientError from './ClientError';
 import Button from './components/Button';
+import Greeting from './components/Greeting';
 import Heading from './components/Heading';
 import DynamicRoute from './containers/DynamicRoute';
 import ErrorBoundary from './containers/ErrorBoundary';
 import Session from './containers/Session';
-import { foreground, gradient } from './styles/helpers';
 
-interface IProps extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
 
-const Header = styled.header`
-  grid-column: 1 / span 1;
-  position: relative;
-  display: flex;
-  flex-flow: column nowrap;
-  align-items: center;
-  padding: ${rem(24)} ${rem(16)};
+const CURRENT_USER_QUERY = gql`
+  query CurrentUserQuery {
+    session {
+      user {
+        id
+        profile {
+          id
+          firstName
+          avatar {
+            id
+            url
+          }
+        }
+      }
+    }
+  }
 `;
 
-const Navigation = styled.nav`
-  position: relative;
-  display: flex;
-  align-items: stretch;
-  flex-flow: column nowrap;
-  margin-top: ${rem(16)};
-`;
+class ThemeNotImplementedError extends Error {
+  constructor(msg: string) {
+    super(`Theme not implemented for mode ${msg}`);
+  }
+}
 
-const PageLink = styled(NavLink)`
-  padding: ${rem(12)};
-  text-align: center;
+const Welcome = styled.div`
+  font-family: 'Raleway';
 `;
 
 const Layout = styled.div`
-  position: relative;
   display: grid;
-  grid-template-columns: min-content auto;
+  grid-template-columns: max-content auto;
   min-height: 100vh;
-  width: 100%;
-  ${gradient({ offset: 0, steps: 4 })};
-  ${foreground({ shade: 1 })};
+  ${props => {
+    switch (props.theme.mode) {
+      case 'dark':
+        return css`
+          color: #fff;
+          background: linear-gradient(to bottom, #0e1a1b, #111b28);
+        `;
+      default:
+        throw ThemeNotImplementedError;
+    }
+  }};
 `;
 
-function Admin({ className, match }: IProps) {
+const Header = styled.header`
+  display: grid;
+  align-content: start;
+  background-color: hsla(0, 0%, 0%, 0.41);
+`;
+
+const Navigation = styled.nav`
+  display: grid;
+  grid-gap: ${rem(16)};
+`;
+
+const PageLink = styled(NavLink)`
+  position: relative;
+  font-size: ${rem(12)};
+  text-decoration: none;
+  color: #fff;
+  display: grid;
+  grid-template-columns: min-content auto;
+  align-items: center;
+  grid-gap: ${rem(10)};
+  ${padding(rem(4), 0, rem(4), rem(16))};
+
+  &.active {
+    background-color: #2573a7;
+
+    &::after {
+      content: ' ';
+      display: block;
+      position: absolute;
+      left: 100%;
+      top: 0;
+      height: 100%;
+      width: 0;
+      border-top: solid 12px transparent;
+      border-bottom: solid 12px transparent;
+      border-left: solid 12px #2573a7;
+    }
+  }
+`;
+
+const LogoutButton = styled(Button)`
+  justify-self: center;
+  display: none;
+`;
+
+const AdminWelcome = styled(Welcome)`
+  display: grid;
+  align-content: start;
+  grid-gap: ${rem(16)};
+  ${margin(rem(32), rem(48))};
+`;
+
+const LinkIcon = styled(FontAwesomeIcon)`
+  font-size: ${rem(16)};
+`;
+
+const Avatar = styled.span<{ size: number; src: string }>`
+  border-radius: 50%;
+  display: inline-block;
+  background-image: url("${props => props.src}");
+  background-position: center center;
+  width: ${props => rem(props.size)};
+  height: ${props => rem(props.size)};
+  background-size: cover;
+`;
+
+function Admin({ className, match }: Props) {
   return (
-    <ThemeProvider theme={{ mode: 'light', size: 'medium' }}>
+    <ThemeProvider theme={{ mode: 'dark', size: 'medium' }}>
       <ErrorBoundary
         handleError={(error, info) => <ClientError error={error} info={info} />}
       >
         <Layout className={className}>
           <Header>
-            <Heading level={1} vertical>
-              CMYK
-            </Heading>
+            <Query<CurrentUserQuery> query={CURRENT_USER_QUERY}>
+              {({ data, loading, error }) => {
+                const user = data && data.session && data.session.user;
+                const profile = user && user.profile;
+                const name = profile ? profile.firstName : '';
+                const avatar =
+                  profile && profile.avatar ? profile.avatar.url : '';
+                return (
+                  <AdminWelcome>
+                    <Greeting message="Oh hello" name={name} />
+                    <Link to={`${match.url}/users/${user ? user.id : ''}`}>
+                      <Avatar size={92} src={avatar} />
+                    </Link>
+                  </AdminWelcome>
+                );
+              }}
+            </Query>
             <Navigation>
               <PageLink exact to={match.url}>
-                <FontAwesomeIcon icon={faHome} />
+                <LinkIcon icon={faSun} size="2x" /> Home
               </PageLink>
               <PageLink to={`${match.url}/documents`}>
-                <FontAwesomeIcon icon={faFolder} />
+                <LinkIcon icon={faFolder} size="2x" /> Documents
               </PageLink>
               <PageLink to={`${match.url}/media`}>
-                <FontAwesomeIcon icon={faCamera} />
+                <LinkIcon icon={faImages} size="2x" /> Files
               </PageLink>
               <PageLink to={`${match.url}/users`}>
-                <FontAwesomeIcon icon={faUser} />
+                <LinkIcon icon={faUser} size="2x" /> Users
               </PageLink>
               <PageLink to={`${match.url}/settings`}>
-                <FontAwesomeIcon icon={faCogs} />
+                <LinkIcon icon={faMehBlank} size="2x" /> Settings
               </PageLink>
-              <Session>
-                {({ session, client }) => {
-                  if (!session) {
-                    return null;
-                  }
-
-                  return (
-                    <Button
-                      format="neutral"
-                      onClick={() => {
-                        localStorage.removeItem('jwt');
-                        client.resetStore();
-                      }}
-                    >
-                      <FontAwesomeIcon icon={faSignOutAlt} />
-                    </Button>
-                  );
-                }}
-              </Session>
             </Navigation>
+            <Session>
+              {({ session, client }) => {
+                if (!session) {
+                  return null;
+                }
+
+                return (
+                  <LogoutButton
+                    format="neutral"
+                    onClick={() => {
+                      localStorage.removeItem('jwt');
+                      client.resetStore();
+                    }}
+                  >
+                    <FontAwesomeIcon icon={faAngry} />
+                  </LogoutButton>
+                );
+              }}
+            </Session>
           </Header>
           <Switch>
             <DynamicRoute

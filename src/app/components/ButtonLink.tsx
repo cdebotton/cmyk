@@ -11,7 +11,6 @@ const ButtonLink = styled(Link)`
   border-radius: 3px;
   font-weight: normal;
   font-family: 'Roboto';
-  color: #fff;
   text-transform: uppercase;
   ${gradient({ steps: 2 })};
 `;

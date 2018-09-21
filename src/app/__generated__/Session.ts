@@ -5,16 +5,9 @@
 // GraphQL query operation: Session
 // ====================================================
 
-export interface Session_session_user {
-  __typename: "User";
-  id: string;
-  email: string;
-}
-
 export interface Session_session {
   __typename: "Session";
   iat: number;
-  user: Session_session_user;
 }
 
 export interface Session {
