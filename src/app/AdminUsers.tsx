@@ -44,6 +44,11 @@ const AdminTable = styled(Table)`
   ${margin(rem(16), 0, 0, 0)};
 `;
 
+const UserLink = styled(Link)`
+  text-decoration: none;
+  color: inherit;
+`;
+
 interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
@@ -85,7 +90,7 @@ function AdminUsers({ className, match }: Props) {
             >
               {data.users.map(user => (
                 <UsersRow key={`USER_${user.id}`}>
-                  <Link to={`${match.url}/${user.id}`}>
+                  <UserLink to={`${match.url}/${user.id}`}>
                     <Card
                       imageUrl={
                         user.profile.avatar
@@ -96,7 +101,7 @@ function AdminUsers({ className, match }: Props) {
                       title={getUserTitle(user)}
                       subtitle={getUserSubtitle(user)}
                     />
-                  </Link>
+                  </UserLink>
                   <span>{getFormattedDate(user.createdAt)}</span>
                   <span>{getTimeAgo(user.lastLogin)}</span>
                   <Mutation<DeleteUserMutation, DeleteUserMutationVariables>

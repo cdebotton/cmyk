@@ -16,6 +16,7 @@ const InputField = styled.input`
   border: none;
   background-color: hsla(0, 0%, 100%, 0.05);
   border-bottom: 3px solid #2473a7;
+  border-radius: 3px;
 `;
 
 const Label = styled.label`
