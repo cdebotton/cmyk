@@ -47,7 +47,11 @@ const AdminTable = styled(Table)`
 const UserLink = styled(Link)`
   text-decoration: none;
   color: inherit;
+  ${margin(0, rem(24))};
+  align-self: stretch;
 `;
+
+const NewUserLink = styled(ButtonLink)``;
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
@@ -74,17 +78,20 @@ function AdminUsers({ className, match }: Props) {
                   initialValues={{ searchField: '' }}
                   onSubmit={() => void 0}
                 >
-                  <Field
-                    name="searchField"
-                    render={({ field, form }: FieldProps<any>) => (
-                      <Input
-                        label="Search users..."
-                        type="search"
-                        field={field}
-                        form={form}
-                      />
-                    )}
-                  />
+                  <form>
+                    <Field
+                      name="searchField"
+                      render={({ field, form }: FieldProps<any>) => (
+                        <Input
+                          label="Search users..."
+                          type="search"
+                          field={field}
+                          form={form}
+                        />
+                      )}
+                    />
+                    <NewUserLink to={`${match.url}/new`}>New user</NewUserLink>
+                  </form>
                 </Formik>
               }
             >
@@ -188,6 +195,7 @@ function deleteUser(
 const UsersRow = styled(TableRow)`
   display: grid;
   grid-template-columns: 3fr repeat(2, 1fr) min-content;
+  align-items: center;
 `;
 
 function getUserTitle(user: Users_users) {
