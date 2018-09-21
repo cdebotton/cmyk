@@ -73,7 +73,7 @@ function AdminUsers({ className, match }: Props) {
                     name="searchField"
                     render={({ field, form }: FieldProps<any>) => (
                       <Input
-                        label="Search users"
+                        label="Search users..."
                         type="search"
                         field={field}
                         form={form}

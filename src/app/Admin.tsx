@@ -137,6 +137,7 @@ const Avatar = styled.span<{ size: number; src: string }>`
   width: ${props => rem(props.size)};
   height: ${props => rem(props.size)};
   background-size: cover;
+  font-family: 'Roboto', sans-serif;
 `;
 
 function Admin({ className, match }: Props) {

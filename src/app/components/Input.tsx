@@ -13,6 +13,9 @@ const InputField = styled.input`
   padding: ${rem(6)};
   height: ${rem(32)};
   width: 100%;
+  border: none;
+  background-color: hsla(0, 0%, 100%, 0.05);
+  border-bottom: 3px solid #2473a7;
 `;
 
 const Label = styled.label`
