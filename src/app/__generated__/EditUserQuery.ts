@@ -17,6 +17,7 @@ export interface EditUserQuery_user_profile_avatar {
 
 export interface EditUserQuery_user_profile {
   __typename: "Profile";
+  id: string;
   avatar: EditUserQuery_user_profile_avatar | null;
   firstName: string;
   lastName: string;

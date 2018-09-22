@@ -8,7 +8,7 @@ import {
 } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import gql from 'graphql-tag';
-import { darken, lighten, margin, padding, rem } from 'polished';
+import { darken, lighten, margin, opacify, padding, rem } from 'polished';
 import React from 'react';
 import { Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
@@ -64,8 +64,8 @@ const Layout = styled.div`
     switch (props.theme.mode) {
       case 'dark':
         return css`
-          color: #fff;
-          background: linear-gradient(to bottom, #0e1a1b, #111b28);
+          color: #000;
+          background: #fff;
         `;
       default:
         throw ThemeNotImplementedError;
@@ -76,16 +76,18 @@ const Layout = styled.div`
 const Header = styled.header`
   display: grid;
   align-content: start;
-  background-color: hsla(0, 0%, 0%, 0.41);
+  background-color: ${opacify(0.92, '#090F16')};
 `;
 
 const Navigation = styled.nav`
   display: grid;
   grid-gap: ${rem(16)};
+  color: #fff;
 `;
 
 const PageLink = styled(NavLink)`
   position: relative;
+  font-family: 'Raleway', sans-serif;
   font-size: ${rem(12)};
   text-decoration: none;
   color: #fff;
@@ -122,6 +124,7 @@ const AdminWelcome = styled(Welcome)`
   display: grid;
   align-content: start;
   grid-gap: ${rem(16)};
+  color: #fff;
   ${margin(rem(32), rem(48))};
 `;
 

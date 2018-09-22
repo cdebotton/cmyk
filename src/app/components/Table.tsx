@@ -1,4 +1,4 @@
-import { margin, padding, rem } from 'polished';
+import { margin, opacify, padding, rem } from 'polished';
 import React, { ReactNode } from 'react';
 import styled from 'styled-components';
 
@@ -16,28 +16,22 @@ const TableContainer = styled.div<{ controls?: ReactNode }>`
     props.controls ? 'min-content auto' : 'auto'};
   width: 100%;
   border-radius: 3px;
-  grid-gap: ${rem(16)};
-  background-image: linear-gradient(
-    to bottom,
-    hsla(0, 0%, 0%, 0.41),
-    hsla(0, 0%, 0%, 0.32)
-  );
+  background-color: hsla(0, 0%, 98%, 1);
 `;
 
 const TableControls = styled.div`
-  background-color: #0a0a0a;
+  display: grid;
+  background-color: hsl(0, 0%, 96%);
   width: ${rem(256)};
   border-radius: 3px;
-  height: calc(100% + ${rem(16)});
-  margin-top: ${rem(-8)};
-  margin-left: ${rem(-8)};
+  align-content: start;
+  grid-gap: ${rem(32)};
   ${padding(rem(32), rem(16))};
 `;
 
 const TableList = styled.ul`
   display: grid;
   grid-template-columns: auto;
-  grid-gap: ${rem(16)};
   list-style: none;
   align-content: start;
   margin: 0;

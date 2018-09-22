@@ -1,7 +1,6 @@
-import { opacify, padding, rem } from 'polished';
+import { padding, rem } from 'polished';
 import { Link } from 'react-router-dom';
 import styled from 'styled-components';
-import { gradient } from '../styles/helpers';
 
 const ButtonLink = styled(Link)`
   text-decoration: none;

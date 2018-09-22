@@ -17,13 +17,13 @@ import {
   DeleteUserMutation,
   DeleteUserMutationVariables,
 } from './__generated__/DeleteUserMutation';
-import { Users, Users_users } from './__generated__/Users';
+import { Users, Users_session, Users_users } from './__generated__/Users';
 import Badge from './components/Badge';
 import Button from './components/Button';
 import ButtonLink from './components/ButtonLink';
-import Card from './components/Card';
 import Heading from './components/Heading';
 import Input from './components/Input';
+import LabeledText from './components/LabledText';
 import Loader from './components/Loader';
 import PageLayout from './components/PageLayout';
 import { Table, TableRow } from './components/Table';
@@ -33,25 +33,122 @@ const AdminUsersLayout = styled(PageLayout)`
   grid-gap: ${rem(16)};
   grid-template-rows: min-content auto;
   align-content: stretch;
-  ${padding(rem(32), rem(16))};
+  ${padding(rem(32), 0, 0)};
 `;
 
 const UsersHeading = styled(Heading)`
-  ${padding(0, rem(32), 0, rem(32))};
+  ${padding(0, rem(32))};
 `;
 
 const AdminTable = styled(Table)`
   ${margin(rem(16), 0, 0, 0)};
 `;
 
-const UserLink = styled(Link)`
-  text-decoration: none;
-  color: inherit;
-  ${margin(0, rem(24))};
-  align-self: stretch;
+const NewUserLink = styled(ButtonLink)`
+  text-align: center;
+  color: #fff;
 `;
 
-const NewUserLink = styled(ButtonLink)``;
+const UsersRowContainer = styled(TableRow)`
+  display: grid;
+  width: 100%;
+  grid-gap: ${rem(32)};
+  align-items: center;
+  grid-template-columns: min-content 2fr repeat(2, 1fr) 2fr;
+  border-bottom: 1px solid hsla(0, 0%, 100%, 0.05);
+`;
+
+function AdminUsersRow(props: {
+  className?: string;
+  user: Users_users;
+  session: Users_session | null;
+  url: string;
+}) {
+  const { className, user, session, url } = props;
+  const profileSrc = user.profile.avatar ? user.profile.avatar.url : null;
+  const fullName = `${user.profile.firstName} ${user.profile.lastName}`;
+  return (
+    <UsersRowContainer className={className}>
+      {profileSrc && (
+        <UserLink to={url}>
+          <Avatar src={profileSrc}>
+            <RoleBadge format="neutral">{user.role}</RoleBadge>
+          </Avatar>
+        </UserLink>
+      )}
+      <LabeledText isLeading label={<UserLink to={url}>{fullName}</UserLink>}>
+        <UserLink to={`mailto:${user.email}`}>{user.email}</UserLink>
+      </LabeledText>
+      <LabeledText label="Last login...">
+        {getTimeAgo(user.lastLogin)}
+      </LabeledText>
+      <LabeledText label="Created on...">
+        {getFormattedDate(user.createdAt)}
+      </LabeledText>
+      {!session ||
+        (session.user.id !== user.id && (
+          <Mutation<DeleteUserMutation, DeleteUserMutationVariables>
+            mutation={DELETE_USER_MUTATION}
+          >
+            {mutate => (
+              <DeleteUserButton onClick={deleteUser(mutate, user.id)}>
+                <FontAwesomeIcon icon={faTimesCircle} />
+              </DeleteUserButton>
+            )}
+          </Mutation>
+        ))}
+    </UsersRowContainer>
+  );
+}
+
+AdminUsersRow.fragments = {
+  entry: gql`
+    fragment userRow on User {
+      id
+      email
+      role
+      lastLogin
+      createdAt
+      profile {
+        id
+        firstName
+        lastName
+        avatar {
+          id
+          url
+        }
+      }
+    }
+  `,
+};
+
+const Avatar = styled.span<{ src: string; size?: number }>`
+  position: relative;
+  display: inline-block;
+  width: ${({ size = 96 }) => rem(size)};
+  height: ${({ size = 96 }) => rem(size)};
+  background-image: url(${({ src }) => src});
+  background-size: cover;
+  border-radius: 50%;
+  ${margin(rem(16), rem(32))};
+`;
+
+const RoleBadge = styled(Badge)`
+  position: absolute;
+  bottom: 0;
+  font-family: 'Roboto', sans-serif;
+  font-weight: bold;
+  font-size: ${rem(8)};
+`;
+
+const DeleteUserButton = styled(Button)`
+  justify-self: center;
+`;
+
+const UserLink = styled(Link)`
+  color: inherit;
+  text-decoration: none;
+`;
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
@@ -74,54 +171,39 @@ function AdminUsers({ className, match }: Props) {
           return (
             <AdminTable
               controls={
-                <Formik
-                  initialValues={{ searchField: '' }}
-                  onSubmit={() => void 0}
-                >
-                  <form>
-                    <Field
-                      name="searchField"
-                      render={({ field, form }: FieldProps<any>) => (
-                        <Input
-                          label="Search users..."
-                          type="search"
-                          field={field}
-                          form={form}
-                        />
-                      )}
-                    />
-                    <NewUserLink to={`${match.url}/new`}>New user</NewUserLink>
-                  </form>
-                </Formik>
+                <>
+                  <Formik
+                    initialValues={{ searchField: '' }}
+                    onSubmit={() => void 0}
+                  >
+                    <form>
+                      <Field
+                        name="searchField"
+                        render={({ field, form }: FieldProps<any>) => (
+                          <Input
+                            label="Search users..."
+                            type="search"
+                            field={field}
+                            form={form}
+                          />
+                        )}
+                      />
+                    </form>
+                  </Formik>
+                  <NewUserLink to={`${match.url}/new`}>New user</NewUserLink>
+                </>
               }
             >
-              {data.users.map(user => (
-                <UsersRow key={`USER_${user.id}`}>
-                  <UserLink to={`${match.url}/${user.id}`}>
-                    <Card
-                      imageUrl={
-                        user.profile.avatar
-                          ? user.profile.avatar.url
-                          : undefined
-                      }
-                      badge={<Badge format="neutral">{user.role}</Badge>}
-                      title={getUserTitle(user)}
-                      subtitle={getUserSubtitle(user)}
-                    />
-                  </UserLink>
-                  <span>{getFormattedDate(user.createdAt)}</span>
-                  <span>{getTimeAgo(user.lastLogin)}</span>
-                  <Mutation<DeleteUserMutation, DeleteUserMutationVariables>
-                    mutation={DELETE_USER_MUTATION}
-                  >
-                    {mutate => (
-                      <Button onClick={deleteUser(mutate, user.id)}>
-                        <FontAwesomeIcon icon={faTimesCircle} />
-                      </Button>
-                    )}
-                  </Mutation>
-                </UsersRow>
-              ))}
+              {data.users.map(user => {
+                return (
+                  <AdminUsersRow
+                    key={`USER_${user.id}`}
+                    session={data.session}
+                    user={user}
+                    url={`${match.url}/${user.id}`}
+                  />
+                );
+              })}
             </AdminTable>
           );
         }}
@@ -132,23 +214,16 @@ function AdminUsers({ className, match }: Props) {
 
 export const USERS_QUERY = gql`
   query Users {
-    users {
-      id
-      email
-      role
-      lastLogin
-      createdAt
-      profile {
+    session {
+      user {
         id
-        firstName
-        lastName
-        avatar {
-          id
-          url
-        }
       }
     }
+    users {
+      ...userRow
+    }
   }
+  ${AdminUsersRow.fragments.entry}
 `;
 
 const DELETE_USER_MUTATION = gql`
@@ -190,28 +265,6 @@ function deleteUser(
       variables: { where: { id } },
     });
   };
-}
-
-const UsersRow = styled(TableRow)`
-  display: grid;
-  grid-template-columns: 3fr repeat(2, 1fr) min-content;
-  align-items: center;
-`;
-
-function getUserTitle(user: Users_users) {
-  if (user.profile.firstName && user.profile.lastName) {
-    return `${user.profile.firstName} ${user.profile.lastName}`;
-  }
-
-  return user.email;
-}
-
-function getUserSubtitle(user: Users_users) {
-  if (user.profile.firstName && user.profile.lastName) {
-    return user.email;
-  }
-
-  return null;
 }
 
 function getFormattedDate(date: string) {

@@ -7,6 +7,16 @@ import { Role } from "./../../../__generated__/globalTypes";
 // GraphQL query operation: Users
 // ====================================================
 
+export interface Users_session_user {
+  __typename: "User";
+  id: string;
+}
+
+export interface Users_session {
+  __typename: "Session";
+  user: Users_session_user;
+}
+
 export interface Users_users_profile_avatar {
   __typename: "File";
   id: string;
@@ -32,5 +42,6 @@ export interface Users_users {
 }
 
 export interface Users {
+  session: Users_session | null;
   users: Users_users[];
 }
