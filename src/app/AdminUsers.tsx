@@ -12,7 +12,7 @@ import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
-import styled, { css } from 'styled-components';
+import styled from 'styled-components';
 import {
   DeleteUserMutation,
   DeleteUserMutationVariables,
