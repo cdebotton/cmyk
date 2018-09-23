@@ -9,7 +9,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import gql from 'graphql-tag';
 import { darken, lighten, margin, opacify, padding, rem } from 'polished';
-import React from 'react';
+import React, { Placeholder } from 'react';
 import { Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps, Switch } from 'react-router';
@@ -20,6 +20,7 @@ import ClientError from './ClientError';
 import Button from './components/Button';
 import Greeting from './components/Greeting';
 import Heading from './components/Heading';
+import Loader from './components/Loader';
 import DynamicRoute from './containers/DynamicRoute';
 import ErrorBoundary from './containers/ErrorBoundary';
 import Session from './containers/Session';
@@ -205,30 +206,32 @@ function Admin({ className, match }: Props) {
               }}
             </Session>
           </Header>
-          <Switch>
-            <DynamicRoute
-              exact
-              path={`${match.url}`}
-              loader={() => import('./AdminDashboard')}
-            />
-            <DynamicRoute
-              path={`${match.url}/users/new`}
-              loader={() => import('./AdminNewUser')}
-            />
-            <DynamicRoute
-              path={`${match.url}/users/:userId`}
-              loader={() => import('./AdminEditUser')}
-            />
-            <DynamicRoute
-              path={`${match.url}/users`}
-              loader={() => import('./AdminUsers')}
-            />
-            <DynamicRoute
-              path={`${match.url}/media`}
-              loader={() => import('./AdminFiles')}
-            />
-            <DynamicRoute loader={() => import('./NotFound')} />
-          </Switch>
+          <Placeholder delayMs={300} fallback={<Loader />}>
+            <Switch>
+              <DynamicRoute
+                exact
+                path={`${match.url}`}
+                loader={() => import('./AdminDashboard')}
+              />
+              <DynamicRoute
+                path={`${match.url}/users/new`}
+                loader={() => import('./AdminNewUser')}
+              />
+              <DynamicRoute
+                path={`${match.url}/users/:userId`}
+                loader={() => import('./AdminEditUser')}
+              />
+              <DynamicRoute
+                path={`${match.url}/users`}
+                loader={() => import('./AdminUsers')}
+              />
+              <DynamicRoute
+                path={`${match.url}/media`}
+                loader={() => import('./AdminFiles')}
+              />
+              <DynamicRoute loader={() => import('./NotFound')} />
+            </Switch>
+          </Placeholder>
         </Layout>
       </ErrorBoundary>
     </ThemeProvider>
