@@ -97,6 +97,7 @@
     "react-hot-loader": "^4.3.8",
     "react-pose": "^3.3.0",
     "react-router-dom": "^4.3.1",
+    "react-spring": "^5.8.0",
     "simple-cache-provider": "^0.9.0",
     "styled-components": "^3.4.6",
     "yup": "^0.26.5"

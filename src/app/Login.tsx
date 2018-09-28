@@ -27,7 +27,7 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
-interface IProps extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
 
@@ -36,7 +36,7 @@ interface Values {
   password: string;
 }
 
-function Login({ className, location }: IProps) {
+function Login({ className, location }: Props) {
   return (
     <Session>
       {({ session, client }) => {
@@ -50,7 +50,7 @@ function Login({ className, location }: IProps) {
         }
 
         return (
-          <div className={className}>
+          <LoginContainer className={className}>
             <Mutation<LoginMutation, LoginVariables> mutation={LOGIN_MUTATION}>
               {mutate => (
                 <Formik<Values>
@@ -99,79 +99,34 @@ function Login({ className, location }: IProps) {
                 </Formik>
               )}
             </Mutation>
-          </div>
+          </LoginContainer>
         );
       }}
     </Session>
   );
 }
 
-const Form = styled.form`
-  background-color: rgba(0, 0, 0, 0.35);
-  padding: ${rem(32)};
-  display: grid;
-  grid-template-rows: repeat(3, min-content);
-  grid-template-columns: repeat(4, 1fr);
-  grid-gap: ${rem(32)};
+const LoginContainer = styled.div`
   width: 100%;
-  box-shadow: 0 2px 5px 0 rgba(20, 20, 20, 0.5);
-  border-radius: 3px;
-`;
-
-const LoginHeading = styled(Heading)`
-  grid-row: 1 / span 1;
-  grid-column: 1 / span 4;
-  text-transform: uppercase;
-`;
-
-const EmailInput = styled(Input)`
-  grid-row: 2 / span 1;
-  grid-column: 1 / span 2;
-`;
-
-const PasswordInput = styled(Input)`
-  grid-row: 2 / span 1;
-  grid-column: 3 / span 2;
-`;
-
-const LoginButton = styled(Button)`
-  grid-row: 3 / span 1;
-  grid-column: 3 / span 1;
-`;
-
-const CancelButton = styled(Button)`
-  grid-row: 3 / span 1;
-  grid-column: 4 / span 1;
-`;
-
-function generateBackground() {
-  const STEPS = 2;
-  const arr = Array.from({ length: STEPS });
-  const steps = arr.reduce<string[]>((acc, _, key) => {
-    const l = 2 + key * 5;
-    const step = 100 / STEPS;
-    const start = key * step;
-    const end = (key + 1) * step;
-    return [
-      ...acc,
-      `hsla(212, 50%, ${l}%, 1.0) ${start}%`,
-      `hsla(190, 50%, ${l}%, 1.0) ${end}%`,
-    ];
-  }, []);
-  return `background-image: linear-gradient(to bottom right, ${steps.join(
-    ', ',
-  )})`;
-}
-
-export default hot(module)(styled(Login)`
-  position: relative;
-  display: grid;
-  grid-template-columns: 46%;
-  background-repeat: no-repeat;
-  background-size: 100% 50%;
-  background-color: rgba(0, 0, 0, 0.93);
   min-height: 100vh;
-  align-items: center;
+  display: grid;
+  align-content: center;
   justify-content: center;
-  ${generateBackground()};
-`);
+`;
+
+const Form = styled.form`
+  display: grid;
+  grid-gap: ${rem(10)};
+`;
+
+const LoginHeading = styled(Heading)``;
+
+const EmailInput = styled(Input)``;
+
+const PasswordInput = styled(Input)``;
+
+const LoginButton = styled(Button)``;
+
+const CancelButton = styled(Button)``;
+
+export default hot(module)(Login);

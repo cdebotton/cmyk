@@ -22,9 +22,9 @@ import {
   UploadFileMutationVariables,
 } from './__generated__/UploadFileMutation';
 import Button from './components/Button';
-import Heading from './components/Heading';
 import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
+import PageHeading from './components/PageHeading';
 import PageLayout from './components/PageLayout';
 import Select from './components/Select';
 import DynamicComponent from './containers/DynamicComponent';
@@ -68,7 +68,7 @@ function AdminEditUser({ className, ...props }: Props) {
 
         return (
           <AdminEditUserLayout className={className}>
-            <Heading>Edit User {user.email}</Heading>
+            <PageHeading>Edit User {user.email}</PageHeading>
             <Mutation<UpdateUserMutation, UpdateUserMutationVariables>
               mutation={USER_UPDATE_MUTATION}
             >

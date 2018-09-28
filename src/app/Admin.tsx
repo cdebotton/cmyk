@@ -118,7 +118,6 @@ const PageLink = styled(NavLink)`
 
 const LogoutButton = styled(Button)`
   justify-self: center;
-  display: none;
 `;
 
 const AdminWelcome = styled(Welcome)`

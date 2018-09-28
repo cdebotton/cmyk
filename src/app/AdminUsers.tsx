@@ -21,23 +21,15 @@ import { Users, Users_session, Users_users } from './__generated__/Users';
 import Badge from './components/Badge';
 import Button from './components/Button';
 import ButtonLink from './components/ButtonLink';
-import Heading from './components/Heading';
 import Input from './components/Input';
 import LabeledText from './components/LabledText';
 import Loader from './components/Loader';
+import PageHeading from './components/PageHeading';
 import PageLayout from './components/PageLayout';
 import { Table, TableRow } from './components/Table';
 
 const AdminUsersLayout = styled(PageLayout)`
-  display: grid;
-  grid-gap: ${rem(16)};
   grid-template-rows: min-content auto;
-  align-content: stretch;
-  ${padding(rem(32), 0, 0)};
-`;
-
-const UsersHeading = styled(Heading)`
-  ${padding(0, rem(32))};
 `;
 
 const AdminTable = styled(Table)`
@@ -157,7 +149,7 @@ interface Props extends RouteComponentProps<{}> {
 function AdminUsers({ className, match }: Props) {
   return (
     <AdminUsersLayout className={className}>
-      <UsersHeading>Users</UsersHeading>
+      <PageHeading>Users</PageHeading>
       <Query<Users, {}> query={USERS_QUERY}>
         {({ data, loading, error }) => {
           if (error) {
