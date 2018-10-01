@@ -1,6 +1,6 @@
 import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
-import { rem } from 'polished';
+import { padding, rem } from 'polished';
 import React from 'react';
 import { Mutation } from 'react-apollo';
 import { hot } from 'react-hot-loader';
@@ -93,7 +93,6 @@ function Login({ className, location }: Props) {
                       <LoginButton type="submit" disabled={!isValid}>
                         Go
                       </LoginButton>
-                      <CancelButton type="submit">Cancel</CancelButton>
                     </Form>
                   )}
                 </Formik>
@@ -110,23 +109,31 @@ const LoginContainer = styled.div`
   width: 100%;
   min-height: 100vh;
   display: grid;
+  grid-template-columns: max-content;
   align-content: center;
   justify-content: center;
+  background-color: #fff;
 `;
 
 const Form = styled.form`
   display: grid;
-  grid-gap: ${rem(10)};
+  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns: repeat(2, 1fr);
+  grid-gap: ${rem(16)};
+  border-radius: 3px;
+  ${padding(rem(16))};
 `;
 
-const LoginHeading = styled(Heading)``;
+const LoginHeading = styled(Heading)`
+  grid-column: 1 / span 2;
+`;
 
 const EmailInput = styled(Input)``;
 
 const PasswordInput = styled(Input)``;
 
-const LoginButton = styled(Button)``;
-
-const CancelButton = styled(Button)``;
+const LoginButton = styled(Button)`
+  grid-column: 2 / span 1;
+`;
 
 export default hot(module)(Login);

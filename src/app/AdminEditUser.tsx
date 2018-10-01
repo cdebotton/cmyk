@@ -1,4 +1,4 @@
-import { Field, Formik } from 'formik';
+import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
 import { History } from 'history';
 import { rem } from 'polished';
@@ -132,8 +132,9 @@ function AdminEditUser({ className, ...props }: Props) {
                       </Mutation>
                       <Field
                         name="email"
-                        component={EmailInput}
-                        label="Email"
+                        render={({ field, form }: FieldProps) => (
+                          <EmailInput label="Email" field={field} form={form} />
+                        )}
                       />
                       <Field
                         name="firstName"

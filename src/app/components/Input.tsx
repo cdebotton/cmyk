@@ -1,7 +1,7 @@
 import { FieldProps } from 'formik';
 import { modularScale, rem } from 'polished';
-import React, { HTMLProps } from 'react';
-import { Spring } from 'react-spring';
+import React, { CSSProperties, HTMLProps } from 'react';
+import { animated, Spring } from 'react-spring';
 import styled from 'styled-components';
 
 interface Props extends FieldProps<any> {
@@ -15,17 +15,11 @@ const InputField = styled.input`
   height: ${rem(32)};
   width: 100%;
   border: none;
+  background: transparent;
 
   &:focus {
     outline: none;
   }
-`;
-
-const Label = styled.label`
-  position: absolute;
-  top: 0;
-  left: ${rem(8)};
-  pointer-events: none;
 `;
 
 const Notice = styled.span`
@@ -53,21 +47,28 @@ const ReactiveBorder = {
   `,
 };
 
-const BORDER_PATH = 'M0,0 L40,0 L40,3 L0,3 L0,0 Z';
-const FILL_PATH = 'M0,0 L40,0 L40,20 L0,30 L0,0 Z';
+const NativeStyles: { [x: string]: CSSProperties } = {
+  label: {
+    left: rem(8),
+    pointerEvents: 'none',
+    position: 'absolute',
+    top: 0,
+  },
+};
+
+const FILL_PATH = 'M0,6 L2,4 L2,0 L0,0 Z';
+const EMPTY_PATH = 'M0,16 L2,16 L3,15 L0,15 Z';
 
 const PLACEHOLDER = {
   color: '#aaa',
   fontSize: modularScale(0),
-  textTransform: 'none',
   transform: `translate3d(0, ${rem(24)}, 0)`,
 };
 
 const LABEL = {
-  color: '#444',
+  color: '#fff',
   fontSize: modularScale(-1),
-  textTransform: 'uppercase',
-  transform: `translate3d(0, 0, 0)`,
+  transform: `translate3d(0, ${rem(3)}, 0)`,
 };
 
 function Input({ className, field, label, form, ...props }: Props) {
@@ -77,22 +78,27 @@ function Input({ className, field, label, form, ...props }: Props) {
   return (
     <InputContainer className={className}>
       <Spring to={field.value === '' ? PLACEHOLDER : LABEL}>
-        {style => <Label style={style}>{label}</Label>}
+        {style => (
+          <animated.label style={{ ...NativeStyles.label, ...style }}>
+            {label}
+          </animated.label>
+        )}
       </Spring>
       <InputField {...props} {...field} placeholder={undefined} />
       {touched && error && <Notice>{error}</Notice>}
       <ReactiveBorder.svg
         version="1.1"
-        viewBox="0 0 40 40"
+        viewBox="0 0 2 16"
         preserveAspectRatio="none"
       >
-        <linearGradient id="fill">
-          <stop offset="0%" stopColor="hsl(180, 50%, 50%)" />
-          <stop offset="100%" stopColor="hsl(212, 50%, 50%)" />
-        </linearGradient>
         <ReactiveBorder.g>
-          <Spring to={{ shape: field.value === '' ? BORDER_PATH : FILL_PATH }}>
-            {({ shape }) => <path fill="url(#fill)" d={shape} />}
+          <Spring
+            native
+            to={{ shape: field.value === '' ? EMPTY_PATH : FILL_PATH }}
+          >
+            {({ shape }) => (
+              <animated.path fill="hsl(180, 50%, 50%)" d={shape} />
+            )}
           </Spring>
         </ReactiveBorder.g>
       </ReactiveBorder.svg>

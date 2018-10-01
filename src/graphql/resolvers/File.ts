@@ -17,6 +17,7 @@ const File: FileResolvers.Type<TypeMap> = {
     const [bucket, ...path] = parent.url.split('/');
     return s3.getSignedUrl('getObject', {
       Bucket: bucket,
+      Expires: 10,
       Key: path.join('/'),
     });
   },

@@ -36,7 +36,7 @@ module.exports = {
     ],
   },
   resolve: {
-    extensions: ['.ts', '.tsx', '.js'],
+    extensions: ['.ts', '.tsx', '.js', '.mjs'],
     alias: {
       react: path.join(__dirname, `vendor/react/build/dist/react.${build}.js`),
       'react-dom': path.join(
