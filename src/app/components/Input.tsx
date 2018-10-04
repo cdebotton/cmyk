@@ -16,6 +16,7 @@ const InputField = styled.input`
   width: 100%;
   border: none;
   background: transparent;
+  border-bottom: 1px solid #ddd;
 
   &:focus {
     outline: none;
@@ -35,18 +36,6 @@ const InputContainer = styled.span`
   padding: ${rem(16)} 0 ${rem(8)};
 `;
 
-const ReactiveBorder = {
-  g: styled.g``,
-  svg: styled.svg`
-    z-index: -1;
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-  `,
-};
-
 const NativeStyles: { [x: string]: CSSProperties } = {
   label: {
     left: rem(8),
@@ -56,9 +45,6 @@ const NativeStyles: { [x: string]: CSSProperties } = {
   },
 };
 
-const FILL_PATH = 'M0,6 L2,4 L2,0 L0,0 Z';
-const EMPTY_PATH = 'M0,16 L2,16 L3,15 L0,15 Z';
-
 const PLACEHOLDER = {
   color: '#aaa',
   fontSize: modularScale(0),
@@ -66,7 +52,7 @@ const PLACEHOLDER = {
 };
 
 const LABEL = {
-  color: '#fff',
+  color: '#222',
   fontSize: modularScale(-1),
   transform: `translate3d(0, ${rem(3)}, 0)`,
 };
@@ -86,22 +72,6 @@ function Input({ className, field, label, form, ...props }: Props) {
       </Spring>
       <InputField {...props} {...field} placeholder={undefined} />
       {touched && error && <Notice>{error}</Notice>}
-      <ReactiveBorder.svg
-        version="1.1"
-        viewBox="0 0 2 16"
-        preserveAspectRatio="none"
-      >
-        <ReactiveBorder.g>
-          <Spring
-            native
-            to={{ shape: field.value === '' ? EMPTY_PATH : FILL_PATH }}
-          >
-            {({ shape }) => (
-              <animated.path fill="hsl(180, 50%, 50%)" d={shape} />
-            )}
-          </Spring>
-        </ReactiveBorder.g>
-      </ReactiveBorder.svg>
     </InputContainer>
   );
 }

@@ -17,14 +17,14 @@ interface IError {
 type State = IValid | IError;
 
 class ErrorBoundary extends Component<Props, State> {
-  public constructor(props: Props, context: any) {
+  constructor(props: Props, context: any) {
     super(props, context);
     this.state = {
       variant: 'ok',
     };
   }
 
-  public componentDidCatch(error: Error, info: ErrorInfo) {
+  componentDidCatch(error: Error, info: ErrorInfo) {
     this.setState(state => ({
       ...state,
       error,
@@ -33,7 +33,7 @@ class ErrorBoundary extends Component<Props, State> {
     }));
   }
 
-  public render() {
+  render() {
     switch (this.state.variant) {
       case 'ok':
         return this.props.children;

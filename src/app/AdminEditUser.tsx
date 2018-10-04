@@ -1,7 +1,7 @@
 import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
 import { History } from 'history';
-import { rem } from 'polished';
+import { padding, rem } from 'polished';
 import React, { FormEvent } from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
@@ -99,34 +99,38 @@ function AdminEditUser({ className, ...props }: Props) {
                         {uploadFile => (
                           <Field
                             name="avatar"
-                            component={ImageSelector}
-                            file={user.profile.avatar}
-                            onFileChange={async (
-                              event: FormEvent<HTMLInputElement>,
-                            ) => {
-                              if (!event.currentTarget.files) {
-                                return;
-                              }
+                            render={({ field }: FieldProps<Values>) => (
+                              <AvatarInput
+                                file={user.profile.avatar}
+                                name="avatar"
+                                {...field}
+                                onFileChange={async (
+                                  event: FormEvent<HTMLInputElement>,
+                                ) => {
+                                  if (!event.currentTarget.files) {
+                                    return;
+                                  }
 
-                              const file = event.currentTarget.files[0];
+                                  const file = event.currentTarget.files[0];
 
-                              const uploadResult = await uploadFile({
-                                // update: (cache, { data: uploadData }) => {},
-                                variables: {
-                                  file,
-                                },
-                              });
+                                  const uploadResult = await uploadFile({
+                                    // update: (cache, { data: uploadData }) => {},
+                                    variables: {
+                                      file,
+                                    },
+                                  });
 
-                              if (!(uploadResult && uploadResult.data)) {
-                                return;
-                              }
+                                  if (!(uploadResult && uploadResult.data)) {
+                                    return;
+                                  }
 
-                              setFieldValue(
-                                'avatar',
-                                uploadResult.data.uploadFile,
-                              );
-                            }}
-                            label="Avatar"
+                                  setFieldValue(
+                                    'avatar',
+                                    uploadResult.data.uploadFile,
+                                  );
+                                }}
+                              />
+                            )}
                           />
                         )}
                       </Mutation>
@@ -279,17 +283,24 @@ const AdminEditUserLayout = styled(PageLayout)`
 const UserForm = styled.form`
   grid-gap: ${rem(16)};
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
+  grid-template-columns: ${rem(128)} repeat(4, 1fr);
+  grid-auto-rows: ${rem(56)};
+  ${padding(0, rem(32))};
+`;
+
+const AvatarInput = styled(ImageSelector)`
+  grid-column: span 1;
+  grid-row: span 2;
 `;
 
 const EmailInput = styled(Input)`
-  grid-column: 1 / span 2;
+  grid-column: span 2;
 `;
 
 const SaveButton = styled(Button).attrs({ type: 'submit' })`
-  grid-column: 3 / span 1;
+  grid-column: span 1;
 `;
 
 const CancelButton = styled(Button).attrs({ type: 'rest' })`
-  grid-column: 4 / span 1;
+  grid-column: span 1;
 `;

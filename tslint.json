@@ -6,6 +6,7 @@
     "jsx-no-lambda": [false],
     "interface-name": [false],
     "jsx-boolean-value": [false],
+    "member-access": [false],
     "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"],
     "object-literal-sort-keys": [true, "shorthand-first"],
     "no-namespace": [false]

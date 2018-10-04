@@ -1,10 +1,11 @@
-import { rem } from 'polished';
+import { rem, size } from 'polished';
 import React, { ChangeEventHandler, Component, FormEventHandler } from 'react';
 import styled from 'styled-components';
 
 interface Props {
   className?: string;
   value: string;
+  name: string;
   file: {
     key: string;
     bucket: string;
@@ -18,21 +19,23 @@ interface State {
 }
 
 class ImageSelector extends Component<Props, State> {
-  public state = { currentUrl: null };
+  state = { currentUrl: null };
 
-  public render() {
-    const { className, file, onFileChange } = this.props;
+  render() {
+    const { className, file, onFileChange, name } = this.props;
     const { currentUrl } = this.state;
     const url = currentUrl || (file ? file.url : null);
+    const id = `file-${name}`;
     return (
       <ImageSelectorContainer className={className}>
         {url && <Image src={url} />}
-        <input onChange={this.onFileChange} type="file" />
+        <FileInput id={id} onChange={this.onFileChange} />
+        <Label htmlFor={id} />
       </ImageSelectorContainer>
     );
   }
 
-  private onFileChange: ChangeEventHandler<HTMLInputElement> = event => {
+  onFileChange: ChangeEventHandler<HTMLInputElement> = event => {
     const reader = new FileReader();
     const files = event.currentTarget.files;
 
@@ -59,9 +62,27 @@ class ImageSelector extends Component<Props, State> {
 }
 
 const Image = styled.img`
-  height: ${rem(64)};
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
 `;
 
-const ImageSelectorContainer = styled.span``;
+const FileInput = styled.input.attrs({ type: 'file' })`
+  display: none;
+`;
+
+const Label = styled.label`
+  position: absolute;
+  top: 0;
+  left: 0;
+  ${size('100%')};
+  cursor: pointer;
+`;
+
+const ImageSelectorContainer = styled.span`
+  position: relative;
+  width: 100%;
+  height: 100%;
+`;
 
 export default ImageSelector;
