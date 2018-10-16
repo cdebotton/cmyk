@@ -132,9 +132,11 @@ const UserLink = styled(Link)`
   color: inherit;
   display: grid;
   align-items: center;
-  grid-template-columns: min-content auto;
+  grid-template-columns: min-content 2fr repeat(3, 1fr);
+  grid-auto-columns: 1fr;
   grid-template-rows: repeat(2, 1fr);
   grid-gap: 0 ${rem(16)};
+  grid-auto-flow: column dense;
 `;
 
 const UserName = styled.span`
@@ -153,6 +155,12 @@ const UserAvatar = styled(Avatar)`
   position: relative;
   grid-row: span 2;
   border-radius: 9px;
+`;
+
+const Label = styled.span`
+  font-size: ${rem(16)};
+  opacity: 0.4;
+  align-self: end;
 `;
 
 function getAvatar(profile: Users_users_profile) {
@@ -215,6 +223,7 @@ function AdminUsers({ className, match }: Props) {
                                   {user.profile.lastName}
                                 </UserName>
                                 <UserEmail>{user.email}</UserEmail>
+                                <Label>Last login</Label>
                               </UserLink>
                             </UserListItem>
                           )}
