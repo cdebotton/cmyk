@@ -6,7 +6,7 @@ const PageLayout = styled.div`
   align-content: start;
   justify-content: stretch;
   grid-gap: ${rem(16)};
-  ${padding(0)};
+  ${padding(rem(0), rem(32), rem(16))};
 `;
 
 export default PageLayout;

@@ -4,6 +4,7 @@
 # import UserUpdateInput from "./prisma.graphql"
 # import UserCreateInput from "./prisma.graphql"
 # import FileWhereInput from "./prisma.graphql"
+# import DocumentWhereInput from "./prisma.graphql"
 # import FileWhereUniqueInput from "./prisma.graphql"
 
 scalar Upload
@@ -14,6 +15,7 @@ type Query {
   files(where: FileWhereInput): [File!]!
   user(where: UserWhereUniqueInput!): User
   users(where: UserWhereInput): [User!]!
+  documents(where: DocumentWhereInput): [Document!]!
 }
 
 type Mutation {

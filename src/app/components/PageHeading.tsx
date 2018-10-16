@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import Heading from './Heading';
 
 const PageHeading = styled(Heading)`
-  ${padding(rem(32))};
+  font-weight: 300;
 `;
 
 export default PageHeading;

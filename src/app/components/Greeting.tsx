@@ -25,9 +25,9 @@ const Name = styled.span`
   font-size: ${rem(24)};
 `;
 
-function Greeting({ message, name }: Props) {
+function Greeting({ message, name, className }: Props) {
   return (
-    <GreetingContainer>
+    <GreetingContainer className={className}>
       <Message>{message},</Message>
       <Name>{name}</Name>
     </GreetingContainer>

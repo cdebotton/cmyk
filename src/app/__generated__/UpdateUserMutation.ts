@@ -16,6 +16,7 @@ export interface UpdateUserMutation_updateUser_profile_avatar {
 
 export interface UpdateUserMutation_updateUser_profile {
   __typename: "Profile";
+  id: string;
   avatar: UpdateUserMutation_updateUser_profile_avatar | null;
   firstName: string;
   lastName: string;

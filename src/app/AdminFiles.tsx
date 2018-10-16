@@ -12,13 +12,9 @@ import Loader from './components/Loader';
 import PageLayout from './components/PageLayout';
 import { Table, TableRow } from './components/Table';
 
-interface Props {
-  className?: string;
-}
-
-function AdminFiles({ className }: Props) {
+function AdminFiles() {
   return (
-    <AdminFilesLayout className={className}>
+    <AdminFilesLayout>
       <Heading>Files</Heading>
       <Query<Files> query={FILES_QUERY}>
         {({ data, loading, error }) => {

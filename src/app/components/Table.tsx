@@ -16,12 +16,10 @@ const TableContainer = styled.div<{ controls?: ReactNode }>`
     props.controls ? 'min-content auto' : 'auto'};
   width: 100%;
   border-radius: 3px;
-  background-color: hsla(0, 0%, 98%, 1);
 `;
 
 const TableControls = styled.div`
   display: grid;
-  background-color: hsl(0, 0%, 96%);
   width: ${rem(256)};
   border-radius: 3px;
   align-content: start;

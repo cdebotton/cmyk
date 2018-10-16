@@ -228,6 +228,65 @@ export interface UserWhereInput {
   documents_some: string;
   documents_none: string;
 }
+export interface DocumentWhereInput {
+  AND: string;
+  OR: string;
+  NOT: string;
+  id: string;
+  id_not: string;
+  id_in: string;
+  id_not_in: string;
+  id_lt: string;
+  id_lte: string;
+  id_gt: string;
+  id_gte: string;
+  id_contains: string;
+  id_not_contains: string;
+  id_starts_with: string;
+  id_not_starts_with: string;
+  id_ends_with: string;
+  id_not_ends_with: string;
+  publishDate: string;
+  publishDate_not: string;
+  publishDate_in: string;
+  publishDate_not_in: string;
+  publishDate_lt: string;
+  publishDate_lte: string;
+  publishDate_gt: string;
+  publishDate_gte: string;
+  title: string;
+  title_not: string;
+  title_in: string;
+  title_not_in: string;
+  title_lt: string;
+  title_lte: string;
+  title_gt: string;
+  title_gte: string;
+  title_contains: string;
+  title_not_contains: string;
+  title_starts_with: string;
+  title_not_starts_with: string;
+  title_ends_with: string;
+  title_not_ends_with: string;
+  createdAt: string;
+  createdAt_not: string;
+  createdAt_in: string;
+  createdAt_not_in: string;
+  createdAt_lt: string;
+  createdAt_lte: string;
+  createdAt_gt: string;
+  createdAt_gte: string;
+  updatedAt: string;
+  updatedAt_not: string;
+  updatedAt_in: string;
+  updatedAt_not_in: string;
+  updatedAt_lt: string;
+  updatedAt_lte: string;
+  updatedAt_gt: string;
+  updatedAt_gte: string;
+  type: string;
+  author: string;
+}
 export interface FileWhereUniqueInput {
   id: string;
 }
@@ -246,6 +305,58 @@ export interface UserUpdateInput {
   role: string;
   profile: string;
   documents: string;
+}
+export interface DocumentTypeWhereInput {
+  AND: string;
+  OR: string;
+  NOT: string;
+  id: string;
+  id_not: string;
+  id_in: string;
+  id_not_in: string;
+  id_lt: string;
+  id_lte: string;
+  id_gt: string;
+  id_gte: string;
+  id_contains: string;
+  id_not_contains: string;
+  id_starts_with: string;
+  id_not_starts_with: string;
+  id_ends_with: string;
+  id_not_ends_with: string;
+  title: string;
+  title_not: string;
+  title_in: string;
+  title_not_in: string;
+  title_lt: string;
+  title_lte: string;
+  title_gt: string;
+  title_gte: string;
+  title_contains: string;
+  title_not_contains: string;
+  title_starts_with: string;
+  title_not_starts_with: string;
+  title_ends_with: string;
+  title_not_ends_with: string;
+  createdAt: string;
+  createdAt_not: string;
+  createdAt_in: string;
+  createdAt_not_in: string;
+  createdAt_lt: string;
+  createdAt_lte: string;
+  createdAt_gt: string;
+  createdAt_gte: string;
+  updatedAt: string;
+  updatedAt_not: string;
+  updatedAt_in: string;
+  updatedAt_not_in: string;
+  updatedAt_lt: string;
+  updatedAt_lte: string;
+  updatedAt_gt: string;
+  updatedAt_gte: string;
+  documents_every: string;
+  documents_some: string;
+  documents_none: string;
 }
 export interface ProfileCreateOneWithoutUserInput {
   create: string;
@@ -343,65 +454,6 @@ export interface ProfileWhereInput {
   user: string;
   avatar: string;
 }
-export interface DocumentWhereInput {
-  AND: string;
-  OR: string;
-  NOT: string;
-  id: string;
-  id_not: string;
-  id_in: string;
-  id_not_in: string;
-  id_lt: string;
-  id_lte: string;
-  id_gt: string;
-  id_gte: string;
-  id_contains: string;
-  id_not_contains: string;
-  id_starts_with: string;
-  id_not_starts_with: string;
-  id_ends_with: string;
-  id_not_ends_with: string;
-  publishDate: string;
-  publishDate_not: string;
-  publishDate_in: string;
-  publishDate_not_in: string;
-  publishDate_lt: string;
-  publishDate_lte: string;
-  publishDate_gt: string;
-  publishDate_gte: string;
-  title: string;
-  title_not: string;
-  title_in: string;
-  title_not_in: string;
-  title_lt: string;
-  title_lte: string;
-  title_gt: string;
-  title_gte: string;
-  title_contains: string;
-  title_not_contains: string;
-  title_starts_with: string;
-  title_not_starts_with: string;
-  title_ends_with: string;
-  title_not_ends_with: string;
-  createdAt: string;
-  createdAt_not: string;
-  createdAt_in: string;
-  createdAt_not_in: string;
-  createdAt_lt: string;
-  createdAt_lte: string;
-  createdAt_gt: string;
-  createdAt_gte: string;
-  updatedAt: string;
-  updatedAt_not: string;
-  updatedAt_in: string;
-  updatedAt_not_in: string;
-  updatedAt_lt: string;
-  updatedAt_lte: string;
-  updatedAt_gt: string;
-  updatedAt_gte: string;
-  type: string;
-  author: string;
-}
 export interface ProfileCreateWithoutUserInput {
   firstName: string;
   lastName: string;
@@ -437,58 +489,6 @@ export interface DocumentUpsertWithWhereUniqueWithoutAuthorInput {
   where: string;
   update: string;
   create: string;
-}
-export interface DocumentTypeWhereInput {
-  AND: string;
-  OR: string;
-  NOT: string;
-  id: string;
-  id_not: string;
-  id_in: string;
-  id_not_in: string;
-  id_lt: string;
-  id_lte: string;
-  id_gt: string;
-  id_gte: string;
-  id_contains: string;
-  id_not_contains: string;
-  id_starts_with: string;
-  id_not_starts_with: string;
-  id_ends_with: string;
-  id_not_ends_with: string;
-  title: string;
-  title_not: string;
-  title_in: string;
-  title_not_in: string;
-  title_lt: string;
-  title_lte: string;
-  title_gt: string;
-  title_gte: string;
-  title_contains: string;
-  title_not_contains: string;
-  title_starts_with: string;
-  title_not_starts_with: string;
-  title_ends_with: string;
-  title_not_ends_with: string;
-  createdAt: string;
-  createdAt_not: string;
-  createdAt_in: string;
-  createdAt_not_in: string;
-  createdAt_lt: string;
-  createdAt_lte: string;
-  createdAt_gt: string;
-  createdAt_gte: string;
-  updatedAt: string;
-  updatedAt_not: string;
-  updatedAt_in: string;
-  updatedAt_not_in: string;
-  updatedAt_lt: string;
-  updatedAt_lte: string;
-  updatedAt_gt: string;
-  updatedAt_gte: string;
-  documents_every: string;
-  documents_some: string;
-  documents_none: string;
 }
 export interface FileCreateOneInput {
   create: string;
@@ -595,6 +595,17 @@ export namespace QueryResolvers {
     info: GraphQLResolveInfo,
   ) => T['UserParent'][] | Promise<T['UserParent'][]>;
 
+  export interface ArgsDocuments {
+    where: DocumentWhereInput | null;
+  }
+
+  export type DocumentsType<T extends ITypeMap> = (
+    parent: T['QueryParent'],
+    args: ArgsDocuments,
+    ctx: T['Context'],
+    info: GraphQLResolveInfo,
+  ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
+
   export interface Type<T extends ITypeMap> {
     session: (
       parent: T['QueryParent'],
@@ -620,6 +631,12 @@ export namespace QueryResolvers {
       ctx: T['Context'],
       info: GraphQLResolveInfo,
     ) => T['UserParent'][] | Promise<T['UserParent'][]>;
+    documents: (
+      parent: T['QueryParent'],
+      args: ArgsDocuments,
+      ctx: T['Context'],
+      info: GraphQLResolveInfo,
+    ) => T['DocumentParent'][] | Promise<T['DocumentParent'][]>;
   }
 }
 

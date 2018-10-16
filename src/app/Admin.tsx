@@ -8,13 +8,14 @@ import {
 } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import gql from 'graphql-tag';
-import { darken, lighten, margin, opacify, padding, rem } from 'polished';
+import { darken, lighten, margin, opacify, padding, rem, size } from 'polished';
+import { normalize } from 'polished';
 import React, { Placeholder } from 'react';
 import { Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps, Switch } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
-import styled, { css, ThemeProvider } from 'styled-components';
+import styled, { css, keyframes, ThemeProvider } from 'styled-components';
 import { CurrentUserQuery } from './__generated__/CurrentUserQuery';
 import ClientError from './ClientError';
 import Button from './components/Button';
@@ -24,6 +25,30 @@ import Loader from './components/Loader';
 import DynamicRoute from './containers/DynamicRoute';
 import ErrorBoundary from './containers/ErrorBoundary';
 import Session from './containers/Session';
+
+import { createGlobalStyle } from 'styled-components';
+import Avatar from './components/Avatar';
+const GlobalStyles = createGlobalStyle`
+  ${normalize()};
+
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: Roboto, sans-serif;
+  }
+
+  ::selection {
+    background-color: hsla(300, 100%, 50%, 0.5);
+  }
+
+  a {
+    color: hsla(212, 50%, 50%, 1.0);
+  }
+`;
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
@@ -53,95 +78,106 @@ class ThemeNotImplementedError extends Error {
   }
 }
 
-const Welcome = styled.div`
-  font-family: 'Raleway';
+const ScrollAnimation = keyframes`
+  from {
+    background-position: 0 0;
+  }
+
+  to {
+    background-position: -300vw -300vh;
+  }
 `;
 
 const Layout = styled.div`
   display: grid;
-  grid-template-columns: max-content auto;
+  grid-template-rows: min-content auto;
+  grid-gap: ${rem(16)};
+  color: #fff;
   min-height: 100vh;
-  ${props => {
-    switch (props.theme.mode) {
-      case 'dark':
-        return css`
-          color: #000;
-          background: #fff;
-        `;
-      default:
-        throw ThemeNotImplementedError;
-    }
-  }};
+
+  &::before {
+    content: ' ';
+    z-index: -1;
+    display: block;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    width: 100vw;
+    background-size: 400vw;
+    height: 400vh;
+    background-image: linear-gradient(
+      to top left,
+      hsl(352, 50%, 50%),
+      hsl(342, 50%, 50%),
+      hsl(332, 50%, 50%),
+      hsl(322, 50%, 50%),
+      hsl(312, 50%, 50%),
+      hsl(302, 50%, 50%),
+      hsl(292, 50%, 50%),
+      hsl(282, 50%, 50%),
+      hsl(272, 50%, 50%),
+      hsl(262, 50%, 50%),
+      hsl(252, 50%, 50%),
+      hsl(242, 50%, 50%),
+      hsl(232, 50%, 50%),
+      hsl(222, 50%, 50%),
+      hsl(212, 50%, 50%),
+      hsl(202, 50%, 50%),
+      hsl(192, 50%, 50%),
+      hsl(182, 50%, 50%),
+      hsl(172, 50%, 50%),
+      hsl(162, 50%, 50%)
+    );
+    animation: ${ScrollAnimation} 120s linear infinite alternate;
+    transform: translate3d(0, 0, 0);
+  }
 `;
 
 const Header = styled.header`
+  position: relative;
   display: grid;
-  align-content: start;
-  background-color: ${opacify(0.92, '#090F16')};
+  grid-gap: ${rem(16)};
+  grid-template-columns: min-content auto max-content;
+  align-items: center;
+  align-content: center;
+  width: 100vw;
+  ${padding(rem(16), rem(32), rem(16), rem(16))};
+
+  &::after {
+    content: ' ';
+    display: block;
+    width: calc(100% - ${rem(64)});
+    height: 1px;
+    background-color: rgba(255, 255, 255, 0.5);
+    position: absolute;
+    bottom: 0;
+    ${margin(0, rem(32))};
+  }
 `;
 
 const Navigation = styled.nav`
   display: grid;
-  grid-gap: ${rem(16)};
-  color: #fff;
+  grid-template-columns: ${props =>
+    `repeat(${React.Children.count(props.children)}, max-content)`};
+  grid-gap: ${rem(8)};
 `;
 
 const PageLink = styled(NavLink)`
-  position: relative;
-  font-family: 'Raleway', sans-serif;
-  font-size: ${rem(12)};
-  text-decoration: none;
   color: #fff;
-  display: grid;
-  grid-template-columns: min-content auto;
-  align-items: center;
-  grid-gap: ${rem(10)};
-  ${padding(rem(4), 0, rem(4), rem(16))};
+  text-decoration: none;
+  font-family: 'Raleway', sans-serif;
+  font-size: ${rem(24)};
+  font-weight: 300;
+  color: hsla(0, 80%, 100%, 0.5);
 
   &.active {
-    background-color: #2573a7;
-
-    &::after {
-      content: ' ';
-      display: block;
-      position: absolute;
-      left: 100%;
-      top: 0;
-      height: 100%;
-      width: 0;
-      border-top: solid 12px transparent;
-      border-bottom: solid 12px transparent;
-      border-left: solid 12px #2573a7;
-    }
+    color: rgba(255, 255, 255, 1);
   }
 `;
 
-const LogoutButton = styled(Button)`
-  justify-self: center;
-`;
-
-const AdminWelcome = styled(Welcome)`
-  display: grid;
-  align-content: start;
-  grid-gap: ${rem(16)};
-  color: #fff;
-  ${margin(rem(32), rem(48))};
-`;
-
-const LinkIcon = styled(FontAwesomeIcon)`
-  font-size: ${rem(16)};
-`;
-
-const Avatar = styled.span<{ size: number; src: string }>`
-  border-radius: 50%;
-  display: inline-block;
-  background-image: url("${props => props.src}");
-  background-position: center center;
-  width: ${props => rem(props.size)};
-  height: ${props => rem(props.size)};
-  background-size: cover;
-  font-family: 'Roboto', sans-serif;
-`;
+const LogoutButton = styled(Button)``;
 
 function Admin({ className, match }: Props) {
   return (
@@ -150,6 +186,7 @@ function Admin({ className, match }: Props) {
         handleError={(error, info) => <ClientError error={error} info={info} />}
       >
         <Layout className={className}>
+          <GlobalStyles />
           <Header>
             <Query<CurrentUserQuery> query={CURRENT_USER_QUERY}>
               {({ data, loading, error }) => {
@@ -159,31 +196,20 @@ function Admin({ className, match }: Props) {
                 const avatar =
                   profile && profile.avatar ? profile.avatar.url : '';
                 return (
-                  <AdminWelcome>
-                    <Greeting message="Oh hello" name={name} />
-                    <Link to={`${match.url}/users/${user ? user.id : ''}`}>
-                      <Avatar size={92} src={avatar} />
-                    </Link>
-                  </AdminWelcome>
+                  <Link to={`${match.url}/users/${user ? user.id : ''}`}>
+                    <Avatar size={64} src={avatar} />
+                  </Link>
                 );
               }}
             </Query>
             <Navigation>
               <PageLink exact to={match.url}>
-                <LinkIcon icon={faSun} size="2x" /> Home
+                Home
               </PageLink>
-              <PageLink to={`${match.url}/documents`}>
-                <LinkIcon icon={faFolder} size="2x" /> Documents
-              </PageLink>
-              <PageLink to={`${match.url}/media`}>
-                <LinkIcon icon={faImages} size="2x" /> Files
-              </PageLink>
-              <PageLink to={`${match.url}/users`}>
-                <LinkIcon icon={faUser} size="2x" /> Users
-              </PageLink>
-              <PageLink to={`${match.url}/settings`}>
-                <LinkIcon icon={faMehBlank} size="2x" /> Settings
-              </PageLink>
+              <PageLink to={`${match.url}/documents`}>Documents</PageLink>
+              <PageLink to={`${match.url}/media`}>Files</PageLink>
+              <PageLink to={`${match.url}/users`}>Users</PageLink>
+              <PageLink to={`${match.url}/settings`}>Settings</PageLink>
             </Navigation>
             <Session>
               {({ session, client }) => {
@@ -223,6 +249,10 @@ function Admin({ className, match }: Props) {
               <DynamicRoute
                 path={`${match.url}/users`}
                 loader={() => import('./AdminUsers')}
+              />
+              <DynamicRoute
+                path={`${match.url}/documents`}
+                loader={() => import('./AdminDocuments')}
               />
               <DynamicRoute
                 path={`${match.url}/media`}
