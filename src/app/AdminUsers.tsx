@@ -3,7 +3,7 @@ import format from 'date-fns/format';
 import isValid from 'date-fns/is_valid';
 import parse from 'date-fns/parse';
 import gql from 'graphql-tag';
-import { padding, rem, size } from 'polished';
+import { padding, position, rem, size } from 'polished';
 import React from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
@@ -152,16 +152,7 @@ const UserEmail = styled.span`
 const UserAvatar = styled(Avatar)`
   position: relative;
   grid-row: span 2;
-
-  &::after {
-    content: ' ';
-    display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
-    border-radius: 50%;
-    ${size('100%')};
-  }
+  border-radius: 9px;
 `;
 
 function getAvatar(profile: Users_users_profile) {
