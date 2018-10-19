@@ -1,26 +1,23 @@
+import { faTimesCircle } from '@fortawesome/free-regular-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
 import format from 'date-fns/format';
 import isValid from 'date-fns/is_valid';
 import parse from 'date-fns/parse';
 import gql from 'graphql-tag';
-import { padding, position, rem, size } from 'polished';
+import { padding, rem } from 'polished';
 import React from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
-import { Spring } from 'react-spring';
+import { animated, Spring } from 'react-spring';
 import styled from 'styled-components';
 import {
   DeleteUserMutation,
   DeleteUserMutationVariables,
 } from './__generated__/DeleteUserMutation';
-import {
-  Users,
-  Users_session,
-  Users_users,
-  Users_users_profile,
-} from './__generated__/Users';
+import { Users, Users_users_profile } from './__generated__/Users';
 import Avatar from './components/Avatar';
 import Loader from './components/Loader';
 import PageHeading from './components/PageHeading';
@@ -63,35 +60,31 @@ const DELETE_USER_MUTATION = gql`
 
 function deleteUser(
   mutate: MutationFn<DeleteUserMutation, DeleteUserMutationVariables>,
-  id: string,
 ) {
-  return () => {
-    mutate({
-      update: (cache, { data: mutationData }) => {
-        const cacheUsers = cache.readQuery<Users>({
-          query: USERS_QUERY,
-        });
+  mutate({
+    update: (cache, { data: mutationData }) => {
+      const cacheUsers = cache.readQuery<Users>({
+        query: USERS_QUERY,
+      });
 
-        if (!(cacheUsers && cacheUsers.users)) {
-          return;
-        }
+      if (!(cacheUsers && cacheUsers.users)) {
+        return;
+      }
 
-        cache.writeQuery({
-          data: {
-            users: cacheUsers.users.filter(u => {
-              if (!(mutationData && mutationData.deleteUser)) {
-                return true;
-              }
+      cache.writeQuery({
+        data: {
+          users: cacheUsers.users.filter(u => {
+            if (!(mutationData && mutationData.deleteUser)) {
+              return true;
+            }
 
-              return u.id !== mutationData.deleteUser.id;
-            }),
-          },
-          query: USERS_QUERY,
-        });
-      },
-      variables: { where: { id } },
-    });
-  };
+            return u.id !== mutationData.deleteUser.id;
+          }),
+        },
+        query: USERS_QUERY,
+      });
+    },
+  });
 }
 
 function getFormattedDate(date: string) {
@@ -109,22 +102,33 @@ function getTimeAgo(date: string | null) {
 
   const parsed = parse(date);
 
-  return distanceInWordsToNow(parsed);
+  return distanceInWordsToNow(parsed) + ' ago';
 }
 
+const UsersLayout = styled(PageLayout)`
+  grid-template-columns: ${rem(32)} auto ${rem(32)};
+  perspective: 800px;
+  transform-style: preserve-3d;
+`;
+
+const UsersHeading = styled(PageHeading)`
+  grid-column: 2 / span 1;
+`;
+
 const UserList = styled.ul`
+  grid-column: 2 / span 1;
   display: grid;
   list-style: none;
   margin: 0;
   padding: 0;
   grid-gap: ${rem(16)};
-  perspective: 800px;
-  transform-style: preserve-3d;
 `;
 
-const UserListItem = styled.li`
+const UserListItem = styled(animated.li)`
   border-radius: 5px;
   ${padding(rem(8))};
+  perspective: 800px;
+  transform-style: preserve-3d;
 `;
 
 const UserLink = styled(Link)`
@@ -132,7 +136,7 @@ const UserLink = styled(Link)`
   color: inherit;
   display: grid;
   align-items: center;
-  grid-template-columns: min-content 2fr repeat(3, 1fr);
+  grid-template-columns: min-content 2fr repeat(2, 1fr) ${rem(128)};
   grid-auto-columns: 1fr;
   grid-template-rows: repeat(2, 1fr);
   grid-gap: 0 ${rem(16)};
@@ -158,9 +162,24 @@ const UserAvatar = styled(Avatar)`
 `;
 
 const Label = styled.span`
-  font-size: ${rem(16)};
+  font-size: ${rem(12)};
   opacity: 0.4;
   align-self: end;
+`;
+
+const DateInfo = styled.span`
+  align-self: start;
+  font-size: ${rem(20)};
+  font-weight: 300;
+  font-family: 'Raleway', sans-serif;
+`;
+
+const DeleteIcon = styled(animated.span)`
+  grid-row: span 2;
+  font-size: ${rem(48)};
+  display: grid;
+  align-content: center;
+  justify-content: center;
 `;
 
 function getAvatar(profile: Users_users_profile) {
@@ -171,14 +190,43 @@ function getAvatar(profile: Users_users_profile) {
   return '';
 }
 
+const getListItemStyles = (on: boolean) => {
+  return on
+    ? {
+        backgroundColor: 'hsla(0, 0%, 100%, 0.175)',
+        boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
+        transform: 'translate3d(0, 0, 20px)',
+      }
+    : {
+        backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
+        boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
+        transform: 'translate3d(0, 0, 0px)',
+      };
+};
+
+const getDeleteAnimation = (on: boolean) =>
+  on
+    ? {
+        opacity: 1.0,
+        textShadow: '0 0 5px hsla(0, 0%, 0%, 0.2)',
+        transform: 'translate3d(0 0 0px)',
+      }
+    : {
+        opacity: 0.0,
+        textShadow: '0 0 20px hsla(0, 0%, 0%, 1.0)',
+        transform: 'translate3d(0, 0, 40px)',
+      };
+
+type ListItemStyles = ReturnType<typeof getListItemStyles>;
+
 interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
 
 function AdminUsers({ className, match }: Props) {
   return (
-    <PageLayout className={className}>
-      <PageHeading>Users</PageHeading>
+    <UsersLayout className={className}>
+      <UsersHeading>Users</UsersHeading>
       <Query<Users, {}> query={USERS_QUERY}>
         {({ data, loading, error }) => {
           if (error) {
@@ -196,20 +244,11 @@ function AdminUsers({ className, match }: Props) {
                 return (
                   <Toggle key={`USER_${user.id}`}>
                     {({ on, setOn, setOff }) => {
-                      const to = on
-                        ? {
-                            backgroundColor: 'hsla(0, 0%, 100%, 0.175)',
-                            boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
-                            transform: 'translate3d(0, 0, 20px)',
-                          }
-                        : {
-                            backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
-                            boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
-                            transform: 'translate3d(0, 0, 0px)',
-                          };
-
                       return (
-                        <Spring to={to}>
+                        <Spring<{}, ListItemStyles>
+                          native
+                          to={getListItemStyles(on)}
+                        >
                           {styles => (
                             <UserListItem
                               onMouseEnter={setOn}
@@ -217,13 +256,55 @@ function AdminUsers({ className, match }: Props) {
                               style={styles}
                             >
                               <UserLink to={`${match.url}/${user.id}`}>
-                                <UserAvatar src={avatar} size={96} />
+                                <UserAvatar
+                                  style={{
+                                    boxShadow: styles.boxShadow,
+                                    transform: styles.transform,
+                                  }}
+                                  src={avatar}
+                                  size={96}
+                                />
                                 <UserName>
                                   {user.profile.firstName}{' '}
                                   {user.profile.lastName}
                                 </UserName>
                                 <UserEmail>{user.email}</UserEmail>
                                 <Label>Last login</Label>
+                                <DateInfo>
+                                  {getTimeAgo(user.lastLogin)}
+                                </DateInfo>
+                                <Label>Created</Label>
+                                <DateInfo>
+                                  {getFormattedDate(user.createdAt)}
+                                </DateInfo>
+                                {!data.session ||
+                                  (data.session.user.id !== user.id && (
+                                    <Spring native to={getDeleteAnimation(on)}>
+                                      {deleteStyles => (
+                                        <Mutation<
+                                          DeleteUserMutation,
+                                          DeleteUserMutationVariables
+                                        >
+                                          mutation={DELETE_USER_MUTATION}
+                                          variables={{ where: { id: user.id } }}
+                                        >
+                                          {mutate => (
+                                            <DeleteIcon
+                                              style={deleteStyles}
+                                              onClick={event => {
+                                                event.preventDefault();
+                                                deleteUser(mutate);
+                                              }}
+                                            >
+                                              <FontAwesomeIcon
+                                                icon={faTimesCircle}
+                                              />
+                                            </DeleteIcon>
+                                          )}
+                                        </Mutation>
+                                      )}
+                                    </Spring>
+                                  ))}
                               </UserLink>
                             </UserListItem>
                           )}
@@ -237,7 +318,7 @@ function AdminUsers({ className, match }: Props) {
           );
         }}
       </Query>
-    </PageLayout>
+    </UsersLayout>
   );
 }
 
