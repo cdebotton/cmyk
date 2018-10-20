@@ -1,24 +1,24 @@
-import { faTimesCircle } from '@fortawesome/free-regular-svg-icons';
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import distanceInWordsToNow from 'date-fns/distance_in_words_to_now';
 import format from 'date-fns/format';
 import isValid from 'date-fns/is_valid';
 import parse from 'date-fns/parse';
 import gql from 'graphql-tag';
-import { padding, rem } from 'polished';
+import { padding, position, rem, size } from 'polished';
 import React from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
-import { animated, Spring } from 'react-spring';
+import { animated, Spring, Transition } from 'react-spring';
 import styled from 'styled-components';
 import {
   DeleteUserMutation,
   DeleteUserMutationVariables,
 } from './__generated__/DeleteUserMutation';
 import { Users, Users_users_profile } from './__generated__/Users';
+import AnimatedCross from './components/AnimatedCross';
 import Avatar from './components/Avatar';
+import ButtonLink from './components/ButtonLink';
 import Loader from './components/Loader';
 import PageHeading from './components/PageHeading';
 import PageLayout from './components/PageLayout';
@@ -182,6 +182,18 @@ const DeleteIcon = styled(animated.span)`
   justify-content: center;
 `;
 
+const DeleteFill = styled.svg`
+  position: absolute;
+  ${position('absolute', 0, 0)};
+  ${size('100%')};
+  z-index: -1;
+  border-radius: inherit;
+`;
+
+const NewUserLink = styled(ButtonLink)`
+  grid-column: 2 / span 1;
+`;
+
 function getAvatar(profile: Users_users_profile) {
   if (profile.avatar) {
     return profile.avatar.url;
@@ -204,18 +216,16 @@ const getListItemStyles = (on: boolean) => {
       };
 };
 
-const getDeleteAnimation = (on: boolean) =>
-  on
-    ? {
-        opacity: 1.0,
-        textShadow: '0 0 5px hsla(0, 0%, 0%, 0.2)',
-        transform: 'translate3d(0 0 0px)',
-      }
-    : {
-        opacity: 0.0,
-        textShadow: '0 0 20px hsla(0, 0%, 0%, 1.0)',
-        transform: 'translate3d(0, 0, 40px)',
-      };
+const redFill = {
+  off: {
+    d: 'M100,0 L100,100, L100,100, L100,0 Z',
+    fill: 'hsla(212, 50%, 50%, 0)',
+  },
+  on: {
+    d: 'M100,0 M100,100, 20,100, 22,0 Z',
+    fill: 'hsla(0, 50%, 50%, 0.4)',
+  },
+};
 
 type ListItemStyles = ReturnType<typeof getListItemStyles>;
 
@@ -227,6 +237,7 @@ function AdminUsers({ className, match }: Props) {
   return (
     <UsersLayout className={className}>
       <UsersHeading>Users</UsersHeading>
+      <NewUserLink to={`${match.url}/new`}>New user</NewUserLink>
       <Query<Users, {}> query={USERS_QUERY}>
         {({ data, loading, error }) => {
           if (error) {
@@ -255,57 +266,80 @@ function AdminUsers({ className, match }: Props) {
                               onMouseLeave={setOff}
                               style={styles}
                             >
-                              <UserLink to={`${match.url}/${user.id}`}>
-                                <UserAvatar
-                                  style={{
-                                    boxShadow: styles.boxShadow,
-                                    transform: styles.transform,
-                                  }}
-                                  src={avatar}
-                                  size={96}
-                                />
-                                <UserName>
-                                  {user.profile.firstName}{' '}
-                                  {user.profile.lastName}
-                                </UserName>
-                                <UserEmail>{user.email}</UserEmail>
-                                <Label>Last login</Label>
-                                <DateInfo>
-                                  {getTimeAgo(user.lastLogin)}
-                                </DateInfo>
-                                <Label>Created</Label>
-                                <DateInfo>
-                                  {getFormattedDate(user.createdAt)}
-                                </DateInfo>
-                                {!data.session ||
-                                  (data.session.user.id !== user.id && (
-                                    <Spring native to={getDeleteAnimation(on)}>
-                                      {deleteStyles => (
-                                        <Mutation<
-                                          DeleteUserMutation,
-                                          DeleteUserMutationVariables
-                                        >
-                                          mutation={DELETE_USER_MUTATION}
-                                          variables={{ where: { id: user.id } }}
-                                        >
-                                          {mutate => (
-                                            <DeleteIcon
-                                              style={deleteStyles}
-                                              onClick={event => {
-                                                event.preventDefault();
-                                                deleteUser(mutate);
+                              <Toggle>
+                                {({
+                                  on: deleteOn,
+                                  setOn: setDeleteOn,
+                                  setOff: setDeleteOff,
+                                }) => (
+                                  <>
+                                    <DeleteFill
+                                      preserveAspectRatio="none"
+                                      viewBox="0 0 100 100"
+                                    >
+                                      <Spring
+                                        native
+                                        to={deleteOn ? redFill.on : redFill.off}
+                                      >
+                                        {({ d, fill }) => {
+                                          return (
+                                            <animated.path fill={fill} d={d} />
+                                          );
+                                        }}
+                                      </Spring>
+                                    </DeleteFill>
+                                    <UserLink to={`${match.url}/${user.id}`}>
+                                      <UserAvatar
+                                        style={{
+                                          boxShadow: styles.boxShadow,
+                                          transform: styles.transform,
+                                        }}
+                                        src={avatar}
+                                        size={96}
+                                      />
+                                      <UserName>
+                                        {user.profile.firstName}{' '}
+                                        {user.profile.lastName}
+                                      </UserName>
+                                      <UserEmail>{user.email}</UserEmail>
+                                      <Label>Last login</Label>
+                                      <DateInfo>
+                                        {getTimeAgo(user.lastLogin)}
+                                      </DateInfo>
+                                      <Label>Created</Label>
+                                      <DateInfo>
+                                        {getFormattedDate(user.createdAt)}
+                                      </DateInfo>
+                                      {on &&
+                                        (!data.session ||
+                                          (data.session.user.id !== user.id && (
+                                            <Mutation<
+                                              DeleteUserMutation,
+                                              DeleteUserMutationVariables
+                                            >
+                                              mutation={DELETE_USER_MUTATION}
+                                              variables={{
+                                                where: { id: user.id },
                                               }}
                                             >
-                                              <FontAwesomeIcon
-                                                icon={faTimesCircle}
-                                              />
-                                            </DeleteIcon>
-                                          )}
-                                        </Mutation>
-                                      )}
-                                    </Spring>
-                                  ))}
-                              </UserLink>
+                                              {mutate => (
+                                                <DeleteIcon
+                                                  onMouseEnter={setDeleteOn}
+                                                  onMouseLeave={setDeleteOff}
+                                                  onClick={event => {
+                                                    event.preventDefault();
+                                                    deleteUser(mutate);
+                                                  }}
+                                                >
+                                                  <AnimatedCross />
+                                                </DeleteIcon>
+                                              )}
+                                            </Mutation>
+                                          )))}
+                                    </UserLink>
+                                  </>
+                                )}
+                              </Toggle>
                             </UserListItem>
                           )}
                         </Spring>

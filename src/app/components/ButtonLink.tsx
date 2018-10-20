@@ -10,7 +10,7 @@ const ButtonLink = styled(Link)`
   border-radius: 3px;
   font-weight: normal;
   font-family: 'Roboto';
-  background-color: rgba(0, 153, 255, 0.5)};
+  background-color: hsla(0, 0%, 100%, 0.25)};
   ${padding(rem(8))};
 `;
 
