@@ -252,6 +252,52 @@ function DeleteUserAlert({ onConfirm, onCancel }: DeleteUserProps) {
   );
 }
 
+interface DeleteUserButtonProps {
+  user: Users_users;
+  setDeleteOn: () => void;
+  setDeleteOff: () => void;
+}
+
+function DeleteUserButton({
+  user,
+  setDeleteOn,
+  setDeleteOff,
+}: DeleteUserButtonProps) {
+  return (
+    <Mutation<DeleteUserMutation, DeleteUserMutationVariables>
+      mutation={DELETE_USER_MUTATION}
+      variables={{
+        where: { id: user.id },
+      }}
+    >
+      {mutate => (
+        <PortalManager.Consumer>
+          {({ setPortalNode }) => (
+            <DeleteIcon
+              onMouseEnter={setDeleteOn}
+              onMouseLeave={setDeleteOff}
+              onClick={event => {
+                event.preventDefault();
+                setPortalNode(
+                  <DeleteUserAlert
+                    onConfirm={() => {
+                      deleteUser(mutate);
+                      setPortalNode(null);
+                    }}
+                    onCancel={() => setPortalNode(null)}
+                  />,
+                );
+              }}
+            >
+              <AnimatedCross />
+            </DeleteIcon>
+          )}
+        </PortalManager.Consumer>
+      )}
+    </Mutation>
+  );
+}
+
 interface UserListItemProps {
   user: Users_users;
   isCurrentUser: boolean;
@@ -307,40 +353,11 @@ function UserListItem({ baseUrl, user, isCurrentUser }: UserListItemProps) {
                         <DateInfo>{getFormattedDate(user.createdAt)}</DateInfo>
                         {on &&
                           !isCurrentUser && (
-                            <Mutation<
-                              DeleteUserMutation,
-                              DeleteUserMutationVariables
-                            >
-                              mutation={DELETE_USER_MUTATION}
-                              variables={{
-                                where: { id: user.id },
-                              }}
-                            >
-                              {mutate => (
-                                <PortalManager.Consumer>
-                                  {({ setPortalNode }) => (
-                                    <DeleteIcon
-                                      onMouseEnter={setDeleteOn}
-                                      onMouseLeave={setDeleteOff}
-                                      onClick={event => {
-                                        event.preventDefault();
-                                        setPortalNode(
-                                          <DeleteUserAlert
-                                            onConfirm={() => {
-                                              deleteUser(mutate);
-                                              setPortalNode(null);
-                                            }}
-                                            onCancel={() => setPortalNode(null)}
-                                          />,
-                                        );
-                                      }}
-                                    >
-                                      <AnimatedCross />
-                                    </DeleteIcon>
-                                  )}
-                                </PortalManager.Consumer>
-                              )}
-                            </Mutation>
+                            <DeleteUserButton
+                              user={user}
+                              setDeleteOn={setDeleteOn}
+                              setDeleteOff={setDeleteOff}
+                            />
                           )}
                       </UserLink>
                     </>
