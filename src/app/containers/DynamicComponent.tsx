@@ -1,7 +1,8 @@
-import React, { ComponentType } from 'react';
+import React, { ComponentType, ReactNode } from 'react';
 import componentFetcher from '../utils/componentFetcher';
 
 type Props<P> = {
+  children?: ReactNode;
   loader: () => Promise<{ default: ComponentType<P> }>;
 } & P;
 

@@ -37,8 +37,8 @@ const resolvers: Resolvers = {
   Upload: GraphQLUpload,
 };
 
-// @ts-ignore
 const schema = makeExecutableSchema<TypeMap['Context']>({
+  // @ts-ignore
   resolvers,
   typeDefs,
 });

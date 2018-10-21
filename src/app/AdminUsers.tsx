@@ -15,13 +15,20 @@ import {
   DeleteUserMutation,
   DeleteUserMutationVariables,
 } from './__generated__/DeleteUserMutation';
-import { Users, Users_users_profile } from './__generated__/Users';
+import {
+  Users,
+  Users_session,
+  Users_users,
+  Users_users_profile,
+} from './__generated__/Users';
 import AnimatedCross from './components/AnimatedCross';
 import Avatar from './components/Avatar';
 import ButtonLink from './components/ButtonLink';
+import Confirm from './components/Confirm';
 import Loader from './components/Loader';
 import PageHeading from './components/PageHeading';
 import PageLayout from './components/PageLayout';
+import PortalManager from './containers/PortalManager';
 import Toggle from './containers/Toggle';
 
 export const USERS_QUERY = gql`
@@ -124,7 +131,7 @@ const UserList = styled.ul`
   grid-gap: ${rem(16)};
 `;
 
-const UserListItem = styled(animated.li)`
+const UserListItemContainer = styled(animated.li)`
   border-radius: 5px;
   ${padding(rem(8))};
   perspective: 800px;
@@ -229,6 +236,125 @@ const redFill = {
 
 type ListItemStyles = ReturnType<typeof getListItemStyles>;
 
+interface DeleteUserProps {
+  onConfirm: () => void;
+  onCancel: () => void;
+}
+
+function DeleteUserAlert({ onConfirm, onCancel }: DeleteUserProps) {
+  return (
+    <Confirm
+      title="Are you sure you want to do this?"
+      message="You are about to permanently delete this user"
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+    />
+  );
+}
+
+interface UserListItemProps {
+  user: Users_users;
+  isCurrentUser: boolean;
+  baseUrl: string;
+}
+
+function UserListItem({ baseUrl, user, isCurrentUser }: UserListItemProps) {
+  const avatar = getAvatar(user.profile);
+  return (
+    <Toggle>
+      {({ on, setOn, setOff }) => {
+        return (
+          <Spring<{}, ListItemStyles> native to={getListItemStyles(on)}>
+            {styles => (
+              <UserListItemContainer
+                onMouseEnter={setOn}
+                onMouseLeave={setOff}
+                style={styles}
+              >
+                <Toggle>
+                  {({
+                    on: deleteOn,
+                    setOn: setDeleteOn,
+                    setOff: setDeleteOff,
+                  }) => (
+                    <>
+                      <DeleteFill
+                        preserveAspectRatio="none"
+                        viewBox="0 0 100 100"
+                      >
+                        <Spring native to={deleteOn ? redFill.on : redFill.off}>
+                          {({ d, fill }) => {
+                            return <animated.path fill={fill} d={d} />;
+                          }}
+                        </Spring>
+                      </DeleteFill>
+                      <UserLink to={`${baseUrl}/${user.id}`}>
+                        <UserAvatar
+                          style={{
+                            boxShadow: styles.boxShadow,
+                            transform: styles.transform,
+                          }}
+                          src={avatar}
+                          size={96}
+                        />
+                        <UserName>
+                          {user.profile.firstName} {user.profile.lastName}
+                        </UserName>
+                        <UserEmail>{user.email}</UserEmail>
+                        <Label>Last login</Label>
+                        <DateInfo>{getTimeAgo(user.lastLogin)}</DateInfo>
+                        <Label>Created</Label>
+                        <DateInfo>{getFormattedDate(user.createdAt)}</DateInfo>
+                        {on &&
+                          !isCurrentUser && (
+                            <Mutation<
+                              DeleteUserMutation,
+                              DeleteUserMutationVariables
+                            >
+                              mutation={DELETE_USER_MUTATION}
+                              variables={{
+                                where: { id: user.id },
+                              }}
+                            >
+                              {mutate => (
+                                <PortalManager.Consumer>
+                                  {({ setPortalNode }) => (
+                                    <DeleteIcon
+                                      onMouseEnter={setDeleteOn}
+                                      onMouseLeave={setDeleteOff}
+                                      onClick={event => {
+                                        event.preventDefault();
+                                        setPortalNode(
+                                          <DeleteUserAlert
+                                            onConfirm={() => {
+                                              deleteUser(mutate);
+                                              setPortalNode(null);
+                                            }}
+                                            onCancel={() => setPortalNode(null)}
+                                          />,
+                                        );
+                                      }}
+                                    >
+                                      <AnimatedCross />
+                                    </DeleteIcon>
+                                  )}
+                                </PortalManager.Consumer>
+                              )}
+                            </Mutation>
+                          )}
+                      </UserLink>
+                    </>
+                  )}
+                </Toggle>
+              </UserListItemContainer>
+            )}
+          </Spring>
+        );
+      }}
+    </Toggle>
+  );
+}
+
 interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
@@ -251,101 +377,15 @@ function AdminUsers({ className, match }: Props) {
           return (
             <UserList>
               {data.users.map(user => {
-                const avatar = getAvatar(user.profile);
+                const isCurrentUser =
+                  (data.session && data.session.user.id === user.id) || false;
                 return (
-                  <Toggle key={`USER_${user.id}`}>
-                    {({ on, setOn, setOff }) => {
-                      return (
-                        <Spring<{}, ListItemStyles>
-                          native
-                          to={getListItemStyles(on)}
-                        >
-                          {styles => (
-                            <UserListItem
-                              onMouseEnter={setOn}
-                              onMouseLeave={setOff}
-                              style={styles}
-                            >
-                              <Toggle>
-                                {({
-                                  on: deleteOn,
-                                  setOn: setDeleteOn,
-                                  setOff: setDeleteOff,
-                                }) => (
-                                  <>
-                                    <DeleteFill
-                                      preserveAspectRatio="none"
-                                      viewBox="0 0 100 100"
-                                    >
-                                      <Spring
-                                        native
-                                        to={deleteOn ? redFill.on : redFill.off}
-                                      >
-                                        {({ d, fill }) => {
-                                          return (
-                                            <animated.path fill={fill} d={d} />
-                                          );
-                                        }}
-                                      </Spring>
-                                    </DeleteFill>
-                                    <UserLink to={`${match.url}/${user.id}`}>
-                                      <UserAvatar
-                                        style={{
-                                          boxShadow: styles.boxShadow,
-                                          transform: styles.transform,
-                                        }}
-                                        src={avatar}
-                                        size={96}
-                                      />
-                                      <UserName>
-                                        {user.profile.firstName}{' '}
-                                        {user.profile.lastName}
-                                      </UserName>
-                                      <UserEmail>{user.email}</UserEmail>
-                                      <Label>Last login</Label>
-                                      <DateInfo>
-                                        {getTimeAgo(user.lastLogin)}
-                                      </DateInfo>
-                                      <Label>Created</Label>
-                                      <DateInfo>
-                                        {getFormattedDate(user.createdAt)}
-                                      </DateInfo>
-                                      {on &&
-                                        (!data.session ||
-                                          (data.session.user.id !== user.id && (
-                                            <Mutation<
-                                              DeleteUserMutation,
-                                              DeleteUserMutationVariables
-                                            >
-                                              mutation={DELETE_USER_MUTATION}
-                                              variables={{
-                                                where: { id: user.id },
-                                              }}
-                                            >
-                                              {mutate => (
-                                                <DeleteIcon
-                                                  onMouseEnter={setDeleteOn}
-                                                  onMouseLeave={setDeleteOff}
-                                                  onClick={event => {
-                                                    event.preventDefault();
-                                                    deleteUser(mutate);
-                                                  }}
-                                                >
-                                                  <AnimatedCross />
-                                                </DeleteIcon>
-                                              )}
-                                            </Mutation>
-                                          )))}
-                                    </UserLink>
-                                  </>
-                                )}
-                              </Toggle>
-                            </UserListItem>
-                          )}
-                        </Spring>
-                      );
-                    }}
-                  </Toggle>
+                  <UserListItem
+                    key={user.id}
+                    user={user}
+                    baseUrl={match.url}
+                    isCurrentUser={isCurrentUser}
+                  />
                 );
               })}
             </UserList>

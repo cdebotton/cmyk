@@ -28,6 +28,8 @@ import Session from './containers/Session';
 
 import { createGlobalStyle } from 'styled-components';
 import Avatar from './components/Avatar';
+import PortalManager from './containers/PortalManager';
+import PortalOutlet from './PortalOutlet';
 const GlobalStyles = createGlobalStyle`
   ${normalize()};
 
@@ -52,6 +54,7 @@ const GlobalStyles = createGlobalStyle`
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
+  portalElement: HTMLElement;
 }
 
 const CURRENT_USER_QUERY = gql`
@@ -181,10 +184,10 @@ const LogoutButton = styled(Button)``;
 
 function Admin({ className, match }: Props) {
   return (
-    <ThemeProvider theme={{ mode: 'dark', size: 'medium' }}>
-      <ErrorBoundary
-        handleError={(error, info) => <ClientError error={error} info={info} />}
-      >
+    <ErrorBoundary
+      handleError={(error, info) => <ClientError error={error} info={info} />}
+    >
+      <ThemeProvider theme={{ mode: 'dark', size: 'medium' }}>
         <Layout className={className}>
           <GlobalStyles />
           <Header>
@@ -261,9 +264,10 @@ function Admin({ className, match }: Props) {
               <DynamicRoute loader={() => import('./NotFound')} />
             </Switch>
           </Placeholder>
+          <PortalOutlet />
         </Layout>
-      </ErrorBoundary>
-    </ThemeProvider>
+      </ThemeProvider>
+    </ErrorBoundary>
   );
 }
 

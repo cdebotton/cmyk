@@ -1,7 +1,7 @@
 import { Component, ErrorInfo, ReactNode } from 'react';
 
 interface Props {
-  handleError: ReactNode | ((error: Error, info: ErrorInfo) => ReactNode);
+  handleError: (error: Error, info: ErrorInfo) => ReactNode;
 }
 
 interface IValid {
