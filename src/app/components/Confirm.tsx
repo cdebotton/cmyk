@@ -14,24 +14,36 @@ const Overlay = styled.div`
 
 const Alert = styled.div`
   display: grid;
-  grid-template-rows: min-content auto;
+  grid-template-rows: min-content auto min-content;
   grid-auto-flow: column dense;
-  background-color: hsla(0, 0%, 100%, 0.75);
+  background-color: hsla(0, 0%, 100%, 0.15);
+  box-shadow: 3px 3px 5px hsla(0, 0%, 0%, 0.05);
   border-radius: 3px;
+  backdrop-filter: blur(2px);
 `;
 
 const Title = styled.header`
-  background-image: linear-gradient(
-    to bottom right,
-    hsla(212, 50%, 50%, 1),
-    hsla(242, 50%, 50%, 1)
-  );
+  font-family: 'Raleway', sans-serif;
+  font-size: ${rem(16)};
+  font-weight: 300;
+  background-color: hsla(250, 50%, 50%, 0.35);
   color: #fff;
-  ${padding(rem(8), rem(16))};
+  ${padding(rem(16), rem(32))};
 `;
 
 const Message = styled.div`
-  ${padding(rem(16))};
+  font-family: 'Roboto', sans-serif;
+  font-size: ${rem(16)};
+  color: #fff;
+  font-weight: 100;
+  ${padding(rem(32))};
+`;
+
+const Actions = styled.span`
+  display: grid;
+  grid-auto-flow: column;
+  grid-gap: ${rem(8)};
+  ${padding(0, rem(16), rem(16), '50%')};
 `;
 
 interface Props {
@@ -47,8 +59,10 @@ function Confirm({ title, message, onConfirm, onCancel }: Props) {
       <Alert>
         <Title>{title}</Title>
         <Message>{message}</Message>
-        <Button onClick={onConfirm}>Okay</Button>
-        <Button onClick={onCancel}>Cancel</Button>
+        <Actions>
+          <Button onClick={onConfirm}>Okay</Button>
+          <Button onClick={onCancel}>Cancel</Button>
+        </Actions>
       </Alert>
     </Overlay>
   );

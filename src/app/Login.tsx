@@ -12,6 +12,8 @@ import Button from './components/Button';
 import Heading from './components/Heading';
 import Input from './components/Input';
 import Session from './containers/Session';
+import GlobalStyles from './styles/AdminStyles';
+import background from './styles/background';
 
 const validationSchema = yup.object().shape({
   email: yup
@@ -51,6 +53,7 @@ function Login({ className, location }: Props) {
 
         return (
           <LoginContainer className={className}>
+            <GlobalStyles />
             <Mutation<LoginMutation, LoginVariables> mutation={LOGIN_MUTATION}>
               {mutate => (
                 <Formik<Values>
@@ -107,12 +110,13 @@ function Login({ className, location }: Props) {
 
 const LoginContainer = styled.div`
   width: 100%;
-  min-height: 100vh;
+  height: 100vh;
   display: grid;
   grid-template-columns: max-content;
   align-content: center;
   justify-content: center;
   background-color: #fff;
+  ${background};
 `;
 
 const Form = styled.form`

@@ -9,7 +9,9 @@ const ButtonLink = styled(Link)`
   padding: ${rem(8)};
   border-radius: 3px;
   font-weight: normal;
-  font-family: 'Roboto';
+  font-family: 'Roboto', sans-serif;
+  font-weight: 800;
+  text-transform: uppercase;
   background-color: hsla(0, 0%, 100%, 0.25)};
   ${padding(rem(8))};
 `;

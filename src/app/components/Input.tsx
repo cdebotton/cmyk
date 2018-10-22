@@ -1,5 +1,5 @@
 import { FieldProps } from 'formik';
-import { modularScale, rem } from 'polished';
+import { modularScale, position, rem, size } from 'polished';
 import React, { CSSProperties, HTMLProps } from 'react';
 import { animated, Spring } from 'react-spring';
 import styled from 'styled-components';
@@ -15,9 +15,7 @@ const InputField = styled.input`
   height: ${rem(32)};
   width: 100%;
   border: none;
-  background: transparent;
-  border-bottom: 1px solid #ddd;
-
+  background-color: transparent;
   &:focus {
     outline: none;
   }
@@ -36,6 +34,12 @@ const InputContainer = styled.span`
   padding: ${rem(16)} 0 ${rem(8)};
 `;
 
+const StateFiller = styled.svg`
+  ${position('absolute', 0, 0)};
+  ${size('100%')};
+  z-index: -1;
+`;
+
 const NativeStyles: { [x: string]: CSSProperties } = {
   label: {
     left: rem(8),
@@ -52,7 +56,7 @@ const PLACEHOLDER = {
 };
 
 const LABEL = {
-  color: '#222',
+  color: '#fff',
   fontSize: modularScale(-1),
   transform: `translate3d(0, ${rem(3)}, 0)`,
 };
@@ -63,13 +67,16 @@ function Input({ className, field, label, form, ...props }: Props) {
 
   return (
     <InputContainer className={className}>
-      <Spring to={field.value === '' ? PLACEHOLDER : LABEL}>
+      <Spring native to={field.value === '' ? PLACEHOLDER : LABEL}>
         {style => (
           <animated.label style={{ ...NativeStyles.label, ...style }}>
             {label}
           </animated.label>
         )}
       </Spring>
+      <StateFiller viewBox="0 0 100 56" preserveAspectRatio="none">
+        <path d="M0,16 L100,16 L100,48 L0,48 Z" fill="hsla(0, 0%, 100%, 0.2)" />
+      </StateFiller>
       <InputField {...props} {...field} placeholder={undefined} />
       {touched && error && <Notice>{error}</Notice>}
     </InputContainer>

@@ -1,4 +1,4 @@
-import { rem } from 'polished';
+import { padding, rem } from 'polished';
 import React, { HTMLProps, ReactNode } from 'react';
 import styled from 'styled-components';
 
@@ -60,12 +60,14 @@ function fontSize({ level = DEFAULT_LEVEL }: IProps) {
 
 export default styled(Heading)`
   position: relative;
+  justify-self: start;
   margin: 0;
   padding: 0;
   font-weight: 400;
   font-family: 'Raleway', sans-serif;
-  user-select: none;
-
+  color: #000;
+  background-color: #fff;
+  ${padding(rem(8))};
   ${writingMode};
   ${fontSize};
 `;

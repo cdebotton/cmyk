@@ -24,6 +24,7 @@ import {
 import Button from './components/Button';
 import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
+import InsetLayout from './components/InsetLayout';
 import PageHeading from './components/PageHeading';
 import PageLayout from './components/PageLayout';
 import Select from './components/Select';
@@ -67,8 +68,8 @@ function AdminEditUser({ className, ...props }: Props) {
         }
 
         return (
-          <AdminEditUserLayout className={className}>
-            <PageHeading>Edit User {user.email}</PageHeading>
+          <InsetLayout className={className}>
+            <EditUserHeading>Edit User {user.email}</EditUserHeading>
             <Mutation<UpdateUserMutation, UpdateUserMutationVariables>
               mutation={USER_UPDATE_MUTATION}
             >
@@ -168,7 +169,7 @@ function AdminEditUser({ className, ...props }: Props) {
                 </Formik>
               )}
             </Mutation>
-          </AdminEditUserLayout>
+          </InsetLayout>
         );
       }}
     </Query>
@@ -276,11 +277,12 @@ function updateUser(
   };
 }
 
-const AdminEditUserLayout = styled(PageLayout)`
-  position: relative;
+const EditUserHeading = styled(PageHeading)`
+  grid-column: 2 / span 1;
 `;
 
 const UserForm = styled.form`
+  grid-column: 2 / span 1;
   grid-gap: ${rem(16)};
   display: grid;
   grid-template-columns: ${rem(128)} repeat(4, 1fr);
@@ -301,6 +303,6 @@ const SaveButton = styled(Button).attrs({ type: 'submit' })`
   grid-column: span 1;
 `;
 
-const CancelButton = styled(Button).attrs({ type: 'rest' })`
+const CancelButton = styled(Button).attrs({ type: 'reset' })`
   grid-column: span 1;
 `;

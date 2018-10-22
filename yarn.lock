@@ -845,45 +845,58 @@
   version "0.7.0"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-0.7.0.tgz#9a06f4f137ee84d7df0460c1fdb1135ffa6c50fd"
 
-"@storybook/addon-actions@^3.4.11":
-  version "3.4.11"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-actions/-/addon-actions-3.4.11.tgz#a51418c5b684fd3df2788c19ef266845d6068baf"
+"@storybook/addon-actions@4.0.0-alpha.3":
+  version "4.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-actions/-/addon-actions-4.0.0-alpha.3.tgz#dd9439d24197abfe2d89042d087391c0cb7c0150"
   dependencies:
-    "@storybook/components" "3.4.11"
+    "@storybook/addons" "4.0.0-alpha.3"
+    "@storybook/components" "4.0.0-alpha.3"
     babel-runtime "^6.26.0"
     deep-equal "^1.0.1"
     glamor "^2.20.40"
-    glamorous "^4.12.1"
+    glamorous "^4.12.3"
     global "^4.3.2"
     make-error "^1.3.4"
     prop-types "^15.6.1"
-    react-inspector "^2.2.2"
+    react-inspector "^2.3.0"
     uuid "^3.2.1"
 
-"@storybook/addon-info@^3.4.11":
-  version "3.4.11"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-info/-/addon-info-3.4.11.tgz#eb4eafb2ec5a580acdaeacab0065ee8463eddefd"
+"@storybook/addon-info@4.0.0-alpha.3":
+  version "4.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-info/-/addon-info-4.0.0-alpha.3.tgz#9816a3971bac3ba9115641486553872114d9645b"
   dependencies:
-    "@storybook/client-logger" "3.4.11"
-    "@storybook/components" "3.4.11"
+    "@storybook/client-logger" "4.0.0-alpha.3"
+    "@storybook/components" "4.0.0-alpha.3"
     babel-runtime "^6.26.0"
     glamor "^2.20.40"
-    glamorous "^4.12.1"
+    glamorous "^4.12.3"
     global "^4.3.2"
     marksy "^6.0.3"
     nested-object-assign "^1.0.1"
     prop-types "^15.6.1"
     react-addons-create-fragment "^15.5.3"
+    react-lifecycles-compat "^3.0.2"
     util-deprecate "^1.0.2"
 
-"@storybook/addon-links@^3.4.11":
-  version "3.4.11"
-  resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-3.4.11.tgz#097b4fcf4b3af3903762ac0d7e65c5d37d14af88"
+"@storybook/addon-links@4.0.0-alpha.3":
+  version "4.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-links/-/addon-links-4.0.0-alpha.3.tgz#1dd628122ee2c8587c1491484578d2e2c2ab69f4"
   dependencies:
-    "@storybook/components" "3.4.11"
+    "@storybook/addons" "4.0.0-alpha.3"
+    "@storybook/components" "4.0.0-alpha.3"
     babel-runtime "^6.26.0"
     global "^4.3.2"
     prop-types "^15.6.1"
+
+"@storybook/addon-notes@4.0.0-alpha.3":
+  version "4.0.0-alpha.3"
+  resolved "https://registry.yarnpkg.com/@storybook/addon-notes/-/addon-notes-4.0.0-alpha.3.tgz#ad252455abc08ed0a2976b6310db07beb54d7520"
+  dependencies:
+    "@storybook/addons" "4.0.0-alpha.3"
+    babel-runtime "^6.26.0"
+    marked "^0.3.19"
+    prop-types "^15.6.1"
+    util-deprecate "^1.0.2"
 
 "@storybook/addons@4.0.0-alpha.3":
   version "4.0.0-alpha.3"
@@ -891,10 +904,6 @@
   dependencies:
     "@storybook/channels" "4.0.0-alpha.3"
     global "^4.3.2"
-
-"@storybook/addons@^3.4.11":
-  version "3.4.11"
-  resolved "https://registry.yarnpkg.com/@storybook/addons/-/addons-3.4.11.tgz#f3e27c46d80ad1f171888c4aad0a19a8a032d072"
 
 "@storybook/channel-postmessage@4.0.0-alpha.3":
   version "4.0.0-alpha.3"
@@ -908,21 +917,9 @@
   version "4.0.0-alpha.3"
   resolved "https://registry.yarnpkg.com/@storybook/channels/-/channels-4.0.0-alpha.3.tgz#e9ca852b8f2438f66329c24e66cfcdb2955ddcbc"
 
-"@storybook/client-logger@3.4.11":
-  version "3.4.11"
-  resolved "https://registry.yarnpkg.com/@storybook/client-logger/-/client-logger-3.4.11.tgz#b592ea227f9f330f50925f7c1c266cc658cbc704"
-
 "@storybook/client-logger@4.0.0-alpha.3":
   version "4.0.0-alpha.3"
   resolved "https://registry.yarnpkg.com/@storybook/client-logger/-/client-logger-4.0.0-alpha.3.tgz#764f231a14880f77354dac84f3780703dc5efb54"
-
-"@storybook/components@3.4.11":
-  version "3.4.11"
-  resolved "https://registry.yarnpkg.com/@storybook/components/-/components-3.4.11.tgz#dbaa1ee19036cd8617993fb6bf4a07780d111f7e"
-  dependencies:
-    glamor "^2.20.40"
-    glamorous "^4.12.1"
-    prop-types "^15.6.1"
 
 "@storybook/components@4.0.0-alpha.3":
   version "4.0.0-alpha.3"
@@ -2047,19 +2044,6 @@ autoprefixer@^8.3.0:
     num2fraction "^1.2.2"
     postcss "^6.0.23"
     postcss-value-parser "^3.2.3"
-
-awesome-typescript-loader@^5.2.1:
-  version "5.2.1"
-  resolved "https://registry.yarnpkg.com/awesome-typescript-loader/-/awesome-typescript-loader-5.2.1.tgz#a41daf7847515f4925cdbaa3075d61f289e913fc"
-  dependencies:
-    chalk "^2.4.1"
-    enhanced-resolve "^4.0.0"
-    loader-utils "^1.1.0"
-    lodash "^4.17.5"
-    micromatch "^3.1.9"
-    mkdirp "^0.5.1"
-    source-map-support "^0.5.3"
-    webpack-log "^1.2.0"
 
 aws-sdk@^2.339.0:
   version "2.339.0"
@@ -4192,7 +4176,7 @@ end-of-stream@^1.0.0, end-of-stream@^1.1.0:
   dependencies:
     once "^1.4.0"
 
-enhanced-resolve@^4.0.0, enhanced-resolve@^4.1.0:
+enhanced-resolve@^4.1.0:
   version "4.1.0"
   resolved "https://registry.yarnpkg.com/enhanced-resolve/-/enhanced-resolve-4.1.0.tgz#41c7e0bfdfe74ac1ffe1e57ad6a5c6c9f3742a7f"
   dependencies:
@@ -4813,7 +4797,7 @@ glamor@^2.20.40:
     prop-types "^15.5.10"
     through "^2.3.8"
 
-glamorous@^4.12.1, glamorous@^4.12.3:
+glamorous@^4.12.3:
   version "4.13.1"
   resolved "https://registry.yarnpkg.com/glamorous/-/glamorous-4.13.1.tgz#8909afcbc7f09133c6eb26bedcc1250c1f774312"
   dependencies:
@@ -6233,7 +6217,7 @@ markdown-loader@^2.0.2:
     loader-utils "^1.1.0"
     marked "^0.3.9"
 
-marked@^0.3.12, marked@^0.3.9:
+marked@^0.3.12, marked@^0.3.19, marked@^0.3.9:
   version "0.3.19"
   resolved "http://registry.npmjs.org/marked/-/marked-0.3.19.tgz#5d47f709c4c9fc3c216b6d46127280f40b39d790"
 
@@ -6336,7 +6320,7 @@ methods@~1.1.2:
   version "1.1.2"
   resolved "https://registry.yarnpkg.com/methods/-/methods-1.1.2.tgz#5529a4d67654134edcc5266656835b0f851afcee"
 
-micromatch@^3.1.10, micromatch@^3.1.4, micromatch@^3.1.8, micromatch@^3.1.9:
+micromatch@^3.1.10, micromatch@^3.1.4, micromatch@^3.1.8:
   version "3.1.10"
   resolved "https://registry.yarnpkg.com/micromatch/-/micromatch-3.1.10.tgz#70859bc95c9840952f359a068a3fc49f9ecfac23"
   dependencies:
@@ -7743,7 +7727,7 @@ react-icons@^2.2.7:
   dependencies:
     react-icon-base "2.1.0"
 
-react-inspector@^2.2.2:
+react-inspector@^2.3.0:
   version "2.3.0"
   resolved "https://registry.yarnpkg.com/react-inspector/-/react-inspector-2.3.0.tgz#fc9c1d38ab687fc0d190dcaf133ae40158968fc8"
   dependencies:
@@ -8463,7 +8447,7 @@ source-map-support@^0.4.15:
   dependencies:
     source-map "^0.5.6"
 
-source-map-support@^0.5.3, source-map-support@^0.5.6, source-map-support@^0.5.9:
+source-map-support@^0.5.6, source-map-support@^0.5.9:
   version "0.5.9"
   resolved "https://registry.yarnpkg.com/source-map-support/-/source-map-support-0.5.9.tgz#41bc953b2534267ea2d605bccfa7bfa3111ced5f"
   dependencies:

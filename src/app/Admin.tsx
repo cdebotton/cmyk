@@ -1,56 +1,25 @@
-import {
-  faAngry,
-  faFolder,
-  faImages,
-  faMehBlank,
-  faSun,
-  faUser,
-} from '@fortawesome/free-regular-svg-icons';
+import { faAngry } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import gql from 'graphql-tag';
-import { darken, lighten, margin, opacify, padding, rem, size } from 'polished';
+import { margin, padding, rem } from 'polished';
 import { normalize } from 'polished';
 import React, { Placeholder } from 'react';
 import { Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps, Switch } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
-import styled, { css, keyframes, ThemeProvider } from 'styled-components';
+import styled, { ThemeProvider } from 'styled-components';
 import { CurrentUserQuery } from './__generated__/CurrentUserQuery';
 import ClientError from './ClientError';
+import Avatar from './components/Avatar';
 import Button from './components/Button';
-import Greeting from './components/Greeting';
-import Heading from './components/Heading';
 import Loader from './components/Loader';
 import DynamicRoute from './containers/DynamicRoute';
 import ErrorBoundary from './containers/ErrorBoundary';
 import Session from './containers/Session';
-
-import { createGlobalStyle } from 'styled-components';
-import Avatar from './components/Avatar';
-import PortalManager from './containers/PortalManager';
 import PortalOutlet from './PortalOutlet';
-const GlobalStyles = createGlobalStyle`
-  ${normalize()};
-
-  *,
-  *::before,
-  *::after {
-    box-sizing: border-box;
-  }
-
-  body {
-    font-family: Roboto, sans-serif;
-  }
-
-  ::selection {
-    background-color: hsla(300, 100%, 50%, 0.5);
-  }
-
-  a {
-    color: hsla(212, 50%, 50%, 1.0);
-  }
-`;
+import GlobalStyles from './styles/AdminStyles';
+import background from './styles/background';
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
@@ -81,61 +50,13 @@ class ThemeNotImplementedError extends Error {
   }
 }
 
-const ScrollAnimation = keyframes`
-  from {
-    background-position: 0 0;
-  }
-
-  to {
-    background-position: -300vw -300vh;
-  }
-`;
-
 const Layout = styled.div`
   display: grid;
   grid-template-rows: min-content auto;
   grid-gap: ${rem(16)};
   color: #fff;
   min-height: 100vh;
-
-  &::before {
-    content: ' ';
-    z-index: -1;
-    display: block;
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    width: 100vw;
-    background-size: 400vw;
-    height: 400vh;
-    background-image: linear-gradient(
-      to top left,
-      hsl(352, 50%, 50%),
-      hsl(342, 50%, 50%),
-      hsl(332, 50%, 50%),
-      hsl(322, 50%, 50%),
-      hsl(312, 50%, 50%),
-      hsl(302, 50%, 50%),
-      hsl(292, 50%, 50%),
-      hsl(282, 50%, 50%),
-      hsl(272, 50%, 50%),
-      hsl(262, 50%, 50%),
-      hsl(252, 50%, 50%),
-      hsl(242, 50%, 50%),
-      hsl(232, 50%, 50%),
-      hsl(222, 50%, 50%),
-      hsl(212, 50%, 50%),
-      hsl(202, 50%, 50%),
-      hsl(192, 50%, 50%),
-      hsl(182, 50%, 50%),
-      hsl(172, 50%, 50%),
-      hsl(162, 50%, 50%)
-    );
-    animation: ${ScrollAnimation} 120s linear infinite alternate;
-    transform: translate3d(0, 0, 0);
-  }
+  ${background};
 `;
 
 const Header = styled.header`
