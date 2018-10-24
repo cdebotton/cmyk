@@ -11,7 +11,7 @@ import ButtonLink from '../src/app/components/ButtonLink';
 import Confirm from '../src/app/components/Confirm';
 import Toggle from '../src/app/containers/Toggle';
 
-const InfoDecorator = storyFn => withInfo({ inline: true })(storyFn)();
+const InfoDecorator = storyFn => withInfo()(storyFn)();
 
 storiesOf('Toggle', module).add('default', () => (
   <Toggle>
@@ -23,10 +23,9 @@ storiesOf('Toggle', module).add('default', () => (
       </>
     )}
   </Toggle>
-));
+), { inline: true });
 
 storiesOf('Confirm', module)
-  .addDecorator(InfoDecorator)
   .add('active', () => (
     <Confirm
       title="Are you sure?"
@@ -34,10 +33,9 @@ storiesOf('Confirm', module)
       onConfirm={action('confirm')}
       onCancel={action('cancel')}
     />
-  ));
+  ), { inline: true });
 
 storiesOf('Button link', module)
-  .addDecorator(InfoDecorator)
   .add('default', () => (
     <MemoryRouter>
       <div
@@ -51,4 +49,4 @@ storiesOf('Button link', module)
         <ButtonLink to="/">Hi</ButtonLink>
       </div>
     </MemoryRouter>
-  ));
+  ), { inline: true, propTables: [ButtonLink] });
