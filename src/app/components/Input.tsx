@@ -1,57 +1,29 @@
 import { FieldProps } from 'formik';
-import { modularScale, position, rem, size } from 'polished';
+import { modularScale, padding, rem } from 'polished';
 import React, { CSSProperties, HTMLProps, ReactNode } from 'react';
 import { animated, Spring } from 'react-spring';
 import styled from 'styled-components';
 import Toggle from '../containers/Toggle';
 
-const InputField = styled.input`
-  position: relative;
-  padding: ${rem(8)};
-  height: ${rem(32)};
-  width: 100%;
-  border: none;
-  color: #000;
-  overflow: hidden;
-  display: block;
-  border-radius: 3px;
-  background-color: #fff;
-  &:focus {
-    outline: none;
-  }
-`;
-
-const Notice = styled.span`
-  position: absolute;
-  top: 100%;
-  font-size: ${modularScale(-1)};
-  left: ${rem(8)};
-`;
-
-const InputContainer = styled.span`
-  transform-style: preserve-3d;
-  perspective: 800;
-  z-index: 0;
-  position: relative;
-  padding: ${rem(16)} 0 ${rem(8)};
-`;
-
 const PLACEHOLDER: CSSProperties = {
   color: '#333',
   fontSize: modularScale(0),
-  transform: `translate3d(0, ${rem(24)}, ${rem(0)})`,
+  letterSpacing: '0px',
+  transform: `translate3d(0, ${rem(8)}, 0)`,
 };
 
 const LABEL: CSSProperties = {
   color: '#fff',
   fontSize: modularScale(-1),
-  transform: `translate3d(0, ${rem(0)}, ${rem(0)})`,
+  letterSpacing: '1px',
+  transform: `translate3d(0, ${rem(-20)}, 0)`,
 };
 
 const FOCUSED_LABEL: CSSProperties = {
-  color: '#fff',
+  color: '#000',
   fontSize: modularScale(-1),
-  transform: `translate3d(0, ${rem(0)}, ${rem(15)})`,
+  letterSpacing: '1px',
+  transform: `translate3d(0, ${rem(-20)}, 0)`,
 };
 
 function ReactiveLabel(props: {
@@ -66,19 +38,46 @@ function ReactiveLabel(props: {
       native
       to={empty ? PLACEHOLDER : focused ? FOCUSED_LABEL : LABEL}
       render={styles => (
-        <animated.label
-          htmlFor={htmlFor}
-          style={{
-            ...styles,
-            cursor: 'pointer',
-            left: rem(8),
-            pointerEvents: empty ? 'none' : 'inherit',
-            position: 'absolute',
-            top: 0,
-          }}
-        >
-          {children}
-        </animated.label>
+        <>
+          <animated.label
+            htmlFor={htmlFor}
+            style={{
+              ...styles,
+              cursor: 'pointer',
+              left: rem(6),
+              padding: rem(2),
+              pointerEvents: empty ? 'none' : 'inherit',
+              position: 'absolute',
+              top: 0,
+            }}
+          >
+            <Spring
+              native
+              to={
+                focused
+                  ? { opacity: 1, transform: 'scaleX(1)' }
+                  : { opacity: 0, transform: 'scaleX(0)' }
+              }
+              render={({ opacity, transform }) => (
+                <animated.span
+                  style={{
+                    opacity,
+                    transform,
+                    backgroundColor: '#fff',
+                    height: '100%',
+                    left: 0,
+                    position: 'absolute',
+                    top: 0,
+                    transformOrigin: '0 0',
+                    width: '100%',
+                    zIndex: -1,
+                  }}
+                />
+              )}
+            />
+            {children}
+          </animated.label>
+        </>
       )}
     />
   );
@@ -92,7 +91,7 @@ enum BorderStep {
 
 const baseBorderStle = {
   backgroundColor: 'hsla(212, 50%, 50%, 0)',
-  bottom: rem(8),
+  bottom: 0,
   height: '4px',
   left: 0,
   position: 'absolute',
@@ -142,6 +141,61 @@ function getBorderStep(options: { focus: boolean; hover: boolean }) {
   return BorderStep.None;
 }
 
+const InputContainer = styled.div`
+  transform-style: preserve-3d;
+  perspective: 800;
+  z-index: 0;
+  position: relative;
+  ${padding(rem(16), 0)};
+`;
+
+const InputWrapper = styled.div`
+  position: relative;
+`;
+
+const InputField = styled.input`
+  position: relative;
+  padding: ${rem(8)};
+  width: 100%;
+  border: none;
+  color: #000;
+  overflow: hidden;
+  display: block;
+  border-radius: 3px;
+  background-color: #fff;
+
+  &:focus {
+    outline: none;
+  }
+`;
+
+function ReactiveError(props: { children: ReactNode; on: boolean }) {
+  const { on, children } = props;
+  return (
+    <Spring
+      to={
+        on
+          ? { transform: `translate3d(0, ${rem(16)}, 0)`, opacity: 1 }
+          : { transform: `translate3d(0, ${rem(0)}, 0`, opacity: 0 }
+      }
+      render={styles => (
+        <animated.span
+          style={{
+            ...styles,
+            bottom: 0,
+            fontSize: modularScale(-1),
+            left: rem(8),
+            pointerEvents: 'none',
+            position: 'absolute',
+          }}
+        >
+          {children}
+        </animated.span>
+      )}
+    />
+  );
+}
+
 interface Props extends FieldProps<any> {
   className?: string;
   label: string;
@@ -152,6 +206,7 @@ function Input({ className, field, label, form, ...props }: Props) {
   const touched = form.touched[field.name];
   const error = form.errors[field.name];
   const id = `field-${field.name}`;
+  const showError = touched === true && error !== undefined;
 
   return (
     <Toggle>
@@ -163,25 +218,32 @@ function Input({ className, field, label, form, ...props }: Props) {
               onMouseEnter={hover.setOn}
               onMouseLeave={hover.setOff}
             >
-              <InputField
-                {...props}
-                {...field}
-                id={id}
-                placeholder={undefined}
-                onFocus={focus.setOn}
-                onBlur={focus.setOff}
-              />
-              <ReactiveLabel
-                htmlFor={id}
-                focused={focus.on}
-                empty={field.value === ''}
-              >
-                {label}
-              </ReactiveLabel>
-              <ReactiveBorder
-                step={getBorderStep({ focus: focus.on, hover: hover.on })}
-              />
-              {touched && error && <Notice>{error}</Notice>}
+              <InputWrapper>
+                <InputField
+                  {...props}
+                  {...field}
+                  id={id}
+                  placeholder={undefined}
+                  onFocus={focus.setOn}
+                  onBlur={event => {
+                    focus.setOff();
+                    field.onBlur(event);
+                  }}
+                />
+                <ReactiveLabel
+                  htmlFor={id}
+                  focused={focus.on}
+                  empty={field.value === ''}
+                >
+                  {label}
+                </ReactiveLabel>
+                <ReactiveBorder
+                  step={getBorderStep({ focus: focus.on, hover: hover.on })}
+                />
+                <ReactiveError on={showError}>
+                  {showError ? error : ''}
+                </ReactiveError>
+              </InputWrapper>
             </InputContainer>
           )}
         </Toggle>

@@ -92,7 +92,7 @@ function AdminEditUser({ className, ...props }: Props) {
                     role: user.role,
                   }}
                 >
-                  {({ handleSubmit, setFieldValue }) => (
+                  {({ handleSubmit, setFieldValue, handleReset }) => (
                     <UserForm onSubmit={handleSubmit}>
                       <Mutation<UploadFileMutation, UploadFileMutationVariables>
                         mutation={UPLOAD_FILE_MUTATION}
@@ -163,7 +163,14 @@ function AdminEditUser({ className, ...props }: Props) {
                         ]}
                       />
                       <SaveButton format="neutral">Save</SaveButton>
-                      <CancelButton>Cancel</CancelButton>
+                      <CancelButton
+                        onClick={() => {
+                          handleReset();
+                          history.goBack();
+                        }}
+                      >
+                        Cancel
+                      </CancelButton>
                     </UserForm>
                   )}
                 </Formik>
@@ -286,7 +293,7 @@ const UserForm = styled.form`
   grid-gap: ${rem(16)};
   display: grid;
   grid-template-columns: ${rem(128)} repeat(4, 1fr);
-  grid-auto-rows: ${rem(56)};
+
   ${padding(0, rem(32))};
 `;
 
