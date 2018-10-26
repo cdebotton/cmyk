@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import gql from 'graphql-tag';
 import { margin, padding, rem } from 'polished';
 import { normalize } from 'polished';
-import React, { Placeholder } from 'react';
+import React, { Suspense } from 'react';
 import { Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { RouteComponentProps, Switch } from 'react-router';
@@ -155,7 +155,7 @@ function Admin({ className, match }: Props) {
               }}
             </Session>
           </Header>
-          <Placeholder delayMs={300} fallback={<Loader />}>
+          <Suspense maxDuration={300} fallback={<Loader />}>
             <Switch>
               <DynamicRoute
                 exact
@@ -184,7 +184,7 @@ function Admin({ className, match }: Props) {
               />
               <DynamicRoute loader={() => import('./NotFound')} />
             </Switch>
-          </Placeholder>
+          </Suspense>
           <PortalOutlet />
         </Layout>
       </ThemeProvider>

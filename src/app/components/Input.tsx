@@ -34,10 +34,8 @@ function ReactiveLabel(props: {
 }) {
   const { empty, children, focused, htmlFor } = props;
   return (
-    <Spring
-      native
-      to={empty ? PLACEHOLDER : focused ? FOCUSED_LABEL : LABEL}
-      render={styles => (
+    <Spring native to={empty ? PLACEHOLDER : focused ? FOCUSED_LABEL : LABEL}>
+      {styles => (
         <>
           <animated.label
             htmlFor={htmlFor}
@@ -58,7 +56,8 @@ function ReactiveLabel(props: {
                   ? { opacity: 1, transform: 'scaleX(1)' }
                   : { opacity: 0, transform: 'scaleX(0)' }
               }
-              render={({ opacity, transform }) => (
+            >
+              {({ opacity, transform }) => (
                 <animated.span
                   style={{
                     opacity,
@@ -74,12 +73,12 @@ function ReactiveLabel(props: {
                   }}
                 />
               )}
-            />
+            </Spring>
             {children}
           </animated.label>
         </>
       )}
-    />
+    </Spring>
   );
 }
 
@@ -119,13 +118,15 @@ function ReactiveBorder(props: { step: BorderStep }) {
       <Spring
         native
         to={step !== BorderStep.None ? halfBorderStyle : baseBorderStle}
-        render={styles => <animated.span style={styles} />}
-      />
+      >
+        {styles => <animated.span style={styles} />}
+      </Spring>
       <Spring
         native
         to={step === BorderStep.Full ? fullBorderStyle : baseBorderStle}
-        render={styles => <animated.span style={styles} />}
-      />
+      >
+        {styles => <animated.span style={styles} />}
+      </Spring>
     </>
   );
 }
@@ -178,7 +179,8 @@ function ReactiveError(props: { children: ReactNode; on: boolean }) {
           ? { transform: `translate3d(0, ${rem(16)}, 0)`, opacity: 1 }
           : { transform: `translate3d(0, ${rem(0)}, 0`, opacity: 0 }
       }
-      render={styles => (
+    >
+      {styles => (
         <animated.span
           style={{
             ...styles,
@@ -192,7 +194,7 @@ function ReactiveError(props: { children: ReactNode; on: boolean }) {
           {children}
         </animated.span>
       )}
-    />
+    </Spring>
   );
 }
 

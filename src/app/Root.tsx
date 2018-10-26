@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import React, { Placeholder } from 'react';
+import React, { Suspense } from 'react';
 import { Query } from 'react-apollo';
 import { hot } from 'react-hot-loader';
 import { Redirect, RouteProps, Switch } from 'react-router';
@@ -45,8 +45,8 @@ function Root() {
         }
 
         return (
-          <Placeholder
-            delayMs={300}
+          <Suspense
+            maxDuration={300}
             fallback={<Loader size={LoaderSize.Large} />}
           >
             <Switch>
@@ -58,7 +58,7 @@ function Root() {
               <DynamicRoute path="/login" loader={() => import('./Login')} />
               <DynamicRoute loader={() => import('./NotFound')} />
             </Switch>
-          </Placeholder>
+          </Suspense>
         );
       }}
     </Query>

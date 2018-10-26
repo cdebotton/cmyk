@@ -1,10 +1,12 @@
 import { ComponentType, ReactNode } from 'react';
 
 declare module 'react' {
-  export const Placeholder: ComponentType<{
-    delayMs?: number;
+  export const Suspense: ComponentType<{
+    maxDuration?: number;
     fallback: ReactNode;
   }>;
+
+  export const ConcurrentMode: ComponentType<{}>;
 
   type Thenable<T, R> = {
     then(
