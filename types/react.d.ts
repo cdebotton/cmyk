@@ -1,4 +1,4 @@
-import { ComponentType, ReactNode, Context } from 'react';
+import { ComponentType, ReactNode, Context, Ref } from 'react';
 
 declare module 'react' {
   export const Suspense: ComponentType<{
@@ -44,7 +44,14 @@ declare module 'react' {
     cDU?: any[],
   ): void;
 
+  export function useRef<T>(initial?: T): Ref<T>;
+
   type Loader<T> = Promise<{ default: ComponentType<T> }>;
 
   export function lazy<T>(loader: () => Loader<T>): ComponentType<T>;
+
+  export function memo<T>(
+    component: ComponentType<T>,
+    areEqual?: (prevProps: T, nextProps: T) => boolean,
+  ): ComponentType<T>;
 }
