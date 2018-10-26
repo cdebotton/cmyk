@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import { padding, position, rem, size } from 'polished';
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
@@ -19,7 +19,6 @@ import InsetLayout from './components/InsetLayout';
 import Loader from './components/Loader';
 import PageHeading from './components/PageHeading';
 import PortalManager from './containers/PortalManager';
-import Toggle from './containers/Toggle';
 import { getFormattedDate, getTimeAgo } from './utils/date';
 
 export const USERS_QUERY = gql`
@@ -99,6 +98,7 @@ function DeleteUserButton(props: {
   setDeleteOff: () => void;
 }) {
   const { user, setDeleteOn, setDeleteOff } = props;
+  const { setPortalNode } = useContext(PortalManager.Context);
 
   return (
     <Mutation<DeleteUserMutation, DeleteUserMutationVariables>
@@ -108,30 +108,26 @@ function DeleteUserButton(props: {
       }}
     >
       {mutate => (
-        <PortalManager.Consumer>
-          {({ setPortalNode }) => (
-            <DeleteIcon
-              onMouseEnter={setDeleteOn}
-              onMouseLeave={setDeleteOff}
-              onClick={event => {
-                event.preventDefault();
-                setPortalNode(
-                  <Confirm
-                    title="Are you sure you want to do this?"
-                    message="You are about to permanently delete this user"
-                    onConfirm={() => {
-                      deleteUser(mutate);
-                      setPortalNode(null);
-                    }}
-                    onCancel={() => setPortalNode(null)}
-                  />,
-                );
-              }}
-            >
-              <AnimatedCross />
-            </DeleteIcon>
-          )}
-        </PortalManager.Consumer>
+        <DeleteIcon
+          onMouseEnter={setDeleteOn}
+          onMouseLeave={setDeleteOff}
+          onClick={event => {
+            event.preventDefault();
+            setPortalNode(
+              <Confirm
+                title="Are you sure you want to do this?"
+                message="You are about to permanently delete this user"
+                onConfirm={() => {
+                  deleteUser(mutate);
+                  setPortalNode(null);
+                }}
+                onCancel={() => setPortalNode(null)}
+              />,
+            );
+          }}
+        >
+          <AnimatedCross />
+        </DeleteIcon>
       )}
     </Mutation>
   );

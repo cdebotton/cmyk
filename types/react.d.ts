@@ -1,4 +1,4 @@
-import { ComponentType, ReactNode } from 'react';
+import { ComponentType, ReactNode, Context } from 'react';
 
 declare module 'react' {
   export const Suspense: ComponentType<{
@@ -29,6 +29,20 @@ declare module 'react' {
   }
 
   export function useState<T>(initialValue: T): [T, StateSetter<T>];
+
+  export function useContext<T>(context: Context<T>): T;
+
+  type ReducerFn<T, U> = (memo: T, action: U) => T;
+  type Dispatch<U> = (action: U) => void;
+  export function useReducer<T, U extends { type: string }>(
+    reducer: ReducerFn<T, U>,
+    initialState: T,
+  ): [T, Dispatch<U>];
+
+  export function useEffect(
+    effect: () => void | (() => void),
+    cDU?: any[],
+  ): void;
 
   type Loader<T> = Promise<{ default: ComponentType<T> }>;
 

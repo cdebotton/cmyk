@@ -41,6 +41,6 @@ class Provider extends Component<Props, State> {
 }
 
 export default {
+  Context,
   Provider,
-  Consumer: Context.Consumer,
 };
