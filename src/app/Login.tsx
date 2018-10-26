@@ -1,7 +1,7 @@
 import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
 import { padding, rem } from 'polished';
-import React, { useReducer } from 'react';
+import React from 'react';
 import { Mutation } from 'react-apollo';
 import { Redirect, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';

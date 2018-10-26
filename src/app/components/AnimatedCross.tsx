@@ -1,7 +1,6 @@
 import React, { SVGProps, useState } from 'react';
 import { animated, Spring } from 'react-spring';
 import styled from 'styled-components';
-import Toggle from '../containers/Toggle';
 
 export const states = {
   disabled: {
