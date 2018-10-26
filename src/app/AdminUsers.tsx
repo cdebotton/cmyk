@@ -1,8 +1,7 @@
 import gql from 'graphql-tag';
 import { padding, position, rem, size } from 'polished';
-import React from 'react';
+import React, { useState } from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
-import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 import { animated, Spring } from 'react-spring';
@@ -236,71 +235,54 @@ function UserListItem(props: {
   isCurrentUser: boolean;
   baseUrl: string;
 }) {
+  const [hoverList, setHoverList] = useState(false);
+  const [hoverDelete, setHoverDelete] = useState(false);
   const { baseUrl, user, isCurrentUser } = props;
   const avatar = getAvatar(user.profile);
   return (
-    <Toggle>
-      {({ on, setOn, setOff }) => {
-        return (
-          <Spring<{}, ListItemStyles> native to={getListItemStyles(on)}>
-            {styles => (
-              <UserListItemContainer
-                onMouseEnter={setOn}
-                onMouseLeave={setOff}
-                style={styles}
-              >
-                <Toggle>
-                  {({
-                    on: deleteOn,
-                    setOn: setDeleteOn,
-                    setOff: setDeleteOff,
-                  }) => (
-                    <>
-                      <DeleteFill
-                        preserveAspectRatio="none"
-                        viewBox="0 0 100 100"
-                      >
-                        <Spring native to={deleteOn ? redFill.on : redFill.off}>
-                          {({ d, fill }) => {
-                            return <animated.path fill={fill} d={d} />;
-                          }}
-                        </Spring>
-                      </DeleteFill>
-                      <UserLink to={`${baseUrl}/${user.id}`}>
-                        <UserAvatar
-                          style={{
-                            boxShadow: styles.boxShadow,
-                            transform: styles.transform,
-                          }}
-                          src={avatar}
-                          size={96}
-                        />
-                        <UserName>
-                          {user.profile.firstName} {user.profile.lastName}
-                        </UserName>
-                        <UserEmail>{user.email}</UserEmail>
-                        <Label>Last login</Label>
-                        <DateInfo>{getTimeAgo(user.lastLogin)}</DateInfo>
-                        <Label>Created</Label>
-                        <DateInfo>{getFormattedDate(user.createdAt)}</DateInfo>
-                        {on &&
-                          !isCurrentUser && (
-                            <DeleteUserButton
-                              user={user}
-                              setDeleteOn={setDeleteOn}
-                              setDeleteOff={setDeleteOff}
-                            />
-                          )}
-                      </UserLink>
-                    </>
-                  )}
-                </Toggle>
-              </UserListItemContainer>
-            )}
-          </Spring>
-        );
-      }}
-    </Toggle>
+    <Spring<{}, ListItemStyles> native to={getListItemStyles(hoverList)}>
+      {styles => (
+        <UserListItemContainer
+          onMouseEnter={() => setHoverList(true)}
+          onMouseLeave={() => setHoverList(false)}
+          style={styles}
+        >
+          <DeleteFill preserveAspectRatio="none" viewBox="0 0 100 100">
+            <Spring native to={hoverDelete ? redFill.on : redFill.off}>
+              {({ d, fill }) => {
+                return <animated.path fill={fill} d={d} />;
+              }}
+            </Spring>
+          </DeleteFill>
+          <UserLink to={`${baseUrl}/${user.id}`}>
+            <UserAvatar
+              style={{
+                boxShadow: styles.boxShadow,
+                transform: styles.transform,
+              }}
+              src={avatar}
+              size={96}
+            />
+            <UserName>
+              {user.profile.firstName} {user.profile.lastName}
+            </UserName>
+            <UserEmail>{user.email}</UserEmail>
+            <Label>Last login</Label>
+            <DateInfo>{getTimeAgo(user.lastLogin)}</DateInfo>
+            <Label>Created</Label>
+            <DateInfo>{getFormattedDate(user.createdAt)}</DateInfo>
+            {hoverList &&
+              !isCurrentUser && (
+                <DeleteUserButton
+                  user={user}
+                  setDeleteOn={() => setHoverDelete(true)}
+                  setDeleteOff={() => setHoverDelete(false)}
+                />
+              )}
+          </UserLink>
+        </UserListItemContainer>
+      )}
+    </Spring>
   );
 }
 
@@ -360,4 +342,4 @@ function AdminUsers(props: { className?: string } & RouteComponentProps<void>) {
   );
 }
 
-export default hot(module)(AdminUsers);
+export default AdminUsers;

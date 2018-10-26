@@ -2,9 +2,8 @@ import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
 import { History } from 'history';
 import { padding, rem } from 'polished';
-import React, { FormEvent } from 'react';
+import React, { FormEvent, lazy } from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
-import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as Yup from 'yup';
@@ -26,9 +25,7 @@ import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
 import InsetLayout from './components/InsetLayout';
 import PageHeading from './components/PageHeading';
-import PageLayout from './components/PageLayout';
 import Select from './components/Select';
-import DynamicComponent from './containers/DynamicComponent';
 
 interface Values {
   avatar: EditUserQuery_user_profile_avatar | null;
@@ -37,6 +34,8 @@ interface Values {
   lastName: string;
   role: Role;
 }
+
+const NotFound = lazy(() => import('./NotFound'));
 
 interface Props extends RouteComponentProps<{ userId: string }> {
   className?: string;
@@ -62,9 +61,7 @@ function AdminEditUser({ className, ...props }: Props) {
         const { user } = data;
 
         if (user === null) {
-          return (
-            <DynamicComponent {...props} loader={() => import('./NotFound')} />
-          );
+          return <NotFound {...props} />;
         }
 
         return (
@@ -183,7 +180,7 @@ function AdminEditUser({ className, ...props }: Props) {
   );
 }
 
-export default hot(module)(AdminEditUser);
+export default AdminEditUser;
 
 const EDIT_USER_QUERY = gql`
   query EditUserQuery($where: UserWhereUniqueInput!) {

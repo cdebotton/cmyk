@@ -172,4 +172,4 @@ const EmailField = styled(Field)`
   grid-column: 1 / span 2;
 `;
 
-export default hot(module)(AdminNewUser);
+export default AdminNewUser;

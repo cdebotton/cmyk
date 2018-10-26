@@ -2,7 +2,6 @@ import gql from 'graphql-tag';
 import { padding, rem } from 'polished';
 import React from 'react';
 import { Query } from 'react-apollo';
-import { hot } from 'react-hot-loader';
 import styled from 'styled-components';
 import { Documents } from './__generated__/Documents';
 import Heading from './components/Heading';
@@ -52,4 +51,4 @@ function AdminDocuments() {
   );
 }
 
-export default hot(module)(AdminDocuments);
+export default AdminDocuments;

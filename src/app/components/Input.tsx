@@ -1,9 +1,8 @@
 import { FieldProps } from 'formik';
 import { modularScale, padding, rem } from 'polished';
-import React, { CSSProperties, HTMLProps, ReactNode } from 'react';
+import React, { CSSProperties, HTMLProps, ReactNode, useState } from 'react';
 import { animated, Spring } from 'react-spring';
 import styled from 'styled-components';
-import Toggle from '../containers/Toggle';
 
 const PLACEHOLDER: CSSProperties = {
   color: '#333',
@@ -205,52 +204,38 @@ interface Props extends FieldProps<any> {
 }
 
 function Input({ className, field, label, form, ...props }: Props) {
+  const [hover, setHover] = useState(false);
+  const [focus, setFocus] = useState(false);
   const touched = form.touched[field.name];
   const error = form.errors[field.name];
   const id = `field-${field.name}`;
   const showError = touched === true && error !== undefined;
 
   return (
-    <Toggle>
-      {hover => (
-        <Toggle>
-          {focus => (
-            <InputContainer
-              className={className}
-              onMouseEnter={hover.setOn}
-              onMouseLeave={hover.setOff}
-            >
-              <InputWrapper>
-                <InputField
-                  {...props}
-                  {...field}
-                  id={id}
-                  placeholder={undefined}
-                  onFocus={focus.setOn}
-                  onBlur={event => {
-                    focus.setOff();
-                    field.onBlur(event);
-                  }}
-                />
-                <ReactiveLabel
-                  htmlFor={id}
-                  focused={focus.on}
-                  empty={field.value === ''}
-                >
-                  {label}
-                </ReactiveLabel>
-                <ReactiveBorder
-                  step={getBorderStep({ focus: focus.on, hover: hover.on })}
-                />
-                <ReactiveError on={showError}>
-                  {showError ? error : ''}
-                </ReactiveError>
-              </InputWrapper>
-            </InputContainer>
-          )}
-        </Toggle>
-      )}
-    </Toggle>
+    <InputContainer
+      className={className}
+      onMouseEnter={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
+      <InputWrapper>
+        <InputField
+          {...props}
+          {...field}
+          id={id}
+          placeholder={undefined}
+          onFocus={() => setFocus(true)}
+          onBlur={event => {
+            setFocus(false);
+            field.onBlur(event);
+          }}
+        />
+        <ReactiveLabel htmlFor={id} focused={focus} empty={field.value === ''}>
+          {label}
+        </ReactiveLabel>
+        <ReactiveBorder step={getBorderStep({ focus, hover })} />
+        <ReactiveError on={showError}>{showError ? error : ''}</ReactiveError>
+      </InputWrapper>
+    </InputContainer>
   );
 }
 

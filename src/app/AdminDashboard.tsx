@@ -1,5 +1,4 @@
 import React from 'react';
-import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import Heading from './components/Heading';
@@ -17,6 +16,6 @@ function Dashboard({ className }: IProps) {
   );
 }
 
-export default hot(module)(styled(Dashboard)`
+export default styled(Dashboard)`
   position: relative;
-`);
+`;

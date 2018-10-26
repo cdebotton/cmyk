@@ -22,4 +22,15 @@ declare module 'react' {
     _reactStatus: number;
     _reactResult: null;
   };
+
+  interface StateSetter<T> {
+    (state: T): void;
+    (setState: (prevState: T) => T): void;
+  }
+
+  export function useState<T>(initialValue: T): [T, StateSetter<T>];
+
+  type Loader<T> = Promise<{ default: ComponentType<T> }>;
+
+  export function lazy<T>(loader: () => Loader<T>): ComponentType<T>;
 }

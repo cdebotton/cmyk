@@ -1,4 +1,4 @@
-import React, { SVGProps } from 'react';
+import React, { SVGProps, useState } from 'react';
 import { animated, Spring } from 'react-spring';
 import styled from 'styled-components';
 import Toggle from '../containers/Toggle';
@@ -26,56 +26,50 @@ interface Props extends SVGProps<SVGElement> {
 }
 
 function AnimatedCross({ className, ...props }: Props) {
+  const [hovering, setHovering] = useState(false);
+  const state = hovering ? states.large : states.small;
   return (
-    <Toggle>
-      {({ on, setOn, setOff }) => {
-        const state = on ? states.large : states.small;
+    <svg
+      className={className}
+      xmlns="http://www.w3.org/2000/svg"
+      width="64"
+      height="64"
+      onMouseEnter={event => {
+        setHovering(true);
 
-        return (
-          <svg
-            className={className}
-            xmlns="http://www.w3.org/2000/svg"
-            width="64"
-            height="64"
-            onMouseEnter={event => {
-              setOn();
-
-              if (props.onMouseEnter) {
-                props.onMouseEnter(event);
-              }
-            }}
-            onMouseLeave={event => {
-              setOff();
-
-              if (props.onMouseLeave) {
-                props.onMouseLeave(event);
-              }
-            }}
-          >
-            <Spring native to={state}>
-              {({ leftPath, rightPath, strokePath }) => (
-                <>
-                  <animated.path
-                    d={leftPath}
-                    fill="transparent"
-                    strokeWidth={strokePath}
-                    strokeLinecap="round"
-                    stroke="#fff"
-                  />
-                  <animated.path
-                    d={rightPath}
-                    fill="transparent"
-                    strokeWidth={strokePath}
-                    strokeLinecap="round"
-                    stroke="#fff"
-                  />
-                </>
-              )}
-            </Spring>
-          </svg>
-        );
+        if (props.onMouseEnter) {
+          props.onMouseEnter(event);
+        }
       }}
-    </Toggle>
+      onMouseLeave={event => {
+        setHovering(false);
+
+        if (props.onMouseLeave) {
+          props.onMouseLeave(event);
+        }
+      }}
+    >
+      <Spring native to={state}>
+        {({ leftPath, rightPath, strokePath }) => (
+          <>
+            <animated.path
+              d={leftPath}
+              fill="transparent"
+              strokeWidth={strokePath}
+              strokeLinecap="round"
+              stroke="#fff"
+            />
+            <animated.path
+              d={rightPath}
+              fill="transparent"
+              strokeWidth={strokePath}
+              strokeLinecap="round"
+              stroke="#fff"
+            />
+          </>
+        )}
+      </Spring>
+    </svg>
   );
 }
 

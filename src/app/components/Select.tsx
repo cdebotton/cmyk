@@ -1,5 +1,5 @@
 import { FieldProps } from 'formik';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useState } from 'react';
 import styled from 'styled-components';
 
 interface Option<T> {
@@ -27,7 +27,7 @@ const OptionList = styled.ul`
   list-style: none;
   padding: 0;
   margin: 0;
-  top: 0;
+  top: 100%;
 `;
 
 const Option = styled.li`
@@ -41,6 +41,7 @@ function Select<T extends string>({
   field,
   ...props
 }: Props<T>) {
+  const [open, setOpen] = useState(false);
   const selected = options
     .map<[ReactNode, T]>(({ label, value: optionValue }) => [
       label,
@@ -58,19 +59,24 @@ function Select<T extends string>({
   return (
     <SelectContainer className={className}>
       <SelectWrapper>
-        <SelectLabel>{selectedLabel}</SelectLabel>
-        <OptionList>
-          {options.map(option => (
-            <Option
-              key={`OPTION_${field.name}_${option.value}`}
-              onClick={event => {
-                form.setFieldValue(field.name, option.value);
-              }}
-            >
-              {option.label}
-            </Option>
-          ))}
-        </OptionList>
+        <SelectLabel onClick={() => setOpen(prevOpen => !prevOpen)}>
+          {selectedLabel}
+        </SelectLabel>
+        {open && (
+          <OptionList>
+            {options.map(option => (
+              <Option
+                key={`OPTION_${field.name}_${option.value}`}
+                onClick={event => {
+                  form.setFieldValue(field.name, option.value);
+                  setOpen(false);
+                }}
+              >
+                {option.label}
+              </Option>
+            ))}
+          </OptionList>
+        )}
       </SelectWrapper>
     </SelectContainer>
   );

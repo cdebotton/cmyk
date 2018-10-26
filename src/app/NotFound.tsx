@@ -25,6 +25,6 @@ function NotFound({ match, className }: IProps) {
   );
 }
 
-export default hot(module)(styled(NotFound)`
+export default styled(NotFound)`
   position: relative;
-`);
+`;

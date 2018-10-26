@@ -55,7 +55,7 @@ function AdminFiles() {
   );
 }
 
-export default hot(module)(AdminFiles);
+export default AdminFiles;
 
 const FILES_QUERY = gql`
   query Files {

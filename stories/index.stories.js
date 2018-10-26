@@ -9,34 +9,25 @@ import { storiesOf } from '@storybook/react';
 import { MemoryRouter } from 'react-router';
 import ButtonLink from '../src/app/components/ButtonLink';
 import Confirm from '../src/app/components/Confirm';
-import Toggle from '../src/app/containers/Toggle';
 
 const InfoDecorator = storyFn => withInfo()(storyFn)();
 
-storiesOf('Toggle', module).add('default', () => (
-  <Toggle>
-    {({ on, setOn, setOff }) => (
-      <>
-        <span>State: {on ? 'on' : 'off'}</span>
-        <button onClick={setOn}>On</button>
-        <button onClick={setOff}>Off</button>
-      </>
-    )}
-  </Toggle>
-), { inline: true });
-
-storiesOf('Confirm', module)
-  .add('active', () => (
+storiesOf('Confirm', module).add(
+  'active',
+  () => (
     <Confirm
       title="Are you sure?"
       message="You are about to permanently delete this user."
       onConfirm={action('confirm')}
       onCancel={action('cancel')}
     />
-  ), { inline: true });
+  ),
+  { inline: true },
+);
 
-storiesOf('Button link', module)
-  .add('default', () => (
+storiesOf('Button link', module).add(
+  'default',
+  () => (
     <MemoryRouter>
       <div
         style={{
@@ -49,4 +40,6 @@ storiesOf('Button link', module)
         <ButtonLink to="/">Hi</ButtonLink>
       </div>
     </MemoryRouter>
-  ), { inline: true, propTables: [ButtonLink] });
+  ),
+  { inline: true, propTables: [ButtonLink] },
+);

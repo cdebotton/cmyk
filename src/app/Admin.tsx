@@ -2,11 +2,9 @@ import { faAngry } from '@fortawesome/free-regular-svg-icons';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import gql from 'graphql-tag';
 import { margin, padding, rem } from 'polished';
-import { normalize } from 'polished';
-import React, { Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Query } from 'react-apollo';
-import { hot } from 'react-hot-loader';
-import { RouteComponentProps, Switch } from 'react-router';
+import { Route, RouteComponentProps, Switch } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
 import { CurrentUserQuery } from './__generated__/CurrentUserQuery';
@@ -14,7 +12,6 @@ import ClientError from './ClientError';
 import Avatar from './components/Avatar';
 import Button from './components/Button';
 import Loader from './components/Loader';
-import DynamicRoute from './containers/DynamicRoute';
 import ErrorBoundary from './containers/ErrorBoundary';
 import Session from './containers/Session';
 import PortalOutlet from './PortalOutlet';
@@ -23,7 +20,6 @@ import background from './styles/background';
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
-  portalElement: HTMLElement;
 }
 
 const CURRENT_USER_QUERY = gql`
@@ -103,6 +99,14 @@ const PageLink = styled(NavLink)`
 
 const LogoutButton = styled(Button)``;
 
+const AdminDashboard = lazy(() => import('./AdminDashboard'));
+const AdminNewUser = lazy(() => import('./AdminNewUser'));
+const AdminEditUser = lazy(() => import('./AdminEditUser'));
+const AdminUsers = lazy(() => import('./AdminUsers'));
+const AdminDocuments = lazy(() => import('./AdminDocuments'));
+const AdminFiles = lazy(() => import('./AdminFiles'));
+const NotFound = lazy(() => import('./NotFound'));
+
 function Admin({ className, match }: Props) {
   return (
     <ErrorBoundary
@@ -157,32 +161,19 @@ function Admin({ className, match }: Props) {
           </Header>
           <Suspense maxDuration={300} fallback={<Loader />}>
             <Switch>
-              <DynamicRoute
-                exact
-                path={`${match.url}`}
-                loader={() => import('./AdminDashboard')}
-              />
-              <DynamicRoute
-                path={`${match.url}/users/new`}
-                loader={() => import('./AdminNewUser')}
-              />
-              <DynamicRoute
+              <Route exact path={`${match.url}`} component={AdminDashboard} />
+              <Route path={`${match.url}/users/new`} component={AdminNewUser} />
+              <Route
                 path={`${match.url}/users/:userId`}
-                loader={() => import('./AdminEditUser')}
+                component={AdminEditUser}
               />
-              <DynamicRoute
-                path={`${match.url}/users`}
-                loader={() => import('./AdminUsers')}
-              />
-              <DynamicRoute
+              <Route path={`${match.url}/users`} component={AdminUsers} />
+              <Route
                 path={`${match.url}/documents`}
-                loader={() => import('./AdminDocuments')}
+                component={AdminDocuments}
               />
-              <DynamicRoute
-                path={`${match.url}/media`}
-                loader={() => import('./AdminFiles')}
-              />
-              <DynamicRoute loader={() => import('./NotFound')} />
+              <Route path={`${match.url}/media`} component={AdminFiles} />
+              <Route component={NotFound} />
             </Switch>
           </Suspense>
           <PortalOutlet />
@@ -192,4 +183,4 @@ function Admin({ className, match }: Props) {
   );
 }
 
-export default hot(module)(Admin);
+export default Admin;

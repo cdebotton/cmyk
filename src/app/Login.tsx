@@ -140,4 +140,4 @@ const LoginButton = styled(Button)`
   grid-column: 2 / span 1;
 `;
 
-export default hot(module)(Login);
+export default Login;

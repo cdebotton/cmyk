@@ -1,11 +1,9 @@
 import gql from 'graphql-tag';
-import React, { Suspense } from 'react';
+import React, { lazy, Suspense } from 'react';
 import { Query } from 'react-apollo';
-import { hot } from 'react-hot-loader';
-import { Redirect, RouteProps, Switch } from 'react-router';
+import { Redirect, Route, RouteProps, Switch } from 'react-router';
 import { Session } from './__generated__/Session';
 import Loader, { LoaderSize } from './components/Loader';
-import DynamicRoute from './containers/DynamicRoute';
 
 const SESSION_QUERY = gql`
   query Session {
@@ -32,6 +30,10 @@ function isLoggedIn(data: Session | null) {
   };
 }
 
+const Admin = lazy(() => import('./Admin'));
+const Login = lazy(() => import('./Login'));
+const NotFound = lazy(() => import('./NotFound'));
+
 function Root() {
   return (
     <Query<Session, {}> query={SESSION_QUERY}>
@@ -50,13 +52,13 @@ function Root() {
             fallback={<Loader size={LoaderSize.Large} />}
           >
             <Switch>
-              <DynamicRoute
+              <Route
                 protect={isLoggedIn(data)}
                 path="/admin"
-                loader={() => import('./Admin')}
+                component={Admin}
               />
-              <DynamicRoute path="/login" loader={() => import('./Login')} />
-              <DynamicRoute loader={() => import('./NotFound')} />
+              <Route path="/login" component={Login} />
+              <Route component={NotFound} />
             </Switch>
           </Suspense>
         );
@@ -65,4 +67,4 @@ function Root() {
   );
 }
 
-export default hot(module)(Root);
+export default Root;
