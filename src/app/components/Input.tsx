@@ -70,16 +70,8 @@ function Input({ className, field, label, form, ...props }: Props) {
   const id = `field-${field.name}`;
   const showError = touched === true && error !== undefined;
 
-  const getErrorStyles = (x: number) => {
-    return {
-      opacity: x,
-      position: 'absolute',
-      transform: `translate3d(0, ${rem(x * 16)}, 0)`,
-    };
-  };
-
   useEffect(() => {
-    setErrorSpring({ to: error !== null ? 1 : 0 });
+    setErrorSpring({ value: error !== null ? 1 : 0 });
     setHoverSpring({ value: hover ? 1 : 0 });
     setFocusSpring({ value: focus ? 1 : 0 });
     setValueSpring({ value: field.value !== '' ? 1 : 0 });
@@ -114,16 +106,16 @@ function Input({ className, field, label, form, ...props }: Props) {
               range: [0, 1],
             }),
             cursor: 'pointer',
-            fontSize: valueSpring.interpolate((y: number) => modularScale(-y)),
+            fontSize: valueSpring.interpolate(y => modularScale(-y)),
             left: rem(6),
-            letterSpacing: valueSpring.interpolate((y: number) => `${y}px`),
+            letterSpacing: valueSpring.interpolate(y => `${y}px`),
             padding: rem(2),
             pointerEvents: field.value === '' ? 'none' : 'inherit',
             position: 'absolute',
             top: 0,
             transform: valueSpring
               .interpolate({ range: [0, 1], output: [5, -20] })
-              .interpolate((y: number) => `translate3d(0, ${rem(y)}, 0)`),
+              .interpolate(y => `translate3d(0, ${rem(y)}, 0)`),
           }}
         >
           <animated.span
@@ -131,10 +123,10 @@ function Input({ className, field, label, form, ...props }: Props) {
               backgroundColor: '#fff',
               height: '100%',
               left: 0,
-              opacity: focusSpring.interpolate((x: number) => `${x}`),
+              opacity: focusSpring,
               position: 'absolute',
               top: 0,
-              transform: focusSpring.interpolate((x: number) => `scaleX(${x})`),
+              transform: focusSpring.interpolate(x => `scaleX(${x})`),
               transformOrigin: '0 0',
               width: '100%',
               zIndex: -1,
@@ -146,9 +138,9 @@ function Input({ className, field, label, form, ...props }: Props) {
           style={{
             ...baseBorderStyle,
             backgroundColor: hoverSpring.interpolate(
-              (x: number) => `hsla(212, 50%, 50%, ${x})`,
+              x => `hsla(212, 50%, 50%, ${x})`,
             ),
-            transform: hoverSpring.interpolate((x: number) => `scaleX(${x})`),
+            transform: hoverSpring.interpolate(x => `scaleX(${x})`),
           }}
         />
         <animated.span
@@ -157,12 +149,18 @@ function Input({ className, field, label, form, ...props }: Props) {
             backgroundColor: focusSpring.interpolate(
               (x: number) => `hsla(90, 50%, 50%, ${x})`,
             ),
-            transform: focusSpring.interpolate((x: number) => `scaleX(${x})`),
+            transform: focusSpring.interpolate(x => `scaleX(${x})`),
           }}
         />
         <animated.span
           hidden={!showError}
-          style={errorSpring.interpolate(getErrorStyles)}
+          style={errorSpring.interpolate(x => {
+            return {
+              opacity: x,
+              position: 'absolute',
+              transform: `translate3d(0, ${rem(x * 16)}, 0)`,
+            };
+          })}
         >
           {error}
         </animated.span>

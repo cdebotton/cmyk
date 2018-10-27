@@ -208,43 +208,56 @@ function UserListItem(props: {
   const [hoverDelete, setHoverDelete] = useState(false);
   const { baseUrl, user, isCurrentUser } = props;
 
+  const itemStates = {
+    blur: {
+      backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
+      boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
+      config: config.default,
+      transform: 'translate3d(0, 0, 0px)',
+    },
+    focus: {
+      backgroundColor: 'hsla(0, 0%, 100%, 0.175)',
+      boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
+      transform: 'translate3d(0, 0, 20px)',
+    },
+  };
+
   const [listStyles, setListStyles] = useSpring({
-    backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
-    boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
+    ...itemStates.blur,
     config: config.default,
-    transform: 'translate3d(0, 0, 0px)',
   });
+
+  const deleteStates = {
+    blur: {
+      d: 'M100,0 L100,100, L100,100, L100,0 Z',
+      fill: 'hsla(212, 50%, 50%, 0)',
+    },
+    disabled: {
+      d: 'M100,0 L100,100, L100,100, L100,0 Z',
+      fill: 'hsla(212, 50%, 50%, 0)',
+    },
+    focus: {
+      d: 'M100,0 M100,100, 20,100, 22,0 Z',
+      fill: 'hsla(5, 50%, 50%, 0.5)',
+    },
+  };
+
   const [{ d, fill }, setDeleteStyles] = useSpring({
     config: config.default,
-    d: 'M100,0 L100,100, L100,100, L100,0 Z',
-    fill: 'hsla(212, 50%, 50%, 0)',
+    ...deleteStates.disabled,
   });
 
   useEffect(() => {
     if (hoverList) {
-      setListStyles({
-        backgroundColor: 'hsla(0, 0%, 100%, 0.175)',
-        boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
-        transform: 'translate3d(0, 0, 20px)',
-      });
+      setListStyles(itemStates.focus);
     } else {
-      setListStyles({
-        backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
-        boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
-        transform: 'translate3d(0, 0, 0px)',
-      });
+      setListStyles(itemStates.blur);
     }
 
     if (hoverDelete) {
-      setDeleteStyles({
-        d: 'M100,0 M100,100, 20,100, 22,0 Z',
-        fill: 'hsla(5, 50%, 50%, 0.5)',
-      });
+      setDeleteStyles(deleteStates.focus);
     } else {
-      setDeleteStyles({
-        d: 'M100,0 L100,100, L100,100, L100,0 Z',
-        fill: 'hsla(212, 50%, 50%, 0)',
-      });
+      setDeleteStyles(deleteStates.blur);
     }
   });
 
