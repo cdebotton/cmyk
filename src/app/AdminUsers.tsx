@@ -1,10 +1,10 @@
 import gql from 'graphql-tag';
 import { padding, position, rem, size } from 'polished';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
-import { animated, Spring } from 'react-spring';
+import { animated, config, useSpring } from 'react-spring';
 import styled from 'styled-components';
 import {
   DeleteUserMutation,
@@ -141,33 +141,6 @@ function getAvatar(profile: Users_users_profile) {
   return '';
 }
 
-const getListItemStyles = (on: boolean) => {
-  return on
-    ? {
-        backgroundColor: 'hsla(0, 0%, 100%, 0.175)',
-        boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
-        transform: 'translate3d(0, 0, 20px)',
-      }
-    : {
-        backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
-        boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
-        transform: 'translate3d(0, 0, 0px)',
-      };
-};
-
-const redFill = {
-  off: {
-    d: 'M100,0 L100,100, L100,100, L100,0 Z',
-    fill: 'hsla(212, 50%, 50%, 0)',
-  },
-  on: {
-    d: 'M100,0 M100,100, 20,100, 22,0 Z',
-    fill: 'hsla(5, 50%, 50%, 0.5)',
-  },
-};
-
-type ListItemStyles = ReturnType<typeof getListItemStyles>;
-
 const UserListItemContainer = styled(animated.li)`
   border-radius: 5px;
   ${padding(rem(8))};
@@ -234,51 +207,84 @@ function UserListItem(props: {
   const [hoverList, setHoverList] = useState(false);
   const [hoverDelete, setHoverDelete] = useState(false);
   const { baseUrl, user, isCurrentUser } = props;
+
+  const [listStyles, setListStyles] = useSpring({
+    backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
+    boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
+    config: config.default,
+    transform: 'translate3d(0, 0, 0px)',
+  });
+  const [{ d, fill }, setDeleteStyles] = useSpring({
+    config: config.default,
+    d: 'M100,0 L100,100, L100,100, L100,0 Z',
+    fill: 'hsla(212, 50%, 50%, 0)',
+  });
+
+  useEffect(() => {
+    if (hoverList) {
+      setListStyles({
+        backgroundColor: 'hsla(0, 0%, 100%, 0.175)',
+        boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
+        transform: 'translate3d(0, 0, 20px)',
+      });
+    } else {
+      setListStyles({
+        backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
+        boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
+        transform: 'translate3d(0, 0, 0px)',
+      });
+    }
+
+    if (hoverDelete) {
+      setDeleteStyles({
+        d: 'M100,0 M100,100, 20,100, 22,0 Z',
+        fill: 'hsla(5, 50%, 50%, 0.5)',
+      });
+    } else {
+      setDeleteStyles({
+        d: 'M100,0 L100,100, L100,100, L100,0 Z',
+        fill: 'hsla(212, 50%, 50%, 0)',
+      });
+    }
+  });
+
   const avatar = getAvatar(user.profile);
   return (
-    <Spring<{}, ListItemStyles> native to={getListItemStyles(hoverList)}>
-      {styles => (
-        <UserListItemContainer
-          onMouseEnter={() => setHoverList(true)}
-          onMouseLeave={() => setHoverList(false)}
-          style={styles}
-        >
-          <DeleteFill preserveAspectRatio="none" viewBox="0 0 100 100">
-            <Spring native to={hoverDelete ? redFill.on : redFill.off}>
-              {({ d, fill }) => {
-                return <animated.path fill={fill} d={d} />;
-              }}
-            </Spring>
-          </DeleteFill>
-          <UserLink to={`${baseUrl}/${user.id}`}>
-            <UserAvatar
-              style={{
-                boxShadow: styles.boxShadow,
-                transform: styles.transform,
-              }}
-              src={avatar}
-              size={96}
+    <UserListItemContainer
+      onMouseEnter={() => setHoverList(true)}
+      onMouseLeave={() => setHoverList(false)}
+      style={listStyles}
+    >
+      <DeleteFill preserveAspectRatio="none" viewBox="0 0 100 100">
+        <animated.path fill={fill} d={d} />;
+      </DeleteFill>
+      <UserLink to={`${baseUrl}/${user.id}`}>
+        <UserAvatar
+          style={{
+            boxShadow: listStyles.boxShadow,
+            transform: listStyles.transform,
+          }}
+          src={avatar}
+          size={96}
+        />
+        <UserName>
+          {user.profile.firstName} {user.profile.lastName}
+        </UserName>
+        <UserEmail>{user.email}</UserEmail>
+        <Label>Last login</Label>
+        <DateInfo>{getTimeAgo(user.lastLogin)}</DateInfo>
+        <Label>Created</Label>
+        <DateInfo>{getFormattedDate(user.createdAt)}</DateInfo>
+        {hoverList &&
+          !isCurrentUser && (
+            <DeleteUserButton
+              user={user}
+              setDeleteOn={() => setHoverDelete(true)}
+              setDeleteOff={() => setHoverDelete(false)}
             />
-            <UserName>
-              {user.profile.firstName} {user.profile.lastName}
-            </UserName>
-            <UserEmail>{user.email}</UserEmail>
-            <Label>Last login</Label>
-            <DateInfo>{getTimeAgo(user.lastLogin)}</DateInfo>
-            <Label>Created</Label>
-            <DateInfo>{getFormattedDate(user.createdAt)}</DateInfo>
-            {hoverList &&
-              !isCurrentUser && (
-                <DeleteUserButton
-                  user={user}
-                  setDeleteOn={() => setHoverDelete(true)}
-                  setDeleteOff={() => setHoverDelete(false)}
-                />
-              )}
-          </UserLink>
-        </UserListItemContainer>
-      )}
-    </Spring>
+          )}
+      </UserLink>
+    </UserListItemContainer>
   );
 }
 

@@ -1,7 +1,7 @@
 import { FieldProps } from 'formik';
 import { modularScale, padding, rem } from 'polished';
 import React, { CSSProperties, HTMLProps, useEffect, useState } from 'react';
-import { animated, interpolate, useSpring } from 'react-spring';
+import { animated, config, interpolate, useSpring } from 'react-spring';
 import styled from 'styled-components';
 
 const baseBorderStyle: CSSProperties = {
@@ -47,14 +47,20 @@ interface Props extends FieldProps<any> {
 }
 
 function Input({ className, field, label, form, ...props }: Props) {
-  const [{ value: errorSpring }, setErrorSpring] = useSpring({ value: 0 });
+  const [{ value: errorSpring }, setErrorSpring] = useSpring({
+    config: config.default,
+    value: 0,
+  });
   const [{ value: focusSpring }, setFocusSpring] = useSpring({
+    config: config.default,
     value: 0,
   });
   const [{ value: hoverSpring }, setHoverSpring] = useSpring({
+    config: config.default,
     value: 0,
   });
   const [{ value: valueSpring }, setValueSpring] = useSpring({
+    config: config.default,
     value: 0,
   });
   const [hover, setHover] = useState(false);
