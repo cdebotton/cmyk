@@ -112,7 +112,7 @@ function Input({ className, field, label, form, ...props }: Props) {
             left: rem(6),
             letterSpacing: valueSpring.interpolate((y: number) => `${y}px`),
             padding: rem(2),
-            pointerEvents: field.value !== '' ? 'none' : 'inherit',
+            pointerEvents: field.value === '' ? 'none' : 'inherit',
             position: 'absolute',
             top: 0,
             transform: valueSpring
