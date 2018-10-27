@@ -6792,6 +6792,10 @@ react-apollo@^2.2.4:
     lodash.isequal "^4.5.0"
     prop-types "^15.6.0"
 
+react-cache@2.0.0-alpha.0:
+  version "2.0.0-alpha.0"
+  resolved "https://registry.yarnpkg.com/react-cache/-/react-cache-2.0.0-alpha.0.tgz#d02d16a4565fd9f12478a2a41e980ba4fcbab4d5"
+
 react-dev-utils@^6.0.5:
   version "6.0.5"
   resolved "https://registry.yarnpkg.com/react-dev-utils/-/react-dev-utils-6.0.5.tgz#6ef34d0a416dc1c97ac20025031ea1f0d819b21d"
@@ -6929,9 +6933,9 @@ react-split-pane@^0.1.84:
     react-lifecycles-compat "^3.0.4"
     react-style-proptype "^3.0.0"
 
-react-spring@^6.1.0:
-  version "6.1.0"
-  resolved "https://registry.yarnpkg.com/react-spring/-/react-spring-6.1.0.tgz#bea4211d0543c13b07c334d374cfec9978b6df24"
+react-spring@^6.1.2:
+  version "6.1.2"
+  resolved "https://registry.yarnpkg.com/react-spring/-/react-spring-6.1.2.tgz#34aeb46b1f3c6aa217ca8ea2bfb9e5267af84bab"
   dependencies:
     "@babel/runtime" "^7.1.2"
 
@@ -7487,10 +7491,6 @@ shelljs@^0.8.2:
 signal-exit@^3.0.0, signal-exit@^3.0.2:
   version "3.0.2"
   resolved "https://registry.yarnpkg.com/signal-exit/-/signal-exit-3.0.2.tgz#b5fdc08f1287ea1178628e415e25132b73646c6d"
-
-simple-cache-provider@^0.10.0:
-  version "0.10.0"
-  resolved "https://registry.yarnpkg.com/simple-cache-provider/-/simple-cache-provider-0.10.0.tgz#09054a18ea78bb352bc3408a8833a9fe478d40a1"
 
 slash@^1.0.0:
   version "1.0.0"

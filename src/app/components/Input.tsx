@@ -1,145 +1,16 @@
 import { FieldProps } from 'formik';
 import { modularScale, padding, rem } from 'polished';
-import React, { CSSProperties, HTMLProps, ReactNode, useState } from 'react';
-import { animated, Spring } from 'react-spring';
+import React, { CSSProperties, HTMLProps, useEffect, useState } from 'react';
+import { animated, interpolate, useSpring } from 'react-spring';
 import styled from 'styled-components';
 
-const PLACEHOLDER: CSSProperties = {
-  color: '#333',
-  fontSize: modularScale(0),
-  letterSpacing: '0px',
-  transform: `translate3d(0, ${rem(8)}, 0)`,
-};
-
-const LABEL: CSSProperties = {
-  color: '#fff',
-  fontSize: modularScale(-1),
-  letterSpacing: '1px',
-  transform: `translate3d(0, ${rem(-20)}, 0)`,
-};
-
-const FOCUSED_LABEL: CSSProperties = {
-  color: '#000',
-  fontSize: modularScale(-1),
-  letterSpacing: '1px',
-  transform: `translate3d(0, ${rem(-20)}, 0)`,
-};
-
-function ReactiveLabel(props: {
-  empty: boolean;
-  focused: boolean;
-  htmlFor: string;
-  children: ReactNode;
-}) {
-  const { empty, children, focused, htmlFor } = props;
-  return (
-    <Spring native to={empty ? PLACEHOLDER : focused ? FOCUSED_LABEL : LABEL}>
-      {styles => (
-        <>
-          <animated.label
-            htmlFor={htmlFor}
-            style={{
-              ...styles,
-              cursor: 'pointer',
-              left: rem(6),
-              padding: rem(2),
-              pointerEvents: empty ? 'none' : 'inherit',
-              position: 'absolute',
-              top: 0,
-            }}
-          >
-            <Spring
-              native
-              to={
-                focused
-                  ? { opacity: 1, transform: 'scaleX(1)' }
-                  : { opacity: 0, transform: 'scaleX(0)' }
-              }
-            >
-              {({ opacity, transform }) => (
-                <animated.span
-                  style={{
-                    opacity,
-                    transform,
-                    backgroundColor: '#fff',
-                    height: '100%',
-                    left: 0,
-                    position: 'absolute',
-                    top: 0,
-                    transformOrigin: '0 0',
-                    width: '100%',
-                    zIndex: -1,
-                  }}
-                />
-              )}
-            </Spring>
-            {children}
-          </animated.label>
-        </>
-      )}
-    </Spring>
-  );
-}
-
-enum BorderStep {
-  None,
-  Half,
-  Full,
-}
-
-const baseBorderStle = {
-  backgroundColor: 'hsla(212, 50%, 50%, 0)',
+const baseBorderStyle: CSSProperties = {
   bottom: 0,
   height: '4px',
   left: 0,
   position: 'absolute',
-  transform: 'scaleX(0)',
   width: '100%',
 };
-
-const halfBorderStyle = {
-  ...baseBorderStle,
-  backgroundColor: 'hsla(212, 50%, 50%, 1.0)',
-  transform: 'scaleX(1)',
-};
-
-const fullBorderStyle = {
-  ...baseBorderStle,
-  backgroundColor: 'hsla(90, 50%, 50%, 1.0)',
-  transform: 'scaleX(1)',
-};
-
-function ReactiveBorder(props: { step: BorderStep }) {
-  const { step } = props;
-
-  return (
-    <>
-      <Spring
-        native
-        to={step !== BorderStep.None ? halfBorderStyle : baseBorderStle}
-      >
-        {styles => <animated.span style={styles} />}
-      </Spring>
-      <Spring
-        native
-        to={step === BorderStep.Full ? fullBorderStyle : baseBorderStle}
-      >
-        {styles => <animated.span style={styles} />}
-      </Spring>
-    </>
-  );
-}
-
-function getBorderStep(options: { focus: boolean; hover: boolean }) {
-  const { focus, hover } = options;
-  if (focus) {
-    return BorderStep.Full;
-  }
-  if (hover) {
-    return BorderStep.Half;
-  }
-  return BorderStep.None;
-}
 
 const InputContainer = styled.div`
   transform-style: preserve-3d;
@@ -169,34 +40,6 @@ const InputField = styled.input`
   }
 `;
 
-function ReactiveError(props: { children: ReactNode; on: boolean }) {
-  const { on, children } = props;
-  return (
-    <Spring
-      to={
-        on
-          ? { transform: `translate3d(0, ${rem(16)}, 0)`, opacity: 1 }
-          : { transform: `translate3d(0, ${rem(0)}, 0`, opacity: 0 }
-      }
-    >
-      {styles => (
-        <animated.span
-          style={{
-            ...styles,
-            bottom: 0,
-            fontSize: modularScale(-1),
-            left: rem(8),
-            pointerEvents: 'none',
-            position: 'absolute',
-          }}
-        >
-          {children}
-        </animated.span>
-      )}
-    </Spring>
-  );
-}
-
 interface Props extends FieldProps<any> {
   className?: string;
   label: string;
@@ -204,12 +47,37 @@ interface Props extends FieldProps<any> {
 }
 
 function Input({ className, field, label, form, ...props }: Props) {
+  const [{ value: errorSpring }, setErrorSpring] = useSpring({ value: 0 });
+  const [{ value: focusSpring }, setFocusSpring] = useSpring({
+    value: 0,
+  });
+  const [{ value: hoverSpring }, setHoverSpring] = useSpring({
+    value: 0,
+  });
+  const [{ value: valueSpring }, setValueSpring] = useSpring({
+    value: 0,
+  });
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
   const touched = form.touched[field.name];
   const error = form.errors[field.name];
   const id = `field-${field.name}`;
   const showError = touched === true && error !== undefined;
+
+  const getErrorStyles = (x: number) => {
+    return {
+      opacity: x,
+      position: 'absolute',
+      transform: `translate3d(0, ${rem(x * 16)}, 0)`,
+    };
+  };
+
+  useEffect(() => {
+    setErrorSpring({ to: error !== null ? 1 : 0 });
+    setHoverSpring({ value: hover ? 1 : 0 });
+    setFocusSpring({ value: focus ? 1 : 0 });
+    setValueSpring({ value: field.value !== '' ? 1 : 0 });
+  });
 
   return (
     <InputContainer
@@ -229,11 +97,69 @@ function Input({ className, field, label, form, ...props }: Props) {
             field.onBlur(event);
           }}
         />
-        <ReactiveLabel htmlFor={id} focused={focus} empty={field.value === ''}>
+        <animated.label
+          htmlFor={id}
+          style={{
+            color: interpolate(
+              [valueSpring, focusSpring],
+              (v, f) => v + f,
+            ).interpolate({
+              output: ['#333', focus ? '#000' : '#fff'],
+              range: [0, 1],
+            }),
+            cursor: 'pointer',
+            fontSize: valueSpring.interpolate((y: number) => modularScale(-y)),
+            left: rem(6),
+            letterSpacing: valueSpring.interpolate((y: number) => `${y}px`),
+            padding: rem(2),
+            pointerEvents: field.value !== '' ? 'none' : 'inherit',
+            position: 'absolute',
+            top: 0,
+            transform: valueSpring
+              .interpolate({ range: [0, 1], output: [5, -20] })
+              .interpolate((y: number) => `translate3d(0, ${rem(y)}, 0)`),
+          }}
+        >
+          <animated.span
+            style={{
+              backgroundColor: '#fff',
+              height: '100%',
+              left: 0,
+              opacity: focusSpring.interpolate((x: number) => `${x}`),
+              position: 'absolute',
+              top: 0,
+              transform: focusSpring.interpolate((x: number) => `scaleX(${x})`),
+              transformOrigin: '0 0',
+              width: '100%',
+              zIndex: -1,
+            }}
+          />
           {label}
-        </ReactiveLabel>
-        <ReactiveBorder step={getBorderStep({ focus, hover })} />
-        <ReactiveError on={showError}>{showError ? error : ''}</ReactiveError>
+        </animated.label>
+        <animated.span
+          style={{
+            ...baseBorderStyle,
+            backgroundColor: hoverSpring.interpolate(
+              (x: number) => `hsla(212, 50%, 50%, ${x})`,
+            ),
+            transform: hoverSpring.interpolate((x: number) => `scaleX(${x})`),
+          }}
+        />
+        <animated.span
+          style={{
+            ...baseBorderStyle,
+            backgroundColor: focusSpring.interpolate(
+              (x: number) => `hsla(90, 50%, 50%, ${x})`,
+            ),
+            transform: focusSpring.interpolate((x: number) => `scaleX(${x})`),
+          }}
+        />
+        <animated.span
+          hidden={!showError}
+          style={errorSpring.interpolate(getErrorStyles)}
+        >
+          {error}
+        </animated.span>
       </InputWrapper>
     </InputContainer>
   );
