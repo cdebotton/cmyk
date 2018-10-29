@@ -219,7 +219,7 @@ function UserListItem(props: {
       transform: 'translate3d(0, 0, 0px)',
     },
     focus: {
-      backgroundColor: 'hsla(0, 0%, 100%, 0.175)',
+      backgroundColor: 'hsla(0, 0%, 100%, 0.225)',
       boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
       transform: 'translate3d(0, 0, 20px)',
     },
