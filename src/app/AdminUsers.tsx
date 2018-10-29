@@ -18,6 +18,7 @@ import Confirm from './components/Confirm';
 import InsetLayout from './components/InsetLayout';
 import Loader from './components/Loader';
 import PageHeading from './components/PageHeading';
+import Tooltip from './components/Tooltip';
 import PortalContext from './containers/PortalContext';
 import { getFormattedDate, getTimeAgo } from './utils/date';
 
@@ -126,7 +127,9 @@ function DeleteUserButton(props: {
             );
           }}
         >
-          <AnimatedCross />
+          <Tooltip content={`Delete ${user.email}`}>
+            <AnimatedCross />
+          </Tooltip>
         </DeleteIcon>
       )}
     </Mutation>
@@ -193,10 +196,10 @@ const DateInfo = styled.span`
 
 const DeleteFill = styled.svg`
   position: absolute;
+  border-radius: inherit;
+  z-index: -1;
   ${position('absolute', 0, 0)};
   ${size('100%')};
-  z-index: -1;
-  border-radius: inherit;
 `;
 
 function UserListItem(props: {

@@ -3,6 +3,7 @@ import { modularScale, padding, rem } from 'polished';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { animated, config, interpolate, useSpring } from 'react-spring';
 import styled, { css } from 'styled-components';
+import InputLabel from './InputLabel';
 
 interface Option<T> {
   value: T;
@@ -48,25 +49,6 @@ const Border = styled(animated.span)`
   width: 100%;
 `;
 
-const Label = styled(animated.label)`
-  cursor: pointer;
-  left: ${rem(6)};
-  padding: ${rem(2)};
-  position: absolute;
-  top: 0;
-`;
-
-const LabelBacker = styled(animated.span)`
-  background-color: #fff;
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  transform-origin: 0 0;
-  width: 100%;
-  z-index: -1;
-`;
-
 const Option = styled(animated.li)<{ disabled: boolean }>`
   ${padding(rem(8), rem(16))};
   background-color: hsla(0, 0%, 20%, 0.2);
@@ -83,7 +65,7 @@ const Option = styled(animated.li)<{ disabled: boolean }>`
 
   ${({ disabled }) => css`
     cursor: ${disabled ? 'default' : 'pointer'};
-    color: ${disabled ? '#222' : '#fff'};
+    color: ${disabled ? 'hsla(0, 0%, 0%, 0.25)' : '#fff'};
   `};
 
   &:last-of-type {
@@ -146,28 +128,9 @@ function Select<T extends string>({
         >
           {selectedLabel}
         </SelectLabel>
-        <Label
-          style={{
-            color: spring.x.interpolate({
-              output: ['#fff', '#000'],
-              range: [0, 1],
-            }),
-            fontSize: spring.y.interpolate(x => modularScale(-x)),
-            letterSpacing: spring.y.interpolate(x => `${x}px`),
-            pointerEvents: field.value === '' ? 'none' : 'inherit',
-            transform: spring.y
-              .interpolate({ range: [0, 1], output: [5, -20] })
-              .interpolate(y => `translate3d(0, ${rem(y)}, 0)`),
-          }}
-        >
-          <LabelBacker
-            style={{
-              opacity: spring.x,
-              transform: spring.x.interpolate(x => `scaleX(${x})`),
-            }}
-          />
+        <InputLabel focused={open} empty={field.value === null}>
           {props.label}
-        </Label>
+        </InputLabel>
         <Border
           style={{
             transform: spring.x.interpolate(x => `scaleX(${x})`),

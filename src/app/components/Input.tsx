@@ -1,8 +1,9 @@
 import { FieldProps } from 'formik';
-import { modularScale, padding, rem } from 'polished';
-import React, { CSSProperties, HTMLProps, useEffect, useState } from 'react';
-import { animated, config, interpolate, useSpring } from 'react-spring';
+import { padding, rem } from 'polished';
+import React, { forwardRef, HTMLProps, Ref, useEffect, useState } from 'react';
+import { animated, config, useSpring } from 'react-spring';
 import styled from 'styled-components';
+import InputLabel from './InputLabel';
 
 const InputContainer = styled.div`
   transform-style: preserve-3d;
@@ -31,25 +32,6 @@ const InputField = styled(animated.input)`
   }
 `;
 
-const Label = styled(animated.label)`
-  cursor: pointer;
-  left: ${rem(6)};
-  padding: ${rem(2)};
-  position: absolute;
-  top: 0;
-`;
-
-const LabelBacker = styled(animated.span)`
-  background-color: #fff;
-  height: 100%;
-  left: 0;
-  position: absolute;
-  top: 0;
-  transform-origin: 0 0;
-  width: 100%;
-  z-index: -1;
-`;
-
 const InputBorder = styled(animated.span)`
   bottom: 0;
   height: 4px;
@@ -73,17 +55,13 @@ interface Props extends FieldProps<any> {
 function Input({ className, field, label, form, ...props }: Props) {
   const [{ value: errorSpring }, setErrorSpring] = useSpring({
     config: config.default,
-    value: 0,
+    value: field.value !== '' ? 1 : 0,
   });
   const [{ value: focusSpring }, setFocusSpring] = useSpring({
     config: config.default,
     value: 0,
   });
   const [{ value: hoverSpring }, setHoverSpring] = useSpring({
-    config: config.default,
-    value: 0,
-  });
-  const [{ value: valueSpring }, setValueSpring] = useSpring({
     config: config.default,
     value: 0,
   });
@@ -98,7 +76,6 @@ function Input({ className, field, label, form, ...props }: Props) {
     setErrorSpring({ value: error !== null ? 1 : 0 });
     setHoverSpring({ value: hover ? 1 : 0 });
     setFocusSpring({ value: focus ? 1 : 0 });
-    setValueSpring({ value: field.value !== '' ? 1 : 0 });
   });
 
   return (
@@ -129,32 +106,9 @@ function Input({ className, field, label, form, ...props }: Props) {
             }),
           }}
         />
-        <Label
-          htmlFor={id}
-          style={{
-            color: interpolate(
-              [valueSpring, focusSpring],
-              (v, f) => v + f,
-            ).interpolate({
-              output: ['#333', focus ? '#000' : '#fff'],
-              range: [0, 1],
-            }),
-            fontSize: valueSpring.interpolate(y => modularScale(-y)),
-            letterSpacing: valueSpring.interpolate(y => `${y}px`),
-            pointerEvents: field.value === '' ? 'none' : 'inherit',
-            transform: valueSpring
-              .interpolate({ range: [0, 1], output: [5, -20] })
-              .interpolate(y => `translate3d(0, ${rem(y)}, 0)`),
-          }}
-        >
-          <LabelBacker
-            style={{
-              opacity: focusSpring,
-              transform: focusSpring.interpolate(x => `scaleX(${x})`),
-            }}
-          />
+        <InputLabel focused={focus} empty={field.value === ''}>
           {label}
-        </Label>
+        </InputLabel>
         <InputBorder
           style={{
             backgroundColor: hoverSpring.interpolate(

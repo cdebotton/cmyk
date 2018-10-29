@@ -1,4 +1,4 @@
-import { ComponentType, ReactNode, Context, Ref } from 'react';
+import { ComponentType, ReactNode, Context, RefObject } from 'react';
 
 declare module 'react' {
   export const Suspense: ComponentType<{
@@ -44,9 +44,19 @@ declare module 'react' {
     cDU?: any[],
   ): void;
 
+  export function useLayoutEffect(
+    effect: () => void | (() => void),
+    cDU?: any[],
+  ): void;
+
+  export function useMutationEffect(
+    effect: () => void | (() => void),
+    cDU?: any[],
+  ): void;
+
   export function useMemo<T>(memoizer: () => T, watch: any[]): T;
 
-  export function useRef<T>(initial?: T): Ref<T>;
+  export function useRef<T>(initial?: T): RefObject<T>;
 
   type Loader<T> = Promise<{ default: ComponentType<T> }>;
 
