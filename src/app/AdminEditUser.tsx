@@ -90,7 +90,7 @@ function AdminEditUser({ className, ...props }: Props) {
                   }}
                 >
                   {({ handleSubmit, setFieldValue, handleReset }) => (
-                    <UserForm onSubmit={handleSubmit}>
+                    <UserForm onSubmit={handleSubmit} autoComplete="off">
                       <Mutation<UploadFileMutation, UploadFileMutationVariables>
                         mutation={UPLOAD_FILE_MUTATION}
                       >

@@ -4,7 +4,6 @@ import { History } from 'history';
 import { rem } from 'polished';
 import React from 'react';
 import { Mutation, MutationFn } from 'react-apollo';
-import { hot } from 'react-hot-loader';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';

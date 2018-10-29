@@ -18,7 +18,7 @@ import Confirm from './components/Confirm';
 import InsetLayout from './components/InsetLayout';
 import Loader from './components/Loader';
 import PageHeading from './components/PageHeading';
-import PortalManager from './containers/PortalManager';
+import PortalContext from './containers/PortalContext';
 import { getFormattedDate, getTimeAgo } from './utils/date';
 
 export const USERS_QUERY = gql`
@@ -98,7 +98,7 @@ function DeleteUserButton(props: {
   setDeleteOff: () => void;
 }) {
   const { user, setDeleteOn, setDeleteOff } = props;
-  const { setPortalNode } = useContext(PortalManager.Context);
+  const { setPortalNode } = useContext(PortalContext);
 
   return (
     <Mutation<DeleteUserMutation, DeleteUserMutationVariables>

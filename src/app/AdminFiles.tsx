@@ -2,7 +2,6 @@ import gql from 'graphql-tag';
 import { rem } from 'polished';
 import React from 'react';
 import { Mutation, MutationFn, Query } from 'react-apollo';
-import { hot } from 'react-hot-loader';
 import styled from 'styled-components';
 import { DeleteFile, DeleteFileVariables } from './__generated__/DeleteFile';
 import { Files } from './__generated__/Files';

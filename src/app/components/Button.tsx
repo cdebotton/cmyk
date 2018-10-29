@@ -1,7 +1,7 @@
 import { rem } from 'polished';
-import React, { HTMLProps } from 'react';
+import { HTMLProps } from 'react';
 import styled from 'styled-components';
-import { foreground, Format, gradient } from '../styles/helpers';
+import { Format } from '../styles/helpers';
 
 interface Props extends HTMLProps<HTMLButtonElement> {
   className?: string;
@@ -16,7 +16,6 @@ export default styled.button<Props>`
   font-size: ${rem(12)};
   border-radius: 3px;
   font-family: 'Raleway', sans-serif;
-  mix-blend-mode: burn;
 
   :disabled {
     opacity: 0.25;
