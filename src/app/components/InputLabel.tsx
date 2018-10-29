@@ -26,9 +26,10 @@ interface Props {
   children: ReactNode;
   empty: boolean;
   focused: boolean;
+  htmlFor?: string;
 }
 
-function InputLabel({ children, focused, empty }: Props) {
+function InputLabel({ children, focused, empty, htmlFor }: Props) {
   const [{ x, y }] = useSpring({
     config: config.stiff,
     x: empty ? 0 : 1,
@@ -37,6 +38,7 @@ function InputLabel({ children, focused, empty }: Props) {
 
   return (
     <Label
+      htmlFor={htmlFor}
       style={{
         color: y.interpolate({
           output: ['#fff', '#000'],

@@ -17,7 +17,12 @@ interface Props<T> extends FieldProps<any> {
   tabIndex?: number;
 }
 
-const SelectContainer = styled.div``;
+const SelectContainer = styled.div`
+  &:focus,
+  &:active {
+    outline: none;
+  }
+`;
 
 const SelectWrapper = styled.div`
   position: relative;
@@ -78,9 +83,11 @@ const Option = styled(animated.li)<{ disabled: boolean }>`
   ${({ disabled }) =>
     !disabled &&
     css`
+      &:focus,
       &:hover {
         background-color: hsla(212, 50%, 50%, 1);
         color: #fff;
+        outline: none;
       }
     `};
 
@@ -211,7 +218,7 @@ function Select<T extends string>({
           {options.map(option => (
             <Option
               role="menuitem"
-              tabIndex={tabIndex}
+              tabIndex={option.value === field.value ? -1 : tabIndex}
               key={`OPTION_${field.name}_${option.value}`}
               disabled={option.value === field.value}
               onClick={_event => {

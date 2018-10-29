@@ -107,7 +107,7 @@ function Input({ className, field, label, form, ...props }: Props) {
             }),
           }}
         />
-        <InputLabel focused={focus} empty={field.value === ''}>
+        <InputLabel focused={focus} empty={field.value === ''} htmlFor={id}>
           {label}
         </InputLabel>
         <InputBorder
