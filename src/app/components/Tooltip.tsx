@@ -62,8 +62,8 @@ interface Props {
 }
 
 function Tooltip({ children, content }: Props) {
-  const target = useRef<HTMLElement | null>(null);
-  const popup = useRef<HTMLElement | null>(null);
+  const target = useRef<any | null>(null);
+  const popup = useRef<any | null>(null);
 
   const targetRect = useElementSize(target);
   const popupRect = useElementSize(popup);
