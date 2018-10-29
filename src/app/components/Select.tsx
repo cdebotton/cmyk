@@ -14,6 +14,7 @@ interface Props<T> extends FieldProps<any> {
   className?: string;
   label: ReactNode;
   options: Option<T>[];
+  tabIndex?: number;
 }
 
 const SelectContainer = styled.div``;
@@ -98,6 +99,7 @@ function Select<T extends string>({
   options,
   form,
   field,
+  tabIndex = 0,
   ...props
 }: Props<T>) {
   const [open, setOpen] = useState(false);
@@ -135,10 +137,13 @@ function Select<T extends string>({
       className={className}
       onMouseMoveCapture={() => setHover(true)}
       onMouseLeave={() => setHover(false)}
+      tabIndex={tabIndex}
+      role="menu"
+      onFocus={() => setOpen(true)}
+      onBlur={() => setOpen(false)}
     >
       <SelectWrapper>
         <SelectLabel
-          onClick={() => setOpen(prevOpen => !prevOpen)}
           style={{
             backgroundColor: spring.open.interpolate({
               output: ['#fff', 'hsla(0, 0%, 20%, 0.2)'],
@@ -203,8 +208,10 @@ function Select<T extends string>({
               .interpolate(y => `translate3d(0, ${y}, 0)`),
           }}
         >
-          {options.map((option, i) => (
+          {options.map(option => (
             <Option
+              role="menuitem"
+              tabIndex={tabIndex}
               key={`OPTION_${field.name}_${option.value}`}
               disabled={option.value === field.value}
               onClick={_event => {
