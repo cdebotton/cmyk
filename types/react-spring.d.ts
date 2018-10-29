@@ -7,18 +7,19 @@ declare module 'react-spring' {
 
   type SpringSetter<T> = (options: Partial<SpringOptions<T>>) => void;
 
-  type InterpolationOptions<T> = {
+  type InterpolationOptions<T, U = T> = {
     range: T[];
-    output: any[];
+    output: U[];
   };
 
   interface InterpolationFn<T> {
-    (options: InterpolationOptions<T>): Interpolation<T> & T & string;
+    <U>(options: InterpolationOptions<T, U>): Interpolation<U> & U & string;
     (interpolator: (params: T) => string): Interpolation<T> & T & string;
   }
 
   type Interpolation<T> = {
     interpolate: InterpolationFn<T>;
+    getValue: () => T;
   } & T;
 
   type AnimatedValue<T> = { [K in keyof T]: Interpolation<T[K]> };

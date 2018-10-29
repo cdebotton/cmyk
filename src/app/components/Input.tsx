@@ -38,6 +38,7 @@ const InputBorder = styled(animated.span)`
   left: 0;
   position: absolute;
   width: 100%;
+  transform-origin: 0 0;
 `;
 
 const ErrorLabel = styled(animated.span)`

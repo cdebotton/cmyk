@@ -1,7 +1,7 @@
 import { FieldProps } from 'formik';
-import { modularScale, padding, rem } from 'polished';
+import { padding, rem, size } from 'polished';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
-import { animated, config, interpolate, useSpring } from 'react-spring';
+import { animated, config, useSpring } from 'react-spring';
 import styled, { css } from 'styled-components';
 import InputLabel from './InputLabel';
 
@@ -20,6 +20,7 @@ const SelectContainer = styled.div``;
 
 const SelectWrapper = styled.div`
   position: relative;
+  display: grid;
   width: 100%;
 `;
 
@@ -28,6 +29,17 @@ const SelectLabel = styled(animated.div)`
   color: #000;
   cursor: pointer;
   ${padding(rem(8), rem(16))};
+`;
+
+const Arrow = styled(animated.svg)`
+  align-self: center;
+  display: block;
+  position: absolute;
+  right: ${rem(10)};
+  top: 50%;
+  bottom: 50%;
+  margin-top: -${rem(5)};
+  ${size(rem(5), rem(10))};
 `;
 
 const OptionList = styled(animated.ul)`
@@ -40,12 +52,20 @@ const OptionList = styled(animated.ul)`
   box-shadow: 0 1px 5px hsla(0, 0%, 0%, 0.4);
 `;
 
-const Border = styled(animated.span)`
+const Border = styled(animated.span)<{ format: 'hover' | 'focus' }>`
   position: absolute;
   bottom: 0;
   left: 0;
-  height: 2px;
-  background-color: hsla(80, 50%, 50%, 1);
+  height: 4px;
+  background-color: ${({ format }) => {
+    switch (format) {
+      case 'hover':
+        return 'hsla(212, 50%, 50%, 1)';
+      case 'focus':
+        return 'hsla(90, 50%, 50%, 1)';
+    }
+  }};
+  transform-origin: 0 0;
   width: 100%;
 `;
 
@@ -81,14 +101,20 @@ function Select<T extends string>({
   ...props
 }: Props<T>) {
   const [open, setOpen] = useState(false);
+  const [hover, setHover] = useState(false);
   const [spring, setSpring] = useSpring({
     config: config.default,
-    x: 0,
-    y: 0,
+    empty: 0,
+    hover: 0,
+    open: 0,
   });
 
   useEffect(() =>
-    setSpring({ x: open ? 1 : 0, y: field.value === null ? 0 : 1 }),
+    setSpring({
+      empty: field.value === null ? 0 : 1,
+      hover: hover ? 1 : 0,
+      open: open ? 1 : 0,
+    }),
   );
 
   const selected = useMemo(
@@ -105,42 +131,71 @@ function Select<T extends string>({
   const selectedLabel = !selected ? props.label : selected[0];
 
   return (
-    <SelectContainer className={className}>
+    <SelectContainer
+      className={className}
+      onMouseMoveCapture={() => setHover(true)}
+      onMouseLeave={() => setHover(false)}
+    >
       <SelectWrapper>
         <SelectLabel
           onClick={() => setOpen(prevOpen => !prevOpen)}
           style={{
-            backgroundColor: spring.x.interpolate({
+            backgroundColor: spring.open.interpolate({
               output: ['#fff', 'hsla(0, 0%, 20%, 0.2)'],
               range: [0, 1],
             }),
-            borderRadius: spring.x
+            borderRadius: spring.open
               .interpolate({
                 output: ['3px', '0px'],
                 range: [0, 1],
               })
               .interpolate(x => `3px 3px ${x} ${x}`),
-            color: spring.x.interpolate({
+            color: spring.open.interpolate({
               output: ['#000', '#fff'],
               range: [0, 1],
             }),
           }}
         >
           {selectedLabel}
+          <Arrow viewBox="0 0 10 5">
+            <animated.path
+              d="M0,0 L10,0 L5,5 L0,0 Z"
+              style={{
+                transform: spring.open
+                  .interpolate({
+                    output: ['0deg', '180deg'],
+                    range: [0, 1],
+                  })
+                  .interpolate(r => `rotateZ(${r})`),
+                transformOrigin: 'center center',
+              }}
+              fill={spring.open.interpolate({
+                output: ['#000', '#fff'],
+                range: [0, 1],
+              })}
+            />
+          </Arrow>
         </SelectLabel>
         <InputLabel focused={open} empty={field.value === null}>
           {props.label}
         </InputLabel>
         <Border
+          format="hover"
           style={{
-            transform: spring.x.interpolate(x => `scaleX(${x})`),
+            transform: spring.hover.interpolate(x => `scaleX(${x})`),
+          }}
+        />
+        <Border
+          format="focus"
+          style={{
+            transform: spring.open.interpolate(x => `scaleX(${x})`),
           }}
         />
         <OptionList
           style={{
-            opacity: spring.x,
+            opacity: spring.open,
             pointerEvents: open ? 'inherit' : 'none',
-            transform: spring.x
+            transform: spring.open
               .interpolate({
                 output: [rem(-20), rem(0)],
                 range: [0, 1],
