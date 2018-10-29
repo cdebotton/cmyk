@@ -16,7 +16,6 @@ const Element = styled(Link)`
   ${padding(rem(8), rem(16))};
   border-radius: 3px;
   font-family: 'Roboto', sans-serif;
-  background-color: hsla(0, 0%, 100%, 0.2);
   backdrop-filter: blur(2px);
   color: #fff;
   text-decoration: none;
@@ -25,6 +24,16 @@ const Element = styled(Link)`
 
 const Label = styled.span`
   position: relative;
+`;
+
+const Backer = styled(animated.span)`
+  background-color: hsla(0, 0%, 20%, 0.2);
+  height: 100%;
+  left: 0;
+  position: absolute;
+  top: 0;
+  transformorigin: 0 0;
+  width: 100%;
 `;
 
 function ButtonLink({ children, ...props }: Props) {
@@ -48,18 +57,22 @@ function ButtonLink({ children, ...props }: Props) {
 
   return (
     <Element {...props} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
-      <animated.span
+      <Backer
         style={{
-          backgroundColor: 'black',
-          height: '100%',
-          left: 0,
-          position: 'absolute',
-          top: 0,
+          backgroundColor: 'hsla(0, 0%, 20%, 0.2)',
           transform: spring.x.interpolate(
             x => `scaleX(${x}) translate3d(0, 0, ${rem(x * 20)})`,
           ),
           transformOrigin: '0 0',
-          width: '100%',
+        }}
+      />
+      <Backer
+        style={{
+          backgroundColor: `hsla(0, 0%, 100%, 0.2)`,
+          transform: spring.x.interpolate(
+            x => `scaleX(${1 - x}) translate3d(0, 0, ${rem((1 - x) * 20)})`,
+          ),
+          transformOrigin: '100% 0',
         }}
       />
       <Label>{children}</Label>
