@@ -1,18 +1,18 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export enum LoaderSize {
-  Small,
-  Medium,
-  Large,
-}
-
 interface Props {
   className?: string;
-  size?: LoaderSize;
+  size?: 'small' | 'medium' | 'large';
 }
 
-const LoaderContainer = styled.span``;
+const LoaderContainer = styled.span`
+  display: grid;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  height: 100%;
+`;
 
 function Loader({ className }: Props) {
   return (

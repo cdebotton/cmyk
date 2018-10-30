@@ -1,7 +1,8 @@
 import React, { lazy, ReactNode, Suspense, useState } from 'react';
 import { Route, Switch } from 'react-router';
-import Loader, { LoaderSize } from './components/Loader';
+import Loader from './components/Loader';
 import PortalContext from './containers/PortalContext';
+import ProtectedRoute from './containers/ProtectedRoute';
 
 const Admin = lazy(() => import('./Admin'));
 const Login = lazy(() => import('./Login'));
@@ -12,23 +13,10 @@ function Root() {
 
   return (
     <PortalContext.Provider value={{ portalNode, setPortalNode }}>
-      <Suspense maxDuration={300} fallback={<Loader size={LoaderSize.Large} />}>
+      <Suspense maxDuration={300} fallback={<Loader size="large" />}>
         <Switch>
-          <Route
-            // protect={(session, props) => {
-            //   if (!session) {
-            //     return (
-            //       <Redirect
-            //         to={{
-            //           pathname: '/login',
-            //           state: {
-            //             attempt: props.location,
-            //           },
-            //         }}
-            //       />
-            //     );
-            //   }
-            // }}
+          <ProtectedRoute
+            canAccess={session => session !== null}
             path="/admin"
             component={Admin}
           />

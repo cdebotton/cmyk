@@ -14,7 +14,7 @@ import {
   useApolloClient,
   useApolloMutation,
   useApolloQuery,
-} from './hooks/apollo';
+} from './hooks/Apollo';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
 
