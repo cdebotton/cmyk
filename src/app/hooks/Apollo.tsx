@@ -50,7 +50,7 @@ export function useApolloQuery<TData, TVariables = OperationVariables>(
 
   const [result, setResult] = useState<ApolloQueryResult<TData> | null>(null);
   const previousQuery = useRef<DocumentNode | null>(null);
-  const previousVariables = useRef<TVariables | null>(null);
+  const previousVariables = useRef<TVariables | undefined>(undefined);
   const observableQuery = useRef<ObservableQuery<TData> | null>(null);
 
   useEffect(
@@ -88,9 +88,8 @@ export function useApolloQuery<TData, TVariables = OperationVariables>(
     )
   ) {
     previousQuery.current = query;
-    if (variables) {
-      previousVariables.current = variables;
-    }
+    previousVariables.current = variables;
+
     const watchedQuery = client.watchQuery<TData, TVariables>({
       query,
       variables,

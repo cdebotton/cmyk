@@ -51,14 +51,14 @@ function AnimatedCross({ className, ...props }: Props) {
       <animated.path
         d={interpolation.leftPath}
         fill="transparent"
-        strokeWidth={interpolation.strokePath}
+        strokeWidth={interpolation.strokeWidth}
         strokeLinecap="round"
         stroke="#fff"
       />
       <animated.path
         d={interpolation.rightPath}
         fill="transparent"
-        strokeWidth={interpolation.strokePath}
+        strokeWidth={interpolation.strokeWidth}
         strokeLinecap="round"
         stroke="#fff"
       />
