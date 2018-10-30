@@ -109,8 +109,10 @@
     "react-apollo": "^2.2.4",
     "react-cache": "2.0.0-alpha.0",
     "react-dom": "next",
+    "react-fast-compare": "^2.0.2",
     "react-router-dom": "next",
     "react-spring": "^6.1.4",
+    "scheduler": "0.10.0",
     "styled-components": "^4.0.2",
     "yup": "^0.26.5"
   }

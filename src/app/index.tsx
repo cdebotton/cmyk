@@ -1,8 +1,8 @@
 import React, { ConcurrentMode } from 'react';
-import { ApolloProvider } from 'react-apollo';
 import { render } from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import client from './client';
+import { ApolloProvider } from './hooks/Apollo';
 import Root from './Root';
 
 const app = document.getElementById('app');

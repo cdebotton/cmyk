@@ -3,7 +3,6 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import gql from 'graphql-tag';
 import { margin, padding, rem } from 'polished';
 import React, { lazy, Suspense } from 'react';
-import { Query } from 'react-apollo';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
@@ -13,7 +12,7 @@ import Avatar from './components/Avatar';
 import Button from './components/Button';
 import Loader from './components/Loader';
 import ErrorBoundary from './containers/ErrorBoundary';
-import Session from './containers/Session';
+import { useApolloClient, useApolloQuery } from './hooks/Apollo';
 import PortalOutlet from './PortalOutlet';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
@@ -39,12 +38,6 @@ const CURRENT_USER_QUERY = gql`
     }
   }
 `;
-
-class ThemeNotImplementedError extends Error {
-  constructor(msg: string) {
-    super(`Theme not implemented for mode ${msg}`);
-  }
-}
 
 const Layout = styled.div`
   display: grid;
@@ -108,6 +101,19 @@ const AdminFiles = lazy(() => import('./AdminFiles'));
 const NotFound = lazy(() => import('./NotFound'));
 
 function Admin({ className, match }: Props) {
+  const client = useApolloClient();
+
+  if (!client) {
+    throw new Error('Client not available');
+  }
+
+  const {
+    data: { session },
+  } = useApolloQuery<CurrentUserQuery>(CURRENT_USER_QUERY);
+  const user = session && session.user;
+  const profile = user && user.profile;
+  const avatar = profile && profile.avatar ? profile.avatar.url : '';
+
   return (
     <ErrorBoundary
       handleError={(error, info) => <ClientError error={error} info={info} />}
@@ -116,20 +122,13 @@ function Admin({ className, match }: Props) {
         <Layout className={className}>
           <GlobalStyles />
           <Header>
-            <Query<CurrentUserQuery> query={CURRENT_USER_QUERY}>
-              {({ data, loading, error }) => {
-                const user = data && data.session && data.session.user;
-                const profile = user && user.profile;
-                const name = profile ? profile.firstName : '';
-                const avatar =
-                  profile && profile.avatar ? profile.avatar.url : '';
-                return (
-                  <Link to={`${match.url}/users/${user ? user.id : ''}`}>
-                    <Avatar size={64} src={avatar} />
-                  </Link>
-                );
-              }}
-            </Query>
+            <Link
+              hidden={!user}
+              to={`${match.url}/users/${user ? user.id : ''}`}
+            >
+              <Avatar size={64} src={avatar} />
+            </Link>
+
             <Navigation>
               <PageLink exact to={match.url}>
                 Home
@@ -139,25 +138,17 @@ function Admin({ className, match }: Props) {
               <PageLink to={`${match.url}/users`}>Users</PageLink>
               <PageLink to={`${match.url}/settings`}>Settings</PageLink>
             </Navigation>
-            <Session>
-              {({ session, client }) => {
-                if (!session) {
-                  return null;
-                }
 
-                return (
-                  <LogoutButton
-                    format="neutral"
-                    onClick={() => {
-                      localStorage.removeItem('jwt');
-                      client.resetStore();
-                    }}
-                  >
-                    <FontAwesomeIcon icon={faAngry} />
-                  </LogoutButton>
-                );
+            <LogoutButton
+              hidden={!session}
+              format="neutral"
+              onClick={() => {
+                localStorage.removeItem('jwt');
+                client.resetStore();
               }}
-            </Session>
+            >
+              <FontAwesomeIcon icon={faAngry} />
+            </LogoutButton>
           </Header>
           <Suspense maxDuration={300} fallback={<Loader />}>
             <Switch>

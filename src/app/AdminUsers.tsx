@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 import { padding, position, rem, size } from 'polished';
 import React, { useContext, useEffect, useState } from 'react';
-import { Mutation, MutationFn, Query } from 'react-apollo';
+import { MutationFn } from 'react-apollo';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 import { animated, config, useSpring } from 'react-spring';
@@ -16,10 +16,10 @@ import Avatar from './components/Avatar';
 import ButtonLink from './components/ButtonLink';
 import Confirm from './components/Confirm';
 import InsetLayout from './components/InsetLayout';
-import Loader from './components/Loader';
 import PageHeading from './components/PageHeading';
 import Tooltip from './components/Tooltip';
 import PortalContext from './containers/PortalContext';
+import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
 import { getFormattedDate, getTimeAgo } from './utils/date';
 
 export const USERS_QUERY = gql`
@@ -56,10 +56,27 @@ const DELETE_USER_MUTATION = gql`
   }
 `;
 
-function deleteUser(
-  mutate: MutationFn<DeleteUserMutation, DeleteUserMutationVariables>,
-) {
-  mutate({
+const DeleteIcon = styled(animated.span)`
+  grid-row: span 2;
+  font-size: ${rem(48)};
+  display: grid;
+  align-content: center;
+  justify-content: center;
+`;
+
+function DeleteUserButton(props: {
+  user: Users_users;
+  setDeleteOn: () => void;
+  setDeleteOff: () => void;
+}) {
+  const { user, setDeleteOn, setDeleteOff } = props;
+  const { setPortalNode } = useContext(PortalContext);
+  const mutate = useApolloMutation<
+    DeleteUserMutation,
+    DeleteUserMutationVariables
+  >(DELETE_USER_MUTATION, {
+    variables: { where: { id: user.id } },
+
     update: (cache, { data: mutationData }) => {
       const cacheUsers = cache.readQuery<Users>({
         query: USERS_QUERY,
@@ -83,56 +100,30 @@ function deleteUser(
       });
     },
   });
-}
-
-const DeleteIcon = styled(animated.span)`
-  grid-row: span 2;
-  font-size: ${rem(48)};
-  display: grid;
-  align-content: center;
-  justify-content: center;
-`;
-
-function DeleteUserButton(props: {
-  user: Users_users;
-  setDeleteOn: () => void;
-  setDeleteOff: () => void;
-}) {
-  const { user, setDeleteOn, setDeleteOff } = props;
-  const { setPortalNode } = useContext(PortalContext);
 
   return (
-    <Mutation<DeleteUserMutation, DeleteUserMutationVariables>
-      mutation={DELETE_USER_MUTATION}
-      variables={{
-        where: { id: user.id },
+    <DeleteIcon
+      onMouseEnter={setDeleteOn}
+      onMouseLeave={setDeleteOff}
+      onClick={event => {
+        event.preventDefault();
+        setPortalNode(
+          <Confirm
+            title="Are you sure you want to do this?"
+            message="You are about to permanently delete this user"
+            onConfirm={() => {
+              mutate();
+              setPortalNode(null);
+            }}
+            onCancel={() => setPortalNode(null)}
+          />,
+        );
       }}
     >
-      {mutate => (
-        <DeleteIcon
-          onMouseEnter={setDeleteOn}
-          onMouseLeave={setDeleteOff}
-          onClick={event => {
-            event.preventDefault();
-            setPortalNode(
-              <Confirm
-                title="Are you sure you want to do this?"
-                message="You are about to permanently delete this user"
-                onConfirm={() => {
-                  deleteUser(mutate);
-                  setPortalNode(null);
-                }}
-                onCancel={() => setPortalNode(null)}
-              />,
-            );
-          }}
-        >
-          <Tooltip content={`Delete ${user.email}`}>
-            <AnimatedCross />
-          </Tooltip>
-        </DeleteIcon>
-      )}
-    </Mutation>
+      <Tooltip content={`Delete ${user.email}`}>
+        <AnimatedCross />
+      </Tooltip>
+    </DeleteIcon>
   );
 }
 
@@ -324,38 +315,29 @@ const NewUserLink = styled(ButtonLink)`
 
 function AdminUsers(props: { className?: string } & RouteComponentProps<void>) {
   const { className, match } = props;
+  const {
+    data: { users, session },
+  } = useApolloQuery<Users>(USERS_QUERY);
+
   return (
     <InsetLayout className={className}>
       <UsersHeading>Users</UsersHeading>
       <NewUserLink to={`${match.url}/new`}>New user</NewUserLink>
-      <Query<Users, {}> query={USERS_QUERY}>
-        {({ data, loading, error }) => {
-          if (error) {
-            return null;
-          }
 
-          if (loading || !data) {
-            return <Loader />;
-          }
-
+      <UserList>
+        {users.map(user => {
+          const isCurrentUser =
+            (session && session.user.id === user.id) || false;
           return (
-            <UserList>
-              {data.users.map(user => {
-                const isCurrentUser =
-                  (data.session && data.session.user.id === user.id) || false;
-                return (
-                  <UserListItem
-                    key={user.id}
-                    user={user}
-                    baseUrl={match.url}
-                    isCurrentUser={isCurrentUser}
-                  />
-                );
-              })}
-            </UserList>
+            <UserListItem
+              key={user.id}
+              user={user}
+              baseUrl={match.url}
+              isCurrentUser={isCurrentUser}
+            />
           );
-        }}
-      </Query>
+        })}
+      </UserList>
     </InsetLayout>
   );
 }

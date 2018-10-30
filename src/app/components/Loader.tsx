@@ -7,22 +7,22 @@ export enum LoaderSize {
   Large,
 }
 
-interface IProps {
+interface Props {
   className?: string;
   size?: LoaderSize;
 }
 
-function Loader({ className, size = LoaderSize.Medium }: IProps) {
+const LoaderContainer = styled.span``;
+
+function Loader({ className }: Props) {
   return (
-    <span className={className}>
+    <LoaderContainer className={className}>
       [Loader...]
       <span />
       <span />
       <span />
-    </span>
+    </LoaderContainer>
   );
 }
 
-export default styled(Loader)`
-  position: relative;
-`;
+export default Loader;
