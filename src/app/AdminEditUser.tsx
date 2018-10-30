@@ -56,13 +56,12 @@ function AdminEditUser({ className, ...props }: Props) {
   const updateUserMutation = useApolloMutation<
     UpdateUserMutation,
     UpdateUserMutationVariables
-  >(USER_UPDATE_MUTATION, {
-    variables: {
-      where: { id: user.id },
-    },
-  });
+  >(USER_UPDATE_MUTATION);
 
   async function updateUser(values: Values) {
+    if (!user) {
+      return;
+    }
     const avatar = values.avatar
       ? {
           connect: { id: values.avatar.id },
@@ -82,6 +81,7 @@ function AdminEditUser({ className, ...props }: Props) {
           },
           role: values.role,
         },
+        where: { id: user.id },
       },
     });
 

@@ -105,7 +105,7 @@ export function useApolloQuery<TData, TVariables = {}>(
 
 export function useApolloMutation<TData, TVariables>(
   mutation: DocumentNode,
-  baseOptions: Partial<MutationOptions<TData, TVariables>> = {},
+  baseOptions: Partial<MutationOptions<TData, Partial<TVariables>>> = {},
 ): MutationFn<TData, TVariables> {
   const client = useApolloClient();
 

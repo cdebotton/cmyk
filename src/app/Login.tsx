@@ -2,15 +2,19 @@ import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
 import { padding, rem } from 'polished';
 import React from 'react';
-import { Mutation } from 'react-apollo';
 import { Redirect, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
 import { Login as LoginMutation, LoginVariables } from './__generated__/Login';
+import { Session } from './__generated__/Session';
 import Button from './components/Button';
 import Heading from './components/Heading';
 import Input from './components/Input';
-import Session from './containers/Session';
+import {
+  useApolloClient,
+  useApolloMutation,
+  useApolloQuery,
+} from './hooks/apollo';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
 
@@ -28,6 +32,14 @@ const LOGIN_MUTATION = gql`
   }
 `;
 
+const SESSION_QUERY = gql`
+  query Session {
+    session {
+      iat
+    }
+  }
+`;
+
 interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
@@ -38,72 +50,79 @@ interface Values {
 }
 
 function Login({ className, location }: Props) {
+  const client = useApolloClient();
+
+  if (!client) {
+    throw new Error(
+      "Can't find Apollo client, please wrap application in <ApolloProvider />",
+    );
+  }
+
+  const {
+    data: { session },
+  } = useApolloQuery<Session>(SESSION_QUERY);
+
+  const mutate = useApolloMutation<LoginMutation, LoginVariables>(
+    LOGIN_MUTATION,
+  );
+
+  if (session) {
+    const to =
+      location.state && location.state.attempt
+        ? location.state.attempt
+        : '/admin';
+
+    return <Redirect to={to} />;
+  }
+
   return (
-    <Session>
-      {({ session, client }) => {
-        if (session) {
-          const to =
-            location.state && location.state.attempt
-              ? location.state.attempt
-              : '/admin';
+    <LoginContainer className={className}>
+      <GlobalStyles />
 
-          return <Redirect to={to} />;
-        }
-
-        return (
-          <LoginContainer className={className}>
-            <GlobalStyles />
-            <Mutation<LoginMutation, LoginVariables> mutation={LOGIN_MUTATION}>
-              {mutate => (
-                <Formik<Values>
-                  initialValues={{ email: '', password: '' }}
-                  validationSchema={validationSchema}
-                  onSubmit={values => {
-                    mutate({
-                      update: (proxy, { data: result }) => {
-                        if (result && result.login) {
-                          localStorage.setItem('jwt', result.login);
-                          client.resetStore();
-                        }
-                      },
-                      variables: {
-                        data: values,
-                      },
-                    });
-                  }}
-                >
-                  {({ handleSubmit, isValid }) => (
-                    <Form onSubmit={handleSubmit}>
-                      <LoginHeading level={1}>Login</LoginHeading>
-                      <Field
-                        name="email"
-                        render={({ field, form }: FieldProps<Values>) => (
-                          <EmailInput form={form} field={field} label="Email" />
-                        )}
-                      />
-                      <Field
-                        name="password"
-                        render={({ field, form }: FieldProps<Values>) => (
-                          <PasswordInput
-                            field={field}
-                            form={form}
-                            type="password"
-                            label="Password"
-                          />
-                        )}
-                      />
-                      <LoginButton type="submit" disabled={!isValid}>
-                        Go
-                      </LoginButton>
-                    </Form>
-                  )}
-                </Formik>
+      <Formik<Values>
+        initialValues={{ email: '', password: '' }}
+        validationSchema={validationSchema}
+        onSubmit={values => {
+          mutate({
+            update: (proxy, { data: result }) => {
+              if (result && result.login) {
+                localStorage.setItem('jwt', result.login);
+                client.resetStore();
+              }
+            },
+            variables: {
+              data: values,
+            },
+          });
+        }}
+      >
+        {({ handleSubmit, isValid }) => (
+          <Form onSubmit={handleSubmit}>
+            <LoginHeading level={1}>Login</LoginHeading>
+            <Field
+              name="email"
+              render={({ field, form }: FieldProps<Values>) => (
+                <EmailInput form={form} field={field} label="Email" />
               )}
-            </Mutation>
-          </LoginContainer>
-        );
-      }}
-    </Session>
+            />
+            <Field
+              name="password"
+              render={({ field, form }: FieldProps<Values>) => (
+                <PasswordInput
+                  field={field}
+                  form={form}
+                  type="password"
+                  label="Password"
+                />
+              )}
+            />
+            <LoginButton type="submit" disabled={!isValid}>
+              Go
+            </LoginButton>
+          </Form>
+        )}
+      </Formik>
+    </LoginContainer>
   );
 }
 

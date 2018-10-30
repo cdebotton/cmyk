@@ -1,55 +1,43 @@
 import gql from 'graphql-tag';
 import { rem } from 'polished';
 import React from 'react';
-import { Mutation, MutationFn, Query } from 'react-apollo';
+import { MutationFn } from 'react-apollo';
 import styled from 'styled-components';
 import { DeleteFile, DeleteFileVariables } from './__generated__/DeleteFile';
 import { Files } from './__generated__/Files';
 import Button from './components/Button';
 import Heading from './components/Heading';
-import Loader from './components/Loader';
 import PageLayout from './components/PageLayout';
 import { Table, TableRow } from './components/Table';
+import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
 
 function AdminFiles() {
+  const {
+    data: { files },
+  } = useApolloQuery<Files>(FILES_QUERY);
+
+  const deleteFileMutation = useApolloMutation<DeleteFile, DeleteFileVariables>(
+    DELETE_FILE_MUTATION,
+  );
+
   return (
     <AdminFilesLayout>
       <Heading>Files</Heading>
-      <Query<Files> query={FILES_QUERY}>
-        {({ data, loading, error }) => {
-          if (error) {
-            return null;
-          }
-
-          if (!data || loading) {
-            return <Loader />;
-          }
-
+      <Table>
+        {files.map(file => {
+          const isImage = file.mimetype.split('/')[0] === 'image';
           return (
-            <Table>
-              {data.files.map(file => {
-                const isImage = file.mimetype.split('/')[0] === 'image';
-                return (
-                  <FileRow key={`FILE_${file.id}`}>
-                    {isImage && <img style={{ width: 128 }} src={file.url} />}
-                    <span>{file.id}</span>
-                    <span>{file.mimetype}</span>
-                    <Mutation<DeleteFile, DeleteFileVariables>
-                      mutation={DELETE_FILE_MUTATION}
-                    >
-                      {mutate => (
-                        <Button onClick={() => deleteFile(mutate, file.id)}>
-                          X
-                        </Button>
-                      )}
-                    </Mutation>
-                  </FileRow>
-                );
-              })}
-            </Table>
+            <FileRow key={`FILE_${file.id}`}>
+              {isImage && <img style={{ width: 128 }} src={file.url} />}
+              <span>{file.id}</span>
+              <span>{file.mimetype}</span>
+              <Button onClick={() => deleteFile(deleteFileMutation, file.id)}>
+                X
+              </Button>
+            </FileRow>
           );
-        }}
-      </Query>
+        })}
+      </Table>
     </AdminFilesLayout>
   );
 }

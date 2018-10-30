@@ -1,13 +1,12 @@
 import gql from 'graphql-tag';
 import { padding, rem } from 'polished';
 import React from 'react';
-import { Query } from 'react-apollo';
 import styled from 'styled-components';
 import { Documents } from './__generated__/Documents';
 import Heading from './components/Heading';
-import Loader from './components/Loader';
 import PageLayout from './components/PageLayout';
 import { Table, TableRow } from './components/Table';
+import { useApolloQuery } from './hooks/Apollo';
 
 const DOCUMENTS_QUERY = gql`
   query Documents {
@@ -23,30 +22,20 @@ const DocumentsHeading = styled(Heading)`
 `;
 
 function AdminDocuments() {
+  const {
+    data: { documents },
+  } = useApolloQuery<Documents>(DOCUMENTS_QUERY);
+
   return (
     <PageLayout>
       <DocumentsHeading>Documents</DocumentsHeading>
-      <Query<Documents> query={DOCUMENTS_QUERY}>
-        {({ data, error, loading }) => {
-          if (error) {
-            return null;
-          }
-
-          if (loading || !data) {
-            return <Loader />;
-          }
-
-          return (
-            <Table controls={<div>HI</div>}>
-              {data.documents.map(document => (
-                <TableRow key={`DOCUMENT_${document.id}`}>
-                  <code>{JSON.stringify(document, null, 2)}</code>
-                </TableRow>
-              ))}
-            </Table>
-          );
-        }}
-      </Query>
+      <Table controls={<div>HI</div>}>
+        {documents.map(document => (
+          <TableRow key={`DOCUMENT_${document.id}`}>
+            <code>{JSON.stringify(document, null, 2)}</code>
+          </TableRow>
+        ))}
+      </Table>
     </PageLayout>
   );
 }
