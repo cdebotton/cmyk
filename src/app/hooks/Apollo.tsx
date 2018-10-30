@@ -5,6 +5,7 @@ import ApolloClient, {
   FetchMoreOptions,
   FetchMoreQueryOptions,
   ObservableQuery,
+  OperationVariables,
 } from 'apollo-client';
 import { DocumentNode } from 'graphql';
 import React, {
@@ -37,7 +38,7 @@ export function useApolloClient() {
   return useContext(ApolloContext);
 }
 
-export function useApolloQuery<TData, TVariables = {}>(
+export function useApolloQuery<TData, TVariables = OperationVariables>(
   query: any,
   { variables }: { variables?: TVariables } = {},
 ): ApolloQueryResult<TData> {
@@ -47,10 +48,10 @@ export function useApolloQuery<TData, TVariables = {}>(
     throw new Error('No client, wrap app in ApolloProvider');
   }
 
-  const [result, setResult] = useState<ApolloCurrentResult<TData> | null>(null);
+  const [result, setResult] = useState<ApolloQueryResult<TData> | null>(null);
   const previousQuery = useRef<DocumentNode | null>(null);
   const previousVariables = useRef<TVariables | null>(null);
-  const observableQuery = useRef<ObservableQuery<TData, TVariables>>();
+  const observableQuery = useRef<ObservableQuery<TData> | null>(null);
 
   useEffect(
     () => {
@@ -71,11 +72,11 @@ export function useApolloQuery<TData, TVariables = {}>(
 
   const helpers = {
     fetchMore: <K extends keyof TVariables>(
-      opts: FetchMoreQueryOptions<TVariables, K> &
-        FetchMoreOptions<TData, TVariables>,
+      fetchMoreOptions: FetchMoreQueryOptions<TVariables, K> &
+        FetchMoreOptions<TData, TVariables | OperationVariables>,
     ) => {
       if (observableQuery.current) {
-        return observableQuery.current.fetchMore(opts);
+        return observableQuery.current.fetchMore(fetchMoreOptions);
       }
     },
   };
@@ -87,12 +88,16 @@ export function useApolloQuery<TData, TVariables = {}>(
     )
   ) {
     previousQuery.current = query;
-    previousVariables.current = variables;
-    const watchedQuery = client.watchQuery({ query, variables });
+    if (variables) {
+      previousVariables.current = variables;
+    }
+    const watchedQuery = client.watchQuery<TData, TVariables>({
+      query,
+      variables,
+    });
     observableQuery.current = watchedQuery;
-    const currentResult: ApolloCurrentResult<
-      TData
-    > = watchedQuery.currentResult();
+
+    const currentResult = watchedQuery.currentResult() as any;
     if (currentResult.partial) {
       throw watchedQuery.result();
     }
@@ -100,10 +105,14 @@ export function useApolloQuery<TData, TVariables = {}>(
     return { ...helpers, ...currentResult };
   }
 
+  if (!result || Object.keys(result).length === 0) {
+    throw new Error('No result');
+  }
+
   return { ...helpers, ...result };
 }
 
-export function useApolloMutation<TData, TVariables>(
+export function useApolloMutation<TData, TVariables = OperationVariables>(
   mutation: DocumentNode,
   baseOptions: Partial<MutationOptions<TData, Partial<TVariables>>> = {},
 ): MutationFn<TData, TVariables> {

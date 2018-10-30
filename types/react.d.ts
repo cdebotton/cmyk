@@ -1,4 +1,4 @@
-import { ComponentType, ReactNode, Context, RefObject } from 'react';
+import { ComponentType, ReactNode, Context } from 'react';
 
 declare module 'react' {
   export const Suspense: ComponentType<{
@@ -56,7 +56,7 @@ declare module 'react' {
 
   export function useMemo<T>(memoizer: () => T, watch: any[]): T;
 
-  export function useRef<T>(initial?: T): RefObject<T>;
+  export function useRef<T>(initial?: T): { current: T | null };
 
   type Loader<T> = Promise<{ default: ComponentType<T> }>;
 
