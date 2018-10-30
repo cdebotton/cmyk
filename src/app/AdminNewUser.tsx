@@ -3,7 +3,7 @@ import gql from 'graphql-tag';
 import { History } from 'history';
 import { rem } from 'polished';
 import React from 'react';
-import { Mutation, MutationFn } from 'react-apollo';
+import { MutationFn } from 'react-apollo';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
@@ -19,6 +19,7 @@ import Heading from './components/Heading';
 import Input from './components/Input';
 import PageLayout from './components/PageLayout';
 import Select from './components/Select';
+import { useApolloMutation } from './hooks/Apollo';
 
 interface Values {
   email: string;
@@ -31,55 +32,54 @@ interface Values {
 interface Props extends RouteComponentProps<{}> {}
 
 function AdminNewUser({ history }: Props) {
+  const mutate = useApolloMutation<
+    CreateUserMutation,
+    CreateUserMutationVariables
+  >(CREATE_USER_MUTATION);
   return (
     <PageLayout>
       <Heading>New user</Heading>
-      <Mutation<CreateUserMutation, CreateUserMutationVariables>
-        mutation={CREATE_USER_MUTATION}
+
+      <Formik<Values>
+        initialValues={{
+          email: '',
+          firstName: '',
+          lastName: '',
+          password: '',
+          role: Role.UNAUTHORIZED,
+        }}
+        onSubmit={onSubmit(mutate, history)}
+        validationSchema={validationSchema}
       >
-        {mutate => (
-          <Formik<Values>
-            initialValues={{
-              email: '',
-              firstName: '',
-              lastName: '',
-              password: '',
-              role: Role.UNAUTHORIZED,
-            }}
-            onSubmit={onSubmit(mutate, history)}
-            validationSchema={validationSchema}
-          >
-            {({ handleSubmit, isValid }) => (
-              <NewUserForm onSubmit={handleSubmit}>
-                <EmailField name="email" component={Input} label="Email" />
-                <Field name="firstName" component={Input} label="First name" />
-                <Field name="lastName" component={Input} label="Last name" />
-                <Field name="password" component={Input} label="Password" />
-                <Field
-                  name="repeatPassword"
-                  component={Input}
-                  label="Repeat password"
-                />
-                <Field
-                  name="role"
-                  component={Select}
-                  label="Role"
-                  options={[
-                    { label: 'Admin', value: 'ADMIN' },
-                    { label: 'Editor', value: 'EDITOR' },
-                    { label: 'User', value: 'USER' },
-                    { label: 'Unauthorized', value: 'UNAUTHORIZED' },
-                  ]}
-                />
-                <Button type="submit" disabled={!isValid} format="neutral">
-                  Create
-                </Button>
-                <Button type="reset">Cancel</Button>
-              </NewUserForm>
-            )}
-          </Formik>
+        {({ handleSubmit, isValid }) => (
+          <NewUserForm onSubmit={handleSubmit}>
+            <EmailField name="email" component={Input} label="Email" />
+            <Field name="firstName" component={Input} label="First name" />
+            <Field name="lastName" component={Input} label="Last name" />
+            <Field name="password" component={Input} label="Password" />
+            <Field
+              name="repeatPassword"
+              component={Input}
+              label="Repeat password"
+            />
+            <Field
+              name="role"
+              component={Select}
+              label="Role"
+              options={[
+                { label: 'Admin', value: 'ADMIN' },
+                { label: 'Editor', value: 'EDITOR' },
+                { label: 'User', value: 'USER' },
+                { label: 'Unauthorized', value: 'UNAUTHORIZED' },
+              ]}
+            />
+            <Button type="submit" disabled={!isValid} format="neutral">
+              Create
+            </Button>
+            <Button type="reset">Cancel</Button>
+          </NewUserForm>
         )}
-      </Mutation>
+      </Formik>
     </PageLayout>
   );
 }

@@ -1,7 +1,6 @@
 import gql from 'graphql-tag';
-import { padding, position, rem, size } from 'polished';
+import { position, rem, size } from 'polished';
 import React, { useContext, useEffect, useState } from 'react';
-import { MutationFn } from 'react-apollo';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
 import { animated, config, useSpring } from 'react-spring';
@@ -16,6 +15,7 @@ import Avatar from './components/Avatar';
 import ButtonLink from './components/ButtonLink';
 import Confirm from './components/Confirm';
 import InsetLayout from './components/InsetLayout';
+import List from './components/List';
 import PageHeading from './components/PageHeading';
 import Tooltip from './components/Tooltip';
 import PortalContext from './containers/PortalContext';
@@ -64,69 +64,6 @@ const DeleteIcon = styled(animated.span)`
   justify-content: center;
 `;
 
-function DeleteUserButton(props: {
-  user: Users_users;
-  setDeleteOn: () => void;
-  setDeleteOff: () => void;
-}) {
-  const { user, setDeleteOn, setDeleteOff } = props;
-  const { setPortalNode } = useContext(PortalContext);
-  const mutate = useApolloMutation<
-    DeleteUserMutation,
-    DeleteUserMutationVariables
-  >(DELETE_USER_MUTATION, {
-    variables: { where: { id: user.id } },
-
-    update: (cache, { data: mutationData }) => {
-      const cacheUsers = cache.readQuery<Users>({
-        query: USERS_QUERY,
-      });
-
-      if (!(cacheUsers && cacheUsers.users)) {
-        return;
-      }
-
-      cache.writeQuery({
-        data: {
-          users: cacheUsers.users.filter(u => {
-            if (!(mutationData && mutationData.deleteUser)) {
-              return true;
-            }
-
-            return u.id !== mutationData.deleteUser.id;
-          }),
-        },
-        query: USERS_QUERY,
-      });
-    },
-  });
-
-  return (
-    <DeleteIcon
-      onMouseEnter={setDeleteOn}
-      onMouseLeave={setDeleteOff}
-      onClick={event => {
-        event.preventDefault();
-        setPortalNode(
-          <Confirm
-            title="Are you sure you want to do this?"
-            message="You are about to permanently delete this user"
-            onConfirm={() => {
-              mutate();
-              setPortalNode(null);
-            }}
-            onCancel={() => setPortalNode(null)}
-          />,
-        );
-      }}
-    >
-      <Tooltip content={`Delete ${user.email}`}>
-        <AnimatedCross />
-      </Tooltip>
-    </DeleteIcon>
-  );
-}
-
 function getAvatar(profile: Users_users_profile) {
   if (profile.avatar) {
     return profile.avatar.url;
@@ -134,13 +71,6 @@ function getAvatar(profile: Users_users_profile) {
 
   return '';
 }
-
-const UserListItemContainer = styled(animated.li)`
-  border-radius: 5px;
-  ${padding(rem(8))};
-  perspective: 800px;
-  transform-style: preserve-3d;
-`;
 
 const UserLink = styled(Link)`
   text-decoration: none;
@@ -193,14 +123,26 @@ const DeleteFill = styled.svg`
   ${size('100%')};
 `;
 
-function UserListItem(props: {
+const UsersHeading = styled(PageHeading)`
+  grid-column: 2 / span 1;
+`;
+
+const NewUserLink = styled(ButtonLink)`
+  grid-column: 2 / span 1;
+  justify-self: start;
+`;
+
+function AdminUserItem({
+  user,
+  isCurrentUser,
+  baseUrl,
+}: {
   user: Users_users;
   isCurrentUser: boolean;
   baseUrl: string;
 }) {
   const [hoverList, setHoverList] = useState(false);
   const [hoverDelete, setHoverDelete] = useState(false);
-  const { baseUrl, user, isCurrentUser } = props;
 
   const itemStates = {
     blur: {
@@ -256,11 +198,41 @@ function UserListItem(props: {
   });
 
   const avatar = getAvatar(user.profile);
+  const { setPortalNode } = useContext(PortalContext);
+  const mutate = useApolloMutation<
+    DeleteUserMutation,
+    DeleteUserMutationVariables
+  >(DELETE_USER_MUTATION, {
+    variables: { where: { id: user.id } },
+
+    update: (cache, { data: mutationData }) => {
+      const cacheUsers = cache.readQuery<Users>({
+        query: USERS_QUERY,
+      });
+
+      if (!(cacheUsers && cacheUsers.users)) {
+        return;
+      }
+
+      cache.writeQuery({
+        data: {
+          users: cacheUsers.users.filter(u => {
+            if (!(mutationData && mutationData.deleteUser)) {
+              return true;
+            }
+
+            return u.id !== mutationData.deleteUser.id;
+          }),
+        },
+        query: USERS_QUERY,
+      });
+    },
+  });
+
   return (
-    <UserListItemContainer
+    <span
       onMouseEnter={() => setHoverList(true)}
       onMouseLeave={() => setHoverList(false)}
-      style={listStyles}
     >
       <DeleteFill preserveAspectRatio="none" viewBox="0 0 100 100">
         <animated.path fill={fill} d={d} />;
@@ -284,34 +256,33 @@ function UserListItem(props: {
         <DateInfo>{getFormattedDate(user.createdAt)}</DateInfo>
         {hoverList &&
           !isCurrentUser && (
-            <DeleteUserButton
-              user={user}
-              setDeleteOn={() => setHoverDelete(true)}
-              setDeleteOff={() => setHoverDelete(false)}
-            />
+            <DeleteIcon
+              onMouseEnter={() => setHoverDelete(true)}
+              onMouseLeave={() => setHoverDelete(false)}
+              onClick={event => {
+                event.preventDefault();
+                setPortalNode(
+                  <Confirm
+                    title="Are you sure you want to do this?"
+                    message="You are about to permanently delete this user"
+                    onConfirm={() => {
+                      mutate();
+                      setPortalNode(null);
+                    }}
+                    onCancel={() => setPortalNode(null)}
+                  />,
+                );
+              }}
+            >
+              <Tooltip content={`Delete ${user.email}`}>
+                <AnimatedCross />
+              </Tooltip>
+            </DeleteIcon>
           )}
       </UserLink>
-    </UserListItemContainer>
+    </span>
   );
 }
-
-const UsersHeading = styled(PageHeading)`
-  grid-column: 2 / span 1;
-`;
-
-const UserList = styled.ul`
-  grid-column: 2 / span 1;
-  display: grid;
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  grid-gap: ${rem(16)};
-`;
-
-const NewUserLink = styled(ButtonLink)`
-  grid-column: 2 / span 1;
-  justify-self: start;
-`;
 
 function AdminUsers(props: { className?: string } & RouteComponentProps<void>) {
   const { className, match } = props;
@@ -323,21 +294,20 @@ function AdminUsers(props: { className?: string } & RouteComponentProps<void>) {
     <InsetLayout className={className}>
       <UsersHeading>Users</UsersHeading>
       <NewUserLink to={`${match.url}/new`}>New user</NewUserLink>
-
-      <UserList>
-        {users.map(user => {
-          const isCurrentUser =
-            (session && session.user.id === user.id) || false;
-          return (
-            <UserListItem
-              key={user.id}
-              user={user}
-              baseUrl={match.url}
-              isCurrentUser={isCurrentUser}
-            />
-          );
-        })}
-      </UserList>
+      <List
+        items={users}
+        getItemKey={user => `USER_LIST_ITEM${user.id}`}
+        render={user => (
+          <AdminUserItem
+            key={`ADMIN_USER_ITEM_${user.id}`}
+            baseUrl={match.url}
+            isCurrentUser={
+              (session && session.user && session.user.id === user.id) || false
+            }
+            user={user}
+          />
+        )}
+      />
     </InsetLayout>
   );
 }

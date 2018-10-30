@@ -5,10 +5,12 @@ import { MutationFn } from 'react-apollo';
 import styled from 'styled-components';
 import { DeleteFile, DeleteFileVariables } from './__generated__/DeleteFile';
 import { Files } from './__generated__/Files';
+import AnimatedCross from './components/AnimatedCross';
 import Button from './components/Button';
 import Heading from './components/Heading';
-import PageLayout from './components/PageLayout';
-import { Table, TableRow } from './components/Table';
+import InsetLayout from './components/InsetLayout';
+import List from './components/List';
+import Tooltip from './components/Tooltip';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
 
 function AdminFiles() {
@@ -20,24 +22,32 @@ function AdminFiles() {
     DELETE_FILE_MUTATION,
   );
 
+  const FilesHeading = styled(Heading)`
+    grid-column: 2 / span 1;
+  `;
+
   return (
     <AdminFilesLayout>
-      <Heading>Files</Heading>
-      <Table>
-        {files.map(file => {
+      <FilesHeading>Files</FilesHeading>
+      <List
+        items={files}
+        getItemKey={file => `ADMIN_FILES_ITEM_${file.id}`}
+        render={file => {
           const isImage = file.mimetype.split('/')[0] === 'image';
           return (
             <FileRow key={`FILE_${file.id}`}>
               {isImage && <img style={{ width: 128 }} src={file.url} />}
               <span>{file.id}</span>
               <span>{file.mimetype}</span>
-              <Button onClick={() => deleteFile(deleteFileMutation, file.id)}>
-                X
-              </Button>
+              <Tooltip content={`Delete ${file.mimetype.split('/')[0]}`}>
+                <AnimatedCross
+                  onClick={() => deleteFile(deleteFileMutation, file.id)}
+                />
+              </Tooltip>
             </FileRow>
           );
-        })}
-      </Table>
+        }}
+      />
     </AdminFilesLayout>
   );
 }
@@ -92,9 +102,9 @@ function deleteFile(
   });
 }
 
-const AdminFilesLayout = styled(PageLayout)``;
+const AdminFilesLayout = styled(InsetLayout)``;
 
-const FileRow = styled(TableRow)`
+const FileRow = styled.span`
   display: grid;
   grid-gap: ${rem(16)};
   grid-template-columns: ${rem(128)} 2fr 1fr ${rem(64)};

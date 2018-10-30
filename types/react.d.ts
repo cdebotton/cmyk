@@ -37,6 +37,7 @@ declare module 'react' {
   export function useReducer<T, U extends { type: string }>(
     reducer: ReducerFn<T, U>,
     initialState: T,
+    initialAction?: U,
   ): [T, Dispatch<U>];
 
   export function useEffect(

@@ -1,86 +1,59 @@
-import { ChangeEvent, FormEvent, useReducer } from 'react';
+import { ChangeEvent, useMutationEffect, useState } from 'react';
+import { Schema } from 'yup';
 
-interface Change<T> {
-  type: 'CHANGE';
-  payload: T;
+interface HookOptions<T> {
+  initialValue: T;
+  validate?: Schema<T>;
+  validateOnBlur?: boolean;
+  validateOnChange?: boolean;
 }
 
-interface Focus {
-  type: 'FOCUS';
-}
+function useFormInput<T>({
+  initialValue,
+  validate,
+  validateOnBlur = true,
+  validateOnChange = true,
+}: HookOptions<T>) {
+  const [value, setValue] = useState<T>(initialValue);
+  const [error, setError] = useState<string[] | null>(null);
+  const [touched, setTouched] = useState(false);
+  const [dirty, setDirty] = useState(false);
 
-interface Blur {
-  type: 'BLUR';
-}
+  function onChange(event: ChangeEvent<{ value: T }>) {
+    setValue(event.currentTarget.value);
+  }
 
-type Action<T> = Change<T> | Focus | Blur;
+  function onBlur() {
+    setTouched(true);
+    setDirty(true);
 
-interface State<T> {
-  dirty: boolean;
-  error: string | null;
-  focused: boolean;
-  touched: boolean;
-  value: T;
-}
-
-function useFormInput<T>(
-  initialValue: T,
-  validate: (value: T) => string | null = () => null,
-) {
-  function reducer(state: State<T>, action: Action<T>) {
-    switch (action.type) {
-      case 'CHANGE':
-        return {
-          ...state,
-          dirty: true,
-          error: validate(action.payload),
-          value: action.payload,
-        };
-      case 'FOCUS':
-        return {
-          ...state,
-          focused: true,
-        };
-      case 'BLUR':
-        return {
-          ...state,
-          focused: false,
-          touched: true,
-        };
-      default:
-        return state;
+    if (validateOnBlur && validate) {
+      validate
+        .validate(value)
+        .then(() => setError(null))
+        .catch(({ errors }) => setError(errors));
     }
   }
 
-  const [{ dirty, error, touched, focused, value }, dispatch] = useReducer(
-    reducer,
-    {
-      dirty: false,
-      error: null,
-      focused: false,
-      touched: false,
-      value: initialValue,
+  useMutationEffect(
+    () => {
+      if (validateOnChange && validate) {
+        validate
+          .validate(value)
+          .then(() => setError(null))
+          .catch(({ errors }) => setError(errors));
+      }
     },
+    [value],
   );
 
   return {
+    dirty,
+    error,
+    onBlur,
+    onChange,
+    touched,
     value,
-    onChange(event: ChangeEvent<{ value: T }>) {
-      dispatch({
-        payload: event.currentTarget.value,
-        type: 'CHANGE',
-      });
-    },
-    onFocus(_event: FormEvent<HTMLElement>) {
-      dispatch({
-        type: 'FOCUS',
-      });
-    },
-    onBlur(_event: FormEvent<HTMLElement>) {
-      dispatch({
-        type: 'BLUR',
-      });
-    },
   };
 }
 

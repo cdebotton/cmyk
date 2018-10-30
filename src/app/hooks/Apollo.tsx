@@ -1,6 +1,5 @@
 import { NormalizedCacheObject } from 'apollo-cache-inmemory';
 import ApolloClient, {
-  ApolloCurrentResult,
   ApolloQueryResult,
   FetchMoreOptions,
   FetchMoreQueryOptions,

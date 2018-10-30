@@ -1,7 +1,6 @@
-import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
 import { padding, rem } from 'polished';
-import React from 'react';
+import React, { useMemo } from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
@@ -9,30 +8,23 @@ import { Login as LoginMutation, LoginVariables } from './__generated__/Login';
 import { Session } from './__generated__/Session';
 import Button from './components/Button';
 import Heading from './components/Heading';
-import Input from './components/Input';
+import SimpleInput from './components/SimpleInput';
 import {
   useApolloClient,
   useApolloMutation,
   useApolloQuery,
 } from './hooks/Apollo';
+import useFormInput from './hooks/useFormInput';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
 
-const validationSchema = yup.object().shape({
-  email: yup
-    .string()
-    .email()
-    .required(),
-  password: yup.string().required(),
-});
-
-const LOGIN_MUTATION = gql`
+const loginMutation = gql`
   mutation Login($data: LoginInput!) {
     login(data: $data)
   }
 `;
 
-const SESSION_QUERY = gql`
+const sessionQuery = gql`
   query Session {
     session {
       iat
@@ -44,13 +36,27 @@ interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
 
-interface Values {
-  email: string;
-  password: string;
-}
-
 function Login({ className, location }: Props) {
   const client = useApolloClient();
+  const email = useFormInput({
+    initialValue: '',
+    validate: yup
+      .string()
+      .email()
+      .required(),
+  });
+
+  const password = useFormInput({
+    initialValue: '',
+    validate: yup.string().required(),
+  });
+
+  const isValid = useMemo(
+    () => {
+      return email.error === null && password.error === null;
+    },
+    [email.error, password.error],
+  );
 
   if (!client) {
     throw new Error(
@@ -60,10 +66,24 @@ function Login({ className, location }: Props) {
 
   const {
     data: { session },
-  } = useApolloQuery<Session>(SESSION_QUERY);
+  } = useApolloQuery<Session>(sessionQuery);
 
   const mutate = useApolloMutation<LoginMutation, LoginVariables>(
-    LOGIN_MUTATION,
+    loginMutation,
+    {
+      update: (proxy, { data: result }) => {
+        if (result && result.login) {
+          localStorage.setItem('jwt', result.login);
+          client.resetStore();
+        }
+      },
+      variables: {
+        data: {
+          email: email.value,
+          password: password.value,
+        },
+      },
+    },
   );
 
   if (session) {
@@ -78,50 +98,24 @@ function Login({ className, location }: Props) {
   return (
     <LoginContainer className={className}>
       <GlobalStyles />
-
-      <Formik<Values>
-        initialValues={{ email: '', password: '' }}
-        validationSchema={validationSchema}
-        onSubmit={values => {
-          mutate({
-            update: (proxy, { data: result }) => {
-              if (result && result.login) {
-                localStorage.setItem('jwt', result.login);
-                client.resetStore();
-              }
-            },
-            variables: {
-              data: values,
-            },
-          });
+      <Form
+        onSubmit={event => {
+          event.preventDefault();
+          mutate();
         }}
       >
-        {({ handleSubmit, isValid }) => (
-          <Form onSubmit={handleSubmit}>
-            <LoginHeading level={1}>Login</LoginHeading>
-            <Field
-              name="email"
-              render={({ field, form }: FieldProps<Values>) => (
-                <EmailInput form={form} field={field} label="Email" />
-              )}
-            />
-            <Field
-              name="password"
-              render={({ field, form }: FieldProps<Values>) => (
-                <PasswordInput
-                  field={field}
-                  form={form}
-                  type="password"
-                  label="Password"
-                />
-              )}
-            />
-            <LoginButton type="submit" disabled={!isValid}>
-              Go
-            </LoginButton>
-          </Form>
-        )}
-      </Formik>
+        <LoginHeading level={1}>Login</LoginHeading>
+        <EmailInput name="email" label="Email" {...email} />
+        <PasswordInput
+          type="password"
+          name="password"
+          label="Password"
+          {...password}
+        />
+        <LoginButton type="submit" disabled={!isValid}>
+          Go
+        </LoginButton>
+      </Form>
     </LoginContainer>
   );
 }
@@ -150,9 +144,9 @@ const LoginHeading = styled(Heading)`
   grid-column: 1 / span 2;
 `;
 
-const EmailInput = styled(Input)``;
+const EmailInput = styled(SimpleInput)``;
 
-const PasswordInput = styled(Input)``;
+const PasswordInput = styled(SimpleInput)``;
 
 const LoginButton = styled(Button)`
   grid-column: 2 / span 1;
