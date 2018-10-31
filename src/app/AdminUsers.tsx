@@ -14,7 +14,7 @@ import AnimatedCross from './components/AnimatedCross';
 import Avatar from './components/Avatar';
 import ButtonLink from './components/ButtonLink';
 import Confirm from './components/Confirm';
-import InsetLayout from './components/InsetLayout';
+import Layout from './components/Layout';
 import List from './components/List';
 import PageHeading from './components/PageHeading';
 import Tooltip from './components/Tooltip';
@@ -123,46 +123,7 @@ const DeleteFill = styled.svg`
   ${size('100%')};
 `;
 
-const UsersHeading = styled(PageHeading)`
-  grid-column: 2 / span 1;
-`;
-
-const NewUserLink = styled(ButtonLink)`
-  grid-column: 2 / span 1;
-  justify-self: start;
-`;
-
-function AdminUserItem({
-  user,
-  isCurrentUser,
-  baseUrl,
-}: {
-  user: Users_users;
-  isCurrentUser: boolean;
-  baseUrl: string;
-}) {
-  const [hoverList, setHoverList] = useState(false);
-  const [hoverDelete, setHoverDelete] = useState(false);
-
-  const itemStates = {
-    blur: {
-      backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
-      boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
-      config: config.default,
-      transform: 'translate3d(0, 0, 0px)',
-    },
-    focus: {
-      backgroundColor: 'hsla(0, 0%, 100%, 0.225)',
-      boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
-      transform: 'translate3d(0, 0, 20px)',
-    },
-  };
-
-  const [listStyles, setListStyles] = useSpring({
-    ...itemStates.blur,
-    config: config.default,
-  });
-
+function AnimatedDeleteBar(props: { on: boolean }) {
   const deleteStates = {
     blur: {
       d: 'M100,0 L100,100, L100,100, L100,0 Z',
@@ -183,19 +144,60 @@ function AdminUserItem({
     ...deleteStates.disabled,
   });
 
-  useEffect(() => {
-    if (hoverList) {
-      setListStyles(itemStates.focus);
-    } else {
-      setListStyles(itemStates.blur);
-    }
+  useEffect(
+    () => {
+      if (props.on) {
+        setDeleteStyles(deleteStates.focus);
+      } else {
+        setDeleteStyles(deleteStates.blur);
+      }
+    },
+    [props.on],
+  );
 
-    if (hoverDelete) {
-      setDeleteStyles(deleteStates.focus);
-    } else {
-      setDeleteStyles(deleteStates.blur);
-    }
+  return <animated.path fill={fill} d={d} />;
+}
+
+function AdminUserItem({
+  user,
+  isCurrentUser,
+  baseUrl,
+}: {
+  user: Users_users;
+  isCurrentUser: boolean;
+  baseUrl: string;
+}) {
+  const [hoverList, setHoverList] = useState(false);
+  const [hoverDelete, setHoverDelete] = useState(false);
+  const itemStates = {
+    blur: {
+      backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
+      boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
+      config: config.default,
+      transform: 'translate3d(0, 0, 0px)',
+    },
+    focus: {
+      backgroundColor: 'hsla(0, 0%, 100%, 0.225)',
+      boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
+      transform: 'translate3d(0, 0, 20px)',
+    },
+  };
+
+  const [listStyles, setListStyles] = useSpring({
+    ...itemStates.blur,
+    config: config.default,
   });
+
+  useEffect(
+    () => {
+      if (hoverList) {
+        setListStyles(itemStates.focus);
+      } else {
+        setListStyles(itemStates.blur);
+      }
+    },
+    [hoverList],
+  );
 
   const avatar = getAvatar(user.profile);
   const { setPortalNode } = useContext(PortalContext);
@@ -235,7 +237,7 @@ function AdminUserItem({
       onMouseLeave={() => setHoverList(false)}
     >
       <DeleteFill preserveAspectRatio="none" viewBox="0 0 100 100">
-        <animated.path fill={fill} d={d} />;
+        <AnimatedDeleteBar on={hoverDelete} />
       </DeleteFill>
       <UserLink to={`${baseUrl}/${user.id}`}>
         <UserAvatar
@@ -284,14 +286,34 @@ function AdminUserItem({
   );
 }
 
-function AdminUsers(props: { className?: string } & RouteComponentProps<void>) {
-  const { className, match } = props;
+const gutter = `minmax(${rem(16)}, auto)`;
+
+const UserLayout = styled(Layout)`
+  grid-gap: ${rem(16)};
+  grid-template-columns: ${gutter} minmax(auto, ${rem(1680)}) ${gutter};
+  align-content: start;
+`;
+
+const UsersHeading = styled(PageHeading)`
+  grid-column: 2 / span 1;
+`;
+
+const NewUserLink = styled(ButtonLink)`
+  grid-column: 2 / span 1;
+  justify-self: start;
+`;
+
+interface Props extends RouteComponentProps<{}> {
+  className?: string;
+}
+
+function AdminUsers({ className, match }: Props) {
   const {
     data: { users, session },
   } = useApolloQuery<Users>(USERS_QUERY);
 
   return (
-    <InsetLayout className={className}>
+    <UserLayout className={className}>
       <UsersHeading>Users</UsersHeading>
       <NewUserLink to={`${match.url}/new`}>New user</NewUserLink>
       <List
@@ -308,7 +330,7 @@ function AdminUsers(props: { className?: string } & RouteComponentProps<void>) {
           />
         )}
       />
-    </InsetLayout>
+    </UserLayout>
   );
 }
 

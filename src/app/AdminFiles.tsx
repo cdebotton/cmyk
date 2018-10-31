@@ -6,9 +6,8 @@ import styled from 'styled-components';
 import { DeleteFile, DeleteFileVariables } from './__generated__/DeleteFile';
 import { Files } from './__generated__/Files';
 import AnimatedCross from './components/AnimatedCross';
-import Button from './components/Button';
 import Heading from './components/Heading';
-import InsetLayout from './components/InsetLayout';
+import Layout from './components/Layout';
 import List from './components/List';
 import Tooltip from './components/Tooltip';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
@@ -102,7 +101,7 @@ function deleteFile(
   });
 }
 
-const AdminFilesLayout = styled(InsetLayout)``;
+const AdminFilesLayout = styled(Layout)``;
 
 const FileRow = styled.span`
   display: grid;

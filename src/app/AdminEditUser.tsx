@@ -22,7 +22,7 @@ import {
 import Button from './components/Button';
 import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
-import InsetLayout from './components/InsetLayout';
+import Layout from './components/Layout';
 import PageHeading from './components/PageHeading';
 import Select from './components/Select';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
@@ -115,7 +115,7 @@ function AdminEditUser({ className, ...props }: Props) {
   }
 
   return (
-    <InsetLayout className={className}>
+    <Layout className={className}>
       <EditUserHeading>Edit User {user.email}</EditUserHeading>
 
       <Formik<Values>
@@ -188,7 +188,7 @@ function AdminEditUser({ className, ...props }: Props) {
           </UserForm>
         )}
       </Formik>
-    </InsetLayout>
+    </Layout>
   );
 }
 
