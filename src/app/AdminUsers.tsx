@@ -9,17 +9,19 @@ import {
   DeleteUserMutation,
   DeleteUserMutationVariables,
 } from './__generated__/DeleteUserMutation';
-import { Users, Users_users, Users_users_profile } from './__generated__/Users';
+import { Users, Users_users } from './__generated__/Users';
 import AnimatedCross from './components/AnimatedCross';
 import Avatar from './components/Avatar';
 import ButtonLink from './components/ButtonLink';
 import Confirm from './components/Confirm';
 import Layout from './components/Layout';
-import List from './components/List';
+import List, { Item } from './components/List';
 import PageHeading from './components/PageHeading';
 import Tooltip from './components/Tooltip';
 import PortalContext from './containers/PortalContext';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
+import useFillToLeft from './hooks/useFillToLeft';
+import useZoomAnimation from './hooks/useZoomAnimation';
 import { getFormattedDate, getTimeAgo } from './utils/date';
 
 export const USERS_QUERY = gql`
@@ -64,14 +66,6 @@ const DeleteIcon = styled(animated.span)`
   justify-content: center;
 `;
 
-function getAvatar(profile: Users_users_profile) {
-  if (profile.avatar) {
-    return profile.avatar.url;
-  }
-
-  return '';
-}
-
 const UserLink = styled(Link)`
   text-decoration: none;
   color: inherit;
@@ -90,9 +84,9 @@ const UserName = styled.span`
   align-self: end;
 `;
 
-const UserEmail = styled.span`
+const Label = styled.span<{ isTitle?: boolean }>`
   font-size: ${rem(14)};
-  align-self: start;
+  align-self: ${({ isTitle = false }) => (isTitle ? 'end' : 'start')};
   opacity: 0.4;
 `;
 
@@ -102,13 +96,7 @@ const UserAvatar = styled(Avatar)`
   border-radius: 9px;
 `;
 
-const Label = styled.span`
-  font-size: ${rem(12)};
-  opacity: 0.4;
-  align-self: end;
-`;
-
-const DateInfo = styled.span`
+const Info = styled.span`
   align-self: start;
   font-size: ${rem(20)};
   font-weight: 300;
@@ -124,41 +112,14 @@ const DeleteFill = styled.svg`
 `;
 
 function AnimatedDeleteBar(props: { on: boolean }) {
-  const deleteStates = {
-    blur: {
-      d: 'M100,0 L100,100, L100,100, L100,0 Z',
-      fill: 'hsla(212, 50%, 50%, 0)',
-    },
-    disabled: {
-      d: 'M100,0 L100,100, L100,100, L100,0 Z',
-      fill: 'hsla(212, 50%, 50%, 0)',
-    },
-    focus: {
-      d: 'M100,0 M100,100, 20,100, 22,0 Z',
-      fill: 'hsla(5, 50%, 50%, 0.5)',
-    },
-  };
-
-  const [{ d, fill }, setDeleteStyles] = useSpring({
-    config: config.default,
-    ...deleteStates.disabled,
+  const { fill, d } = useFillToLeft(props.on, {
+    color: 'hsla(5, 50%, 50%, 0.5)',
   });
-
-  useEffect(
-    () => {
-      if (props.on) {
-        setDeleteStyles(deleteStates.focus);
-      } else {
-        setDeleteStyles(deleteStates.blur);
-      }
-    },
-    [props.on],
-  );
 
   return <animated.path fill={fill} d={d} />;
 }
 
-function AdminUserItem({
+function User({
   user,
   isCurrentUser,
   baseUrl,
@@ -167,39 +128,11 @@ function AdminUserItem({
   isCurrentUser: boolean;
   baseUrl: string;
 }) {
-  const [hoverList, setHoverList] = useState(false);
-  const [hoverDelete, setHoverDelete] = useState(false);
-  const itemStates = {
-    blur: {
-      backgroundColor: 'hsla(0, 0%, 100%, 0.1)',
-      boxShadow: '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
-      config: config.default,
-      transform: 'translate3d(0, 0, 0px)',
-    },
-    focus: {
-      backgroundColor: 'hsla(0, 0%, 100%, 0.225)',
-      boxShadow: '0px 10px 40px hsla(0, 0%, 0%, 0.4)',
-      transform: 'translate3d(0, 0, 20px)',
-    },
-  };
+  const [isHoveringList, setIsHoveringList] = useState(false);
+  const [isHoveringDelete, setIsHoveringDelete] = useState(false);
+  const zoom = useZoomAnimation(isHoveringList);
 
-  const [listStyles, setListStyles] = useSpring({
-    ...itemStates.blur,
-    config: config.default,
-  });
-
-  useEffect(
-    () => {
-      if (hoverList) {
-        setListStyles(itemStates.focus);
-      } else {
-        setListStyles(itemStates.blur);
-      }
-    },
-    [hoverList],
-  );
-
-  const avatar = getAvatar(user.profile);
+  const avatar = user.profile.avatar ? user.profile.avatar.url : '';
   const { setPortalNode } = useContext(PortalContext);
   const mutate = useApolloMutation<
     DeleteUserMutation,
@@ -232,18 +165,19 @@ function AdminUserItem({
   });
 
   return (
-    <span
-      onMouseEnter={() => setHoverList(true)}
-      onMouseLeave={() => setHoverList(false)}
+    <Item
+      onMouseEnter={() => setIsHoveringList(true)}
+      onMouseLeave={() => setIsHoveringList(false)}
+      style={zoom}
     >
       <DeleteFill preserveAspectRatio="none" viewBox="0 0 100 100">
-        <AnimatedDeleteBar on={hoverDelete} />
+        <AnimatedDeleteBar on={isHoveringDelete} />
       </DeleteFill>
       <UserLink to={`${baseUrl}/${user.id}`}>
         <UserAvatar
           style={{
-            boxShadow: listStyles.boxShadow,
-            transform: listStyles.transform,
+            boxShadow: zoom.boxShadow,
+            transform: zoom.transform,
           }}
           src={avatar}
           size={96}
@@ -251,16 +185,16 @@ function AdminUserItem({
         <UserName>
           {user.profile.firstName} {user.profile.lastName}
         </UserName>
-        <UserEmail>{user.email}</UserEmail>
-        <Label>Last login</Label>
-        <DateInfo>{getTimeAgo(user.lastLogin)}</DateInfo>
-        <Label>Created</Label>
-        <DateInfo>{getFormattedDate(user.createdAt)}</DateInfo>
-        {hoverList &&
+        <Label>{user.email}</Label>
+        <Label isTitle>Last login</Label>
+        <Info>{getTimeAgo(user.lastLogin)}</Info>
+        <Label isTitle>Created</Label>
+        <Info>{getFormattedDate(user.createdAt)}</Info>
+        {isHoveringList &&
           !isCurrentUser && (
             <DeleteIcon
-              onMouseEnter={() => setHoverDelete(true)}
-              onMouseLeave={() => setHoverDelete(false)}
+              onMouseEnter={() => setIsHoveringDelete(true)}
+              onMouseLeave={() => setIsHoveringDelete(false)}
               onClick={event => {
                 event.preventDefault();
                 setPortalNode(
@@ -282,7 +216,7 @@ function AdminUserItem({
             </DeleteIcon>
           )}
       </UserLink>
-    </span>
+    </Item>
   );
 }
 
@@ -316,20 +250,20 @@ function AdminUsers({ className, match }: Props) {
     <UserLayout className={className}>
       <UsersHeading>Users</UsersHeading>
       <NewUserLink to={`${match.url}/new`}>New user</NewUserLink>
-      <List
-        items={users}
-        getItemKey={user => `USER_LIST_ITEM${user.id}`}
-        render={user => (
-          <AdminUserItem
-            key={`ADMIN_USER_ITEM_${user.id}`}
-            baseUrl={match.url}
-            isCurrentUser={
-              (session && session.user && session.user.id === user.id) || false
-            }
-            user={user}
-          />
-        )}
-      />
+      <List>
+        {users.map(user => {
+          const isCurrentUser =
+            session && session.user.id === user.id ? true : false;
+          return (
+            <User
+              key={`USER_${user.id}`}
+              user={user}
+              baseUrl={match.url}
+              isCurrentUser={isCurrentUser}
+            />
+          );
+        })}
+      </List>
     </UserLayout>
   );
 }
