@@ -1,9 +1,9 @@
 import gql from 'graphql-tag';
 import { position, rem, size } from 'polished';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { RouteComponentProps } from 'react-router';
 import { Link } from 'react-router-dom';
-import { animated, config, useSpring } from 'react-spring';
+import { animated } from 'react-spring';
 import styled from 'styled-components';
 import {
   DeleteUserMutation,
@@ -138,8 +138,6 @@ function User({
     DeleteUserMutation,
     DeleteUserMutationVariables
   >(DELETE_USER_MUTATION, {
-    variables: { where: { id: user.id } },
-
     update: (cache, { data: mutationData }) => {
       const cacheUsers = cache.readQuery<Users>({
         query: USERS_QUERY,
@@ -162,6 +160,7 @@ function User({
         query: USERS_QUERY,
       });
     },
+    variables: { where: { id: user.id } },
   });
 
   return (

@@ -1,4 +1,3 @@
-import { useEffect } from 'react';
 import { config, useSpring } from 'react-spring';
 
 interface Options {
@@ -6,38 +5,25 @@ interface Options {
 }
 
 function useFillToLeft(on: boolean, options: Options) {
-  const deleteStates = {
-    blur: {
-      d: 'M100,0 L100,100, L100,100, L100,0 Z',
-      fill: 'hsla(212, 50%, 50%, 0)',
-    },
-    disabled: {
-      d: 'M100,0 L100,100, L100,100, L100,0 Z',
-      fill: 'hsla(212, 50%, 50%, 0)',
-    },
-    focus: {
-      d: 'M100,0 M100,100, 20,100, 22,0 Z',
-      fill: options.color,
-    },
-  };
-
-  const [spring, setSpring] = useSpring({
+  const value = on ? 1 : 0;
+  const [spring] = useSpring({
+    value,
     config: config.default,
-    ...deleteStates.disabled,
   });
 
-  useEffect(
-    () => {
-      if (on) {
-        setSpring(deleteStates.focus);
-      } else {
-        setSpring(deleteStates.blur);
-      }
-    },
-    [on],
-  );
-
-  return spring;
+  return {
+    d: spring.value.interpolate({
+      output: [
+        'M100,0 L100,100, L100,100, L100,0 Z',
+        'M100,0 M100,100, 20,100, 22,0 Z',
+      ],
+      range: [0, 1],
+    }),
+    fill: spring.value.interpolate({
+      output: ['hsla(212, 50%, 50%, 0)', options.color],
+      range: [0, 1],
+    }),
+  };
 }
 
 export default useFillToLeft;
