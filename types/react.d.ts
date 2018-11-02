@@ -55,6 +55,8 @@ declare module 'react' {
     cDU?: any[],
   ): void;
 
+  export function useCallback(fn: VoidFunction, cDU?: any[]): void;
+
   export function useMemo<T>(memoizer: () => T, watch: any[]): T;
 
   export function useRef<T>(initial?: T): { current: T | null };
