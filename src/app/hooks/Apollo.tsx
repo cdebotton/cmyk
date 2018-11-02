@@ -5,6 +5,7 @@ import ApolloClient, {
   FetchMoreQueryOptions,
   ObservableQuery,
   OperationVariables,
+  QueryOptions,
 } from 'apollo-client';
 import { DocumentNode } from 'graphql';
 import React, {
@@ -39,7 +40,13 @@ export function useApolloClient() {
 
 export function useApolloQuery<TData, TVariables = OperationVariables>(
   query: any,
-  { variables }: { variables?: TVariables } = {},
+  {
+    variables,
+    ...restOptions
+  }: Pick<
+    QueryOptions<TVariables>,
+    Exclude<keyof QueryOptions<TVariables>, 'query'>
+  > = {},
 ): ApolloQueryResult<TData> {
   const client = useApolloClient();
 
@@ -66,7 +73,7 @@ export function useApolloQuery<TData, TVariables = OperationVariables>(
         subscripton.unsubscribe();
       };
     },
-    [query, objToKey(variables || {})],
+    [query, objToKey(variables), objToKey(restOptions)],
   );
 
   const helpers = {
@@ -92,6 +99,7 @@ export function useApolloQuery<TData, TVariables = OperationVariables>(
     const watchedQuery = client.watchQuery<TData, TVariables>({
       query,
       variables,
+      ...restOptions,
     });
     observableQuery.current = watchedQuery;
 
@@ -124,7 +132,10 @@ export function useApolloMutation<TData, TVariables = OperationVariables>(
     client.mutate({ mutation, ...baseOptions, ...localOptions });
 }
 
-function objToKey<T extends any>(obj: T): string {
+function objToKey<T extends any>(obj?: T): string | null {
+  if (!obj) {
+    return null;
+  }
   const keys = Object.keys(obj);
   keys.sort();
   const sortedObj = keys.reduce<Partial<T>>((result, key) => {
