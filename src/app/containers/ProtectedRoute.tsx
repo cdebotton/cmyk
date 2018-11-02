@@ -7,18 +7,21 @@ import {
   RouteComponentProps,
   RouteProps,
 } from 'react-router-dom';
-import { Session, Session_session } from '../__generated__/Session';
 import { useApolloQuery } from '../hooks/Apollo';
+import {
+  ProtectedSession,
+  ProtectedSession_session,
+} from './__generated__/ProtectedSession';
 
 interface Props extends RouteProps {
-  canAccess: (session: Session_session | null) => boolean;
+  canAccess: (session: ProtectedSession_session | null) => boolean;
   children?: ((
     props: RouteComponentProps<any, StaticContext, any>,
   ) => ReactNode);
 }
 
 const query = gql`
-  query Session {
+  query ProtectedSession {
     session {
       iat
       user {
@@ -37,7 +40,7 @@ function ProtectedRoute({
 }: Props) {
   const {
     data: { session },
-  } = useApolloQuery<Session>(query);
+  } = useApolloQuery<ProtectedSession>(query);
 
   return (
     <Route

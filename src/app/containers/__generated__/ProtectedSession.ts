@@ -2,21 +2,20 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: Session_Session
+// GraphQL query operation: ProtectedSession
 // ====================================================
 
-export interface Session_Session_session_user {
+export interface ProtectedSession_session_user {
   __typename: "User";
   id: string;
-  email: string;
 }
 
-export interface Session_Session_session {
+export interface ProtectedSession_session {
   __typename: "Session";
   iat: number;
-  user: Session_Session_session_user;
+  user: ProtectedSession_session_user;
 }
 
-export interface Session_Session {
-  session: Session_Session_session | null;
+export interface ProtectedSession {
+  session: ProtectedSession_session | null;
 }

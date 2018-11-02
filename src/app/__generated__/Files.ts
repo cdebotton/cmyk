@@ -12,6 +12,7 @@ export interface Files_files {
   key: string;
   bucket: string;
   url: string;
+  createdAt: any;
 }
 
 export interface Files {

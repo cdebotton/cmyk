@@ -1,57 +1,17 @@
 import gql from 'graphql-tag';
 import { rem } from 'polished';
-import React from 'react';
-import { MutationFn } from 'react-apollo';
+import React, { useContext } from 'react';
+import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import { DeleteFile, DeleteFileVariables } from './__generated__/DeleteFile';
 import { Files } from './__generated__/Files';
-import AnimatedCross from './components/AnimatedCross';
-import Heading from './components/Heading';
+import Confirm from './components/Confirm';
 import Layout from './components/Layout';
-import List from './components/List';
-import Tooltip from './components/Tooltip';
+import List, { Item } from './components/List';
+import PageHeading from './components/PageHeading';
+import PortalContext from './containers/PortalContext';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
-
-function AdminFiles() {
-  const {
-    data: { files },
-  } = useApolloQuery<Files>(FILES_QUERY);
-
-  const deleteFileMutation = useApolloMutation<DeleteFile, DeleteFileVariables>(
-    DELETE_FILE_MUTATION,
-  );
-
-  const FilesHeading = styled(Heading)`
-    grid-column: 2 / span 1;
-  `;
-
-  return (
-    <AdminFilesLayout>
-      <FilesHeading>Files</FilesHeading>
-      <List
-        items={files}
-        getItemKey={file => `ADMIN_FILES_ITEM_${file.id}`}
-        render={file => {
-          const isImage = file.mimetype.split('/')[0] === 'image';
-          return (
-            <FileRow key={`FILE_${file.id}`}>
-              {isImage && <img style={{ width: 128 }} src={file.url} />}
-              <span>{file.id}</span>
-              <span>{file.mimetype}</span>
-              <Tooltip content={`Delete ${file.mimetype.split('/')[0]}`}>
-                <AnimatedCross
-                  onClick={() => deleteFile(deleteFileMutation, file.id)}
-                />
-              </Tooltip>
-            </FileRow>
-          );
-        }}
-      />
-    </AdminFilesLayout>
-  );
-}
-
-export default AdminFiles;
+import { getTimeAgo } from './utils/date';
 
 const FILES_QUERY = gql`
   query Files {
@@ -61,6 +21,7 @@ const FILES_QUERY = gql`
       key
       bucket
       url
+      createdAt
     }
   }
 `;
@@ -73,39 +34,90 @@ const DELETE_FILE_MUTATION = gql`
   }
 `;
 
-function deleteFile(
-  mutate: MutationFn<DeleteFile, DeleteFileVariables>,
-  id: string,
-) {
-  return mutate({
-    update: (cache, { data }) => {
-      const filesCache = cache.readQuery<Files>({ query: FILES_QUERY });
+interface Props extends RouteComponentProps<{}> {}
 
-      if (!(filesCache && filesCache.files)) {
-        return;
-      }
+function AdminFiles({ match }: Props) {
+  const {
+    data: { files },
+  } = useApolloQuery<Files>(FILES_QUERY);
 
-      cache.writeQuery({
-        data: {
-          files: filesCache.files.filter(file => {
-            if (!(data && data.deleteFile)) {
-              return true;
-            }
-            return file.id !== data.deleteFile.id;
-          }),
-        },
-        query: FILES_QUERY,
-      });
-    },
-    variables: { where: { id } },
-  });
+  const { setPortalNode } = useContext(PortalContext);
+
+  const mutate = useApolloMutation<DeleteFile, DeleteFileVariables>(
+    DELETE_FILE_MUTATION,
+  );
+
+  function deleteFile(id: string) {
+    return mutate({
+      update: (cache, { data }) => {
+        const filesCache = cache.readQuery<Files>({ query: FILES_QUERY });
+
+        if (!(filesCache && filesCache.files)) {
+          return;
+        }
+
+        cache.writeQuery({
+          data: {
+            files: filesCache.files.filter(file => {
+              if (!(data && data.deleteFile)) {
+                return true;
+              }
+              return file.id !== data.deleteFile.id;
+            }),
+          },
+          query: FILES_QUERY,
+        });
+      },
+      variables: { where: { id } },
+    });
+  }
+
+  const gutter = `minmax(${rem(16)}, auto)`;
+
+  const AdminFilesLayout = styled(Layout)`
+    grid-gap: ${rem(16)};
+    grid-template-columns: ${gutter} minmax(auto, ${rem(1680)}) ${gutter};
+    align-content: start;
+  `;
+
+  const FilesHeading = styled(PageHeading)`
+    grid-column: 2 / span 1;
+  `;
+
+  return (
+    <AdminFilesLayout>
+      <FilesHeading>Files</FilesHeading>
+      <List>
+        {files.map(file => {
+          return (
+            <Item
+              key={file.id}
+              image={file.url}
+              label={file.key}
+              info={file.mimetype}
+              to={`${match.url}/${file.id}`}
+              details={[{ label: 'Created', info: getTimeAgo(file.createdAt) }]}
+              onDelete={() => {
+                setPortalNode(
+                  <Confirm
+                    title="Are you sure?"
+                    message={`This will delete file '${file.bucket}/${
+                      file.key
+                    }' from the database as well as from storage`}
+                    onConfirm={() => {
+                      deleteFile(file.id);
+                      setPortalNode(null);
+                    }}
+                    onCancel={() => setPortalNode(null)}
+                  />,
+                );
+              }}
+            />
+          );
+        })}
+      </List>
+    </AdminFilesLayout>
+  );
 }
 
-const AdminFilesLayout = styled(Layout)``;
-
-const FileRow = styled.span`
-  display: grid;
-  grid-gap: ${rem(16)};
-  grid-template-columns: ${rem(128)} 2fr 1fr ${rem(64)};
-  align-items: center;
-`;
+export default AdminFiles;
