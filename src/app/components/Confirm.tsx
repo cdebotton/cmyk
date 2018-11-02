@@ -22,6 +22,8 @@ const Alert = styled(animated.div)`
   box-shadow: 3px 3px 5px hsla(0, 0%, 0%, 0.05);
   border-radius: 3px;
   backdrop-filter: blur(3px);
+  max-width: 50vw;
+  max-height: 50vw;
 `;
 
 const Title = styled.header`
@@ -38,6 +40,8 @@ const Message = styled.div`
   font-size: ${rem(16)};
   color: #fff;
   font-weight: 100;
+  line-height: 1.5;
+  word-break: break-all;
   ${padding(rem(32))};
 `;
 
@@ -74,6 +78,7 @@ function Confirm({ title, message, onConfirm, onCancel }: Props) {
       style={{
         opacity: x,
       }}
+      onClick={onCancel}
     >
       <Alert
         style={{
@@ -84,6 +89,9 @@ function Confirm({ title, message, onConfirm, onCancel }: Props) {
               range: [0, 1],
             })
             .interpolate(y => `translate3d(0, 0, ${y})`),
+        }}
+        onClick={event => {
+          event.stopPropagation();
         }}
       >
         <Title>{title}</Title>

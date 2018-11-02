@@ -10,6 +10,7 @@ export interface UploadFileMutation_uploadFile {
   id: string;
   bucket: string;
   key: string;
+  url: string;
 }
 
 export interface UploadFileMutation {

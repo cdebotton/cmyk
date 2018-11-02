@@ -1,10 +1,9 @@
-import { rem, size } from 'polished';
+import { size } from 'polished';
 import React, { ChangeEventHandler, Component, FormEventHandler } from 'react';
 import styled from 'styled-components';
 
 interface Props {
   className?: string;
-  value: string;
   name: string;
   file: {
     key: string;
@@ -22,7 +21,7 @@ class ImageSelector extends Component<Props, State> {
   state = { currentUrl: null };
 
   render() {
-    const { className, file, onFileChange, name } = this.props;
+    const { className, file, name } = this.props;
     const { currentUrl } = this.state;
     const url = currentUrl || (file ? file.url : null);
     const id = `file-${name}`;

@@ -1,10 +1,9 @@
-import { Field, FieldProps, Formik } from 'formik';
 import gql from 'graphql-tag';
 import { padding, rem } from 'polished';
 import React, { FormEvent, lazy } from 'react';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
-import * as Yup from 'yup';
+import * as yup from 'yup';
 import { Role } from '../../__generated__/globalTypes';
 import {
   EditUserQuery,
@@ -21,11 +20,104 @@ import {
 } from './__generated__/UploadFileMutation';
 import Button from './components/Button';
 import ImageSelector from './components/ImageSelector';
-import Input from './components/Input';
 import Layout from './components/Layout';
 import PageHeading from './components/PageHeading';
 import Select from './components/Select';
+import SimpleInput from './components/SimpleInput';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
+import useFormInput, { Field } from './hooks/useFormInput';
+
+const EDIT_USER_QUERY = gql`
+  query EditUserQuery($where: UserWhereUniqueInput!) {
+    user(where: $where) {
+      id
+      email
+      role
+      profile {
+        id
+        avatar {
+          id
+          key
+          bucket
+          url
+        }
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+const USER_UPDATE_MUTATION = gql`
+  mutation UpdateUserMutation(
+    $data: UserUpdateInput!
+    $where: UserWhereUniqueInput!
+  ) {
+    updateUser(data: $data, where: $where) {
+      id
+      email
+      role
+      profile {
+        id
+        avatar {
+          id
+          bucket
+          key
+        }
+        firstName
+        lastName
+      }
+    }
+  }
+`;
+
+const UPLOAD_FILE_MUTATION = gql`
+  mutation UploadFileMutation($file: Upload!) {
+    uploadFile(file: $file) {
+      id
+      bucket
+      key
+      url
+    }
+  }
+`;
+
+const AdminEditUserLayout = styled(Layout)`
+  align-content: start;
+`;
+
+const EditUserHeading = styled(PageHeading)`
+  grid-column: 2 / span 1;
+`;
+
+const UserForm = styled.form`
+  grid-column: 2 / span 1;
+  grid-gap: ${rem(16)};
+  display: grid;
+  grid-template-columns: ${rem(128)} repeat(4, 1fr);
+  align-content: start;
+
+  ${padding(0, rem(32))};
+`;
+
+const AvatarInput = styled(ImageSelector)`
+  grid-column: span 1;
+  grid-row: span 2;
+`;
+
+const EmailInput = styled(SimpleInput)`
+  grid-column: span 2;
+`;
+
+const SaveButton = styled(Button).attrs({ type: 'submit' })`
+  grid-column: span 1;
+`;
+
+const CancelButton = styled(Button).attrs({ type: 'reset' })`
+  grid-column: span 1;
+`;
+
+const NotFound = lazy(() => import('./NotFound'));
 
 interface Values {
   avatar: EditUserQuery_user_profile_avatar | null;
@@ -34,8 +126,6 @@ interface Values {
   lastName: string;
   role: Role;
 }
-
-const NotFound = lazy(() => import('./NotFound'));
 
 interface Props extends RouteComponentProps<{ userId: string }> {
   className?: string;
@@ -62,6 +152,7 @@ function AdminEditUser({ className, ...props }: Props) {
     if (!user) {
       return;
     }
+
     const avatar = values.avatar
       ? {
           connect: { id: values.avatar.id },
@@ -114,178 +205,98 @@ function AdminEditUser({ className, ...props }: Props) {
     return uploadResult.data;
   }
 
+  const [email, resetEmail] = useFormInput({
+    initialValue: user.email,
+    validate: yup
+      .string()
+      .email('Must be a valid email address')
+      .required('Email required'),
+  });
+  const [firstName, resetFirstName] = useFormInput({
+    initialValue: user.profile.firstName,
+    validate: yup
+      .string()
+      .min(2, 'First name must be longer than 2 characters')
+      .required('First name is required'),
+  });
+  const [lastName, resetLastName] = useFormInput({
+    initialValue: user.profile.lastName,
+    validate: yup
+      .string()
+      .min(2, 'Last name must be longer than 2 characters')
+      .required('Last name is required'),
+  });
+  const [image, resetImage] = useFormInput({
+    initialValue: user.profile.avatar,
+  });
+  const [role, resetRole] = useFormInput<Role>({
+    initialValue: user.role,
+  });
+
+  function handleReset() {
+    resetEmail();
+    resetFirstName();
+    resetLastName();
+    resetRole();
+    resetImage();
+  }
+
+  function handleSubmit() {
+    updateUser({
+      avatar: image.value,
+      email: email.value,
+      firstName: firstName.value,
+      lastName: lastName.value,
+      role: role.value,
+    });
+  }
+
   return (
-    <Layout className={className}>
+    <AdminEditUserLayout className={className}>
       <EditUserHeading>Edit User {user.email}</EditUserHeading>
 
-      <Formik<Values>
-        key={user.id}
-        validationSchema={UserSchema}
-        onSubmit={updateUser}
-        initialValues={{
-          avatar: user.profile.avatar,
-          email: user.email,
-          firstName:
-            user.profile && user.profile.firstName !== null
-              ? user.profile.firstName
-              : '',
-          lastName:
-            user.profile && user.profile.lastName !== null
-              ? user.profile.lastName
-              : '',
-          role: user.role,
-        }}
-      >
-        {({ handleSubmit, setFieldValue, handleReset }) => (
-          <UserForm onSubmit={handleSubmit} autoComplete="off">
-            <Field
-              name="avatar"
-              render={({ field }: FieldProps<Values>) => (
-                <AvatarInput
-                  file={user.profile.avatar}
-                  name="avatar"
-                  {...field}
-                  onFileChange={async event => {
-                    const uploadResult = await handleFileChange(event);
+      <UserForm onSubmit={handleSubmit} autoComplete="off">
+        <AvatarInput
+          file={user.profile.avatar}
+          name="avatar"
+          {...image}
+          onFileChange={async event => {
+            const uploadResult = await handleFileChange(event);
 
-                    if (!uploadResult) {
-                      return;
-                    }
+            if (!uploadResult) {
+              return;
+            }
 
-                    setFieldValue('avatar', uploadResult.uploadFile);
-                  }}
-                />
-              )}
-            />
-            <Field
-              name="email"
-              render={({ field, form }: FieldProps) => (
-                <EmailInput label="Email" field={field} form={form} />
-              )}
-            />
-            <Field name="firstName" component={Input} label="First name" />
-            <Field name="lastName" component={Input} label="Last name" />
-            <Field
-              name="role"
-              component={Select}
-              label="Role"
-              options={[
-                { label: 'Admin', value: Role.ADMIN },
-                { label: 'Editor', value: Role.EDITOR },
-                { label: 'User', value: Role.USER },
-                { label: 'Unauthorized', value: Role.UNAUTHORIZED },
-              ]}
-            />
-            <SaveButton format="neutral">Save</SaveButton>
-            <CancelButton
-              onClick={() => {
-                handleReset();
-                history.goBack();
-              }}
-            >
-              Cancel
-            </CancelButton>
-          </UserForm>
-        )}
-      </Formik>
-    </Layout>
+            image.setValue(uploadResult.uploadFile);
+          }}
+        />
+
+        <EmailInput name="email" label="Email" {...email} />
+        <SimpleInput name="firstName" label="First name" {...firstName} />
+        <SimpleInput name="lastName" label="Last name" {...lastName} />
+        <Select
+          {...role}
+          name="role"
+          label="Role"
+          options={[
+            { label: 'Admin', value: Role.ADMIN },
+            { label: 'Editor', value: Role.EDITOR },
+            { label: 'User', value: Role.USER },
+            { label: 'Unauthorized', value: Role.UNAUTHORIZED },
+          ]}
+        />
+        <SaveButton format="neutral">Save</SaveButton>
+        <CancelButton
+          onClick={() => {
+            handleReset();
+            history.goBack();
+          }}
+        >
+          Cancel
+        </CancelButton>
+      </UserForm>
+    </AdminEditUserLayout>
   );
 }
 
 export default AdminEditUser;
-
-const EDIT_USER_QUERY = gql`
-  query EditUserQuery($where: UserWhereUniqueInput!) {
-    user(where: $where) {
-      id
-      email
-      role
-      profile {
-        id
-        avatar {
-          id
-          key
-          bucket
-          url
-        }
-        firstName
-        lastName
-      }
-    }
-  }
-`;
-
-const USER_UPDATE_MUTATION = gql`
-  mutation UpdateUserMutation(
-    $data: UserUpdateInput!
-    $where: UserWhereUniqueInput!
-  ) {
-    updateUser(data: $data, where: $where) {
-      id
-      email
-      role
-      profile {
-        id
-        avatar {
-          id
-          bucket
-          key
-        }
-        firstName
-        lastName
-      }
-    }
-  }
-`;
-
-const UPLOAD_FILE_MUTATION = gql`
-  mutation UploadFileMutation($file: Upload!) {
-    uploadFile(file: $file) {
-      id
-      bucket
-      key
-    }
-  }
-`;
-
-const UserSchema = Yup.object().shape({
-  email: Yup.string()
-    .email('Must be a valid email address')
-    .required('Email required'),
-  firstName: Yup.string()
-    .min(2, 'First name must be longer than 2 characters')
-    .required('First name is required'),
-  lastName: Yup.string()
-    .min(2, 'Last name must be longer than 2 characters')
-    .required('Last name is required'),
-});
-
-const EditUserHeading = styled(PageHeading)`
-  grid-column: 2 / span 1;
-`;
-
-const UserForm = styled.form`
-  grid-column: 2 / span 1;
-  grid-gap: ${rem(16)};
-  display: grid;
-  grid-template-columns: ${rem(128)} repeat(4, 1fr);
-
-  ${padding(0, rem(32))};
-`;
-
-const AvatarInput = styled(ImageSelector)`
-  grid-column: span 1;
-  grid-row: span 2;
-`;
-
-const EmailInput = styled(Input)`
-  grid-column: span 2;
-`;
-
-const SaveButton = styled(Button).attrs({ type: 'submit' })`
-  grid-column: span 1;
-`;
-
-const CancelButton = styled(Button).attrs({ type: 'reset' })`
-  grid-column: span 1;
-`;

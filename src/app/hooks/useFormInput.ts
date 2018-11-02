@@ -1,4 +1,10 @@
-import { ChangeEvent, useMutationEffect, useState } from 'react';
+import {
+  ChangeEvent,
+  ChangeEventHandler,
+  FormEventHandler,
+  useMutationEffect,
+  useState,
+} from 'react';
 import { Schema } from 'yup';
 
 interface HookOptions<T> {
@@ -8,12 +14,22 @@ interface HookOptions<T> {
   validateOnChange?: boolean;
 }
 
+export interface Field<T> {
+  dirty: boolean;
+  error: string[] | null;
+  onBlur: FormEventHandler<Element>;
+  onChange: ChangeEventHandler<{ value: T }>;
+  touched: boolean;
+  value: T;
+  setValue: (value: T) => void;
+}
+
 function useFormInput<T>({
   initialValue,
   validate,
   validateOnBlur = true,
   validateOnChange = true,
-}: HookOptions<T>) {
+}: HookOptions<T>): [Field<T>, VoidFunction] {
   const [value, setValue] = useState<T>(initialValue);
   const [error, setError] = useState<string[] | null>(null);
   const [touched, setTouched] = useState(false);
@@ -47,14 +63,24 @@ function useFormInput<T>({
     [value],
   );
 
-  return {
+  function resetValue() {
+    setValue(initialValue);
+    setError(null);
+    setTouched(false);
+    setDirty(false);
+  }
+
+  const input = {
     dirty,
     error,
     onBlur,
     onChange,
+    setValue,
     touched,
     value,
   };
+
+  return [input, resetValue];
 }
 
 export default useFormInput;

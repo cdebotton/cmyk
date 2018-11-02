@@ -138,7 +138,6 @@ function Admin({ className, match }: Props) {
               <PageLink to={`${match.url}/users`}>Users</PageLink>
               <PageLink to={`${match.url}/settings`}>Settings</PageLink>
             </Navigation>
-
             <LogoutButton
               hidden={!session}
               format="neutral"

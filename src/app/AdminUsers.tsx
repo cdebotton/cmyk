@@ -117,26 +117,27 @@ function AdminUsers({ className, match }: Props) {
             session && session.user.id === user.id ? true : false;
           const avatar = user.profile.avatar ? user.profile.avatar.url : '';
 
-          const onDelete = isCurrentUser
-            ? undefined
-            : () => {
-                setPortalNode(
-                  <Confirm
-                    title="Are you sure you want to do this?"
-                    message="You are about to permanently delete this user"
-                    onConfirm={() => deleteUser(user.id)}
-                    onCancel={() => onCancel()}
-                  />,
-                );
-              };
           return (
             <Item
               key={`USER_${user.id}`}
-              to={`${match.url}/user.id`}
+              to={`${match.url}/${user.id}`}
               image={avatar}
               label={`${user.profile.firstName} ${user.profile.lastName}`}
               info={user.email}
-              onDelete={onDelete}
+              onDelete={
+                isCurrentUser
+                  ? undefined
+                  : () => {
+                      setPortalNode(
+                        <Confirm
+                          title="Are you sure you want to do this?"
+                          message="You are about to permanently delete this user"
+                          onConfirm={() => deleteUser(user.id)}
+                          onCancel={() => onCancel()}
+                        />,
+                      );
+                    }
+              }
               deleteTooltip={`Delete ${user.email}`}
               details={[
                 { label: 'Last login', info: getTimeAgo(user.lastLogin) },

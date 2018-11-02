@@ -101,9 +101,15 @@ function AdminFiles({ match }: Props) {
                 setPortalNode(
                   <Confirm
                     title="Are you sure?"
-                    message={`This will delete file '${file.bucket}/${
-                      file.key
-                    }' from the database as well as from storage`}
+                    message={
+                      <>
+                        This will delete file{' '}
+                        <em>
+                          {file.bucket}/{file.key}
+                        </em>{' '}
+                        from the database as well as from storage
+                      </>
+                    }
                     onConfirm={() => {
                       deleteFile(file.id);
                       setPortalNode(null);

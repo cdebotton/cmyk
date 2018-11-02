@@ -56,15 +56,25 @@ interface Props {
   className?: string;
   label: string;
   value: string;
-  onChange: ChangeEventHandler<{ value: string }>;
-  onBlur: FormEventHandler<{ value: string }>;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  onBlur: FormEventHandler<HTMLInputElement>;
   type?: HTMLProps<HTMLInputElement>['type'];
   name: string;
+  dirty?: boolean;
   touched?: boolean;
   error?: string[] | null;
+  setValue: (value: string) => void;
 }
 
-function SimpleInput({ className, label, touched, error, ...field }: Props) {
+function SimpleInput({
+  className,
+  label,
+  touched,
+  error,
+  dirty: _,
+  setValue,
+  ...field
+}: Props) {
   const [{ value: errorSpring }, setErrorSpring] = useSpring({
     config: config.default,
     value: field.value !== '' ? 1 : 0,

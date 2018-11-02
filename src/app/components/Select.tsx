@@ -1,4 +1,3 @@
-import { FieldProps } from 'formik';
 import { padding, rem, size } from 'polished';
 import React, { ReactNode, useEffect, useMemo, useState } from 'react';
 import { animated, config, useSpring } from 'react-spring';
@@ -10,11 +9,17 @@ interface Option<T> {
   label: ReactNode;
 }
 
-interface Props<T> extends FieldProps<any> {
+interface Props<T> {
   className?: string;
+  name: string;
+  value: T;
   label: ReactNode;
   options: Option<T>[];
   tabIndex?: number;
+  touched: boolean;
+  dirty: boolean;
+  error: string[] | null;
+  setValue: (value: T) => void;
 }
 
 const SelectContainer = styled.div`
@@ -104,9 +109,9 @@ const Option = styled(animated.li)<{ disabled: boolean }>`
 function Select<T extends string>({
   className,
   options,
-  form,
-  field,
+  value,
   tabIndex = 0,
+  setValue,
   ...props
 }: Props<T>) {
   const [open, setOpen] = useState(false);
@@ -120,7 +125,7 @@ function Select<T extends string>({
 
   useEffect(() =>
     setSpring({
-      empty: field.value === null ? 0 : 1,
+      empty: value === null ? 0 : 1,
       hover: hover ? 1 : 0,
       open: open ? 1 : 0,
     }),
@@ -133,8 +138,8 @@ function Select<T extends string>({
           label,
           optionValue,
         ])
-        .find(([_, optionValue]) => optionValue === field.value),
-    [options, field.value],
+        .find(([_, optionValue]) => optionValue === value),
+    [options, value],
   );
 
   const selectedLabel = !selected ? props.label : selected[0];
@@ -188,7 +193,7 @@ function Select<T extends string>({
             />
           </Arrow>
         </SelectLabel>
-        <InputLabel focused={open} empty={field.value === null}>
+        <InputLabel focused={open} empty={value === null}>
           {props.label}
         </InputLabel>
         <Border
@@ -218,11 +223,11 @@ function Select<T extends string>({
           {options.map(option => (
             <Option
               role="menuitem"
-              tabIndex={option.value === field.value ? -1 : tabIndex}
-              key={`OPTION_${field.name}_${option.value}`}
-              disabled={option.value === field.value}
+              tabIndex={option.value === value ? -1 : tabIndex}
+              key={`OPTION_${name}_${option.value}`}
+              disabled={option.value === value}
               onClick={_event => {
-                form.setFieldValue(field.name, option.value);
+                setValue(option.value);
                 setOpen(false);
               }}
             >
