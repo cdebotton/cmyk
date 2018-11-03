@@ -1,5 +1,5 @@
 import React from 'react';
-import { fireEvent, render } from 'react-testing-library';
+import { fireEvent, render, waitForElement } from 'react-testing-library';
 import * as yup from 'yup';
 import useFormHook from '../useFormHook';
 
@@ -16,6 +16,7 @@ function Assert({ initialValue = 'bar' }: Props) {
     dirty,
     valid,
     handleSubmit,
+    submitting,
   } = useFormHook({
     initialValues: {
       foo: initialValue,
@@ -35,7 +36,8 @@ function Assert({ initialValue = 'bar' }: Props) {
       {touched.foo && <span data-testid="touched" />}
       {dirty.foo && <span data-testid="dirty" />}
       {errors.foo && <span data-testid="error">{errors.foo}</span>}
-      <button data-testid="button" disabled={!valid}>
+      {submitting && <span data-testid="submitting" />}
+      <button data-testid="button" type="submit" disabled={!valid}>
         Go
       </button>
     </form>
@@ -146,5 +148,18 @@ describe('useFormHook()', () => {
     expect(button).not.toBeDisabled();
   });
 
-  it('should set a submitting state', () => {});
+  it('should set a submitting state', () => {
+    const ui = <Assert initialValue="admin@cmyk.com" />;
+    const { getByTestId, rerender } = render(ui);
+    const submit = getByTestId('button');
+    rerender(ui);
+
+    // @ts-ignore
+    expect(submit).not.toBeDisabled();
+
+    fireEvent.click(submit);
+
+    const submitting = waitForElement(() => getByTestId('submitting'));
+    expect(submitting).not.toBeNull();
+  });
 });
