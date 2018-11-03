@@ -8,20 +8,29 @@ interface Props {
 }
 
 function Assert({ initialValue = 'bar' }: Props) {
-  const { values, touched, handlers, errors, dirty, valid } = useFormHook({
+  const {
+    values,
+    touched,
+    handlers,
+    errors,
+    dirty,
+    valid,
+    handleSubmit,
+  } = useFormHook({
     initialValues: {
       foo: initialValue,
     },
+    onSubmit: () => undefined,
     validationSchema: yup.object().shape({
       foo: yup
         .string()
-        .required('required')
-        .email('email'),
+        .email('email')
+        .required('required'),
     }),
   });
 
   return (
-    <form>
+    <form onSubmit={handleSubmit}>
       <input data-testid="input" value={values.foo} {...handlers.foo} />
       {touched.foo && <span data-testid="touched" />}
       {dirty.foo && <span data-testid="dirty" />}
@@ -37,8 +46,23 @@ describe('useFormHook()', () => {
   test('it should create a bound field', () => {
     const { getByTestId, queryByTestId } = render(<Assert />);
     const input = getByTestId('input');
-    // @ts-ignore
-    let touched = queryByTestId(/touched/i);
+
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+
+    expect(input.value).toBe('bar');
+
+    fireEvent.change(input, { target: { value: 'baz' } });
+
+    expect(input.value).toBe('baz');
+
+    fireEvent.blur(input);
+  });
+
+  it('should expose dirty fields', () => {
+    const { getByTestId, queryByTestId } = render(<Assert />);
+    const input = getByTestId('input');
     // @ts-ignore
     let dirty = queryByTestId(/dirty/i);
 
@@ -46,8 +70,6 @@ describe('useFormHook()', () => {
       return;
     }
 
-    expect(input.value).toBe('bar');
-    expect(touched).toBeNull();
     expect(dirty).toBeNull();
 
     fireEvent.change(input, { target: { value: 'baz' } });
@@ -55,17 +77,33 @@ describe('useFormHook()', () => {
     dirty = queryByTestId(/dirty/i);
 
     expect(dirty).not.toBeNull();
-    expect(input.value).toBe('baz');
+  });
+
+  it('should expose touched fields', () => {
+    const ui = <Assert />;
+    const { getByTestId, queryByTestId, rerender } = render(ui);
+    const input = getByTestId('input');
+    // @ts-ignore
+    let touched = queryByTestId(/touched/i);
+
+    if (!(input instanceof HTMLInputElement)) {
+      return;
+    }
+
+    expect(input.value).toBe('bar');
+    expect(touched).toBeNull();
 
     fireEvent.blur(input);
 
+    rerender(ui);
     // @ts-ignore
     touched = queryByTestId(/touched/i);
     expect(touched).not.toBeNull();
   });
 
   it('should run validation schema and generate errors', async () => {
-    const { getByTestId } = render(<Assert initialValue="" />);
+    const ui = <Assert initialValue="" />;
+    const { getByTestId, rerender } = render(ui);
     const input = getByTestId('input');
 
     if (!(input instanceof HTMLInputElement)) {
@@ -74,25 +112,39 @@ describe('useFormHook()', () => {
 
     fireEvent.blur(input);
 
+    rerender(ui);
+
     const error = getByTestId('error');
+
     // @ts-ignore
     expect(error).toHaveTextContent('required');
+
     fireEvent.change(input, { target: { value: 'admin' } });
+
+    rerender(ui);
+
     // @ts-ignore
     expect(error).toHaveTextContent('email');
   });
 
   it('should provide form level validation info', () => {
-    const { container, getByTestId } = render(<Assert initialValue="" />);
+    const ui = <Assert initialValue="" />;
+    const { getByTestId, rerender } = render(ui);
     const button = getByTestId('button');
     const input = getByTestId('input');
+
+    rerender(ui);
 
     // @ts-ignore
     expect(button).toBeDisabled();
 
     fireEvent.change(input, { target: { value: 'admin@cmyk.com' } });
 
+    rerender(ui);
+
     // @ts-ignore
     expect(button).not.toBeDisabled();
   });
+
+  it('should set a submitting state', () => {});
 });

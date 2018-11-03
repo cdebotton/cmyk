@@ -3,8 +3,8 @@ import {
   ChangeEventHandler,
   FormEvent,
   FormEventHandler,
-  useMemo,
   useEffect,
+  useMemo,
   useState,
 } from 'react';
 import { Schema } from 'yup';
@@ -114,7 +114,7 @@ function useFormHook<T>({
             [key]: <K extends keyof T>(value: T[K]) => {
               setValues(prevValues => {
                 return {
-                  ...(values as any),
+                  ...(prevValues as any),
                   [key]: value,
                 };
               });
