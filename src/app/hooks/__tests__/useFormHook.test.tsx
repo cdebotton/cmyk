@@ -1,15 +1,22 @@
 import React from 'react';
-import { fireEvent, render, waitForElement } from 'react-testing-library';
+import { fireEvent, render } from 'react-testing-library';
 import * as yup from 'yup';
 import useFormHook from '../useFormHook';
 
-function Assert() {
+interface Props {
+  initialValue?: string;
+}
+
+function Assert({ initialValue = 'bar' }: Props) {
   const { values, touched, handlers, errors } = useFormHook({
     initialValues: {
-      foo: 'bar',
+      foo: initialValue,
     },
     validationSchema: yup.object().shape({
-      foo: yup.string().required('required'),
+      foo: yup
+        .string()
+        .required('required')
+        .email('email'),
     }),
   });
 
@@ -45,8 +52,8 @@ describe('useFormHook()', () => {
     expect(touched).not.toBeNull();
   });
 
-  xit('should run validation schema and generate errors', () => {
-    const { getByTestId } = render(<Assert />);
+  it('should run validation schema and generate errors', async () => {
+    const { getByTestId } = render(<Assert initialValue="" />);
     const input = getByTestId('input');
 
     if (!(input instanceof HTMLInputElement)) {
@@ -54,8 +61,12 @@ describe('useFormHook()', () => {
     }
 
     fireEvent.blur(input);
-    const error = await waitForElement(() => getByTestId('error'));
+
+    const error = getByTestId('error');
     // @ts-ignore
-    expect(error.innerText).toBe('required');
+    expect(error).toHaveTextContent('required');
+    fireEvent.change(input, { target: { value: 'admin' } });
+    // @ts-ignore
+    expect(error).toHaveTextContent('email');
   });
 });

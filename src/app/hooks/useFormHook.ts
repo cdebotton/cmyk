@@ -9,7 +9,7 @@ import {
 import { Schema } from 'yup';
 
 interface Options<T> {
-  initialValues: any;
+  initialValues: T;
   validateOnBlur?: boolean;
   validateOnChange?: boolean;
   validationSchema?: any;
@@ -50,21 +50,20 @@ function useFormHook<T>({
         return {
           ...(memo as any),
           [key]: {
-            onBlur: async (_: FormEvent<FormElement>) => {
+            onBlur: (_: FormEvent<FormElement>) => {
               setTouched(prevState => {
                 return Object.assign({}, prevState, { [key]: true });
               });
 
-              // if (validationSchema && validateOnBlur) {
-              //   Promise.resolve(
-              //     validationSchema ? validationSchema.validate(values) : {},
-              //   )
-              //     .then(x => x, e => e)
-              //     .then(e => {
-              //       console.log(e, '!!!');
-              //       setErrors(e);
-              //     });
-              // }
+              if (validationSchema && validateOnBlur) {
+                try {
+                  validationSchema.validateSync(values);
+                } catch (yupError) {
+                  setErrors(prevErrors => {
+                    return setErrorsFromYup(prevErrors, yupError);
+                  });
+                }
+              }
             },
             onChange: (event: ChangeEvent<FormElement>) => {
               const { currentTarget } = event;
@@ -74,6 +73,16 @@ function useFormHook<T>({
                   [key]: currentTarget.value,
                 };
               });
+
+              if (validationSchema && validateOnChange) {
+                try {
+                  validationSchema.validateSync(values);
+                } catch (yupError) {
+                  setErrors(prevErrors => {
+                    return setErrorsFromYup(prevErrors, yupError);
+                  });
+                }
+              }
             },
           },
         };
@@ -83,6 +92,20 @@ function useFormHook<T>({
   );
 
   return { values, touched, handlers, errors };
+}
+
+function setErrorsFromYup<T>(_: ErrorShape<T>, yupError: any): ErrorShape<T> {
+  if (yupError.inner.length === 0) {
+    return { [yupError.path]: yupError.message } as any;
+  }
+
+  const newErrors = {};
+  for (const err of yupError.inner) {
+    Object.assign(newErrors, {
+      [err.path]: err.message,
+    });
+  }
+  return newErrors;
 }
 
 export default useFormHook;
