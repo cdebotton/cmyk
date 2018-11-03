@@ -4,6 +4,7 @@ import {
   FormEvent,
   FormEventHandler,
   useMemo,
+  useMutationEffect,
   useState,
 } from 'react';
 import { Schema } from 'yup';
@@ -12,11 +13,11 @@ interface Options<T> {
   initialValues: T;
   validateOnBlur?: boolean;
   validateOnChange?: boolean;
-  validationSchema?: any;
+  validationSchema?: Schema<any>;
 }
 
 type BoolShape<T> = { readonly [K in keyof T]?: boolean };
-type ErrorShape<T> = { readonly [K in keyof T]?: string };
+type StringShape<T> = { readonly [K in keyof T]?: string };
 
 type Handlers<T> = {
   readonly [K in keyof T]: {
@@ -27,9 +28,11 @@ type Handlers<T> = {
 
 interface Form<T> {
   values: T;
-  errors: ErrorShape<T>;
+  errors: StringShape<T>;
   touched: BoolShape<T>;
+  dirty: BoolShape<T>;
   handlers: Handlers<T>;
+  valid: boolean;
 }
 
 type FormElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
@@ -42,7 +45,20 @@ function useFormHook<T>({
 }: Options<T>): Form<T> {
   const [values, setValues] = useState(initialValues);
   const [touched, setTouched] = useState<BoolShape<T>>({});
-  const [errors, setErrors] = useState<ErrorShape<T>>({});
+  const [dirty, setDirty] = useState<BoolShape<T>>({});
+  const [errors, setErrors] = useState<StringShape<T>>({});
+  const [valid, setValid] = useState(true);
+
+  function validateValues(val: T, schema: Schema<any>) {
+    try {
+      schema.validateSync(val);
+      setErrors({});
+    } catch (yupError) {
+      setErrors(prevErrors => {
+        return setErrorsFromYup(prevErrors, yupError);
+      });
+    }
+  }
 
   const handlers = useMemo<Handlers<T>>(
     () => {
@@ -54,19 +70,10 @@ function useFormHook<T>({
               setTouched(prevState => {
                 return Object.assign({}, prevState, { [key]: true });
               });
-
-              if (validationSchema && validateOnBlur) {
-                try {
-                  validationSchema.validateSync(values);
-                } catch (yupError) {
-                  setErrors(prevErrors => {
-                    return setErrorsFromYup(prevErrors, yupError);
-                  });
-                }
-              }
             },
             onChange: (event: ChangeEvent<FormElement>) => {
               const { currentTarget } = event;
+
               setValues(prevState => {
                 return {
                   ...(prevState as any),
@@ -74,15 +81,12 @@ function useFormHook<T>({
                 };
               });
 
-              if (validationSchema && validateOnChange) {
-                try {
-                  validationSchema.validateSync(values);
-                } catch (yupError) {
-                  setErrors(prevErrors => {
-                    return setErrorsFromYup(prevErrors, yupError);
-                  });
-                }
-              }
+              setDirty(prevState => {
+                return {
+                  ...(prevState as any),
+                  [key]: true,
+                };
+              });
             },
           },
         };
@@ -91,10 +95,36 @@ function useFormHook<T>({
     [initialValues],
   );
 
-  return { values, touched, handlers, errors };
+  useMutationEffect(
+    () => {
+      if (validationSchema && validateOnChange) {
+        validateValues(values, validationSchema);
+      }
+    },
+    [values],
+  );
+
+  useMutationEffect(
+    () => {
+      if (validationSchema && validateOnBlur) {
+        validateValues(values, validationSchema);
+      }
+    },
+    [touched],
+  );
+
+  useMutationEffect(
+    () => {
+      const isValid = Object.keys(errors).length === 0;
+      setValid(isValid);
+    },
+    [errors],
+  );
+
+  return { values, touched, handlers, errors, valid, dirty };
 }
 
-function setErrorsFromYup<T>(_: ErrorShape<T>, yupError: any): ErrorShape<T> {
+function setErrorsFromYup<T>(_: StringShape<T>, yupError: any): StringShape<T> {
   if (yupError.inner.length === 0) {
     return { [yupError.path]: yupError.message } as any;
   }

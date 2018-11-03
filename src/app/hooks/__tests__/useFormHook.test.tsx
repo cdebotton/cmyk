@@ -8,7 +8,7 @@ interface Props {
 }
 
 function Assert({ initialValue = 'bar' }: Props) {
-  const { values, touched, handlers, errors } = useFormHook({
+  const { values, touched, handlers, errors, dirty, valid } = useFormHook({
     initialValues: {
       foo: initialValue,
     },
@@ -24,7 +24,11 @@ function Assert({ initialValue = 'bar' }: Props) {
     <form>
       <input data-testid="input" value={values.foo} {...handlers.foo} />
       {touched.foo && <span data-testid="touched" />}
+      {dirty.foo && <span data-testid="dirty" />}
       {errors.foo && <span data-testid="error">{errors.foo}</span>}
+      <button data-testid="button" disabled={!valid}>
+        Go
+      </button>
     </form>
   );
 }
@@ -35,6 +39,8 @@ describe('useFormHook()', () => {
     const input = getByTestId('input');
     // @ts-ignore
     let touched = queryByTestId(/touched/i);
+    // @ts-ignore
+    let dirty = queryByTestId(/dirty/i);
 
     if (!(input instanceof HTMLInputElement)) {
       return;
@@ -42,9 +48,15 @@ describe('useFormHook()', () => {
 
     expect(input.value).toBe('bar');
     expect(touched).toBeNull();
+    expect(dirty).toBeNull();
 
     fireEvent.change(input, { target: { value: 'baz' } });
+    // @ts-ignore
+    dirty = queryByTestId(/dirty/i);
+
+    expect(dirty).not.toBeNull();
     expect(input.value).toBe('baz');
+
     fireEvent.blur(input);
 
     // @ts-ignore
@@ -68,5 +80,19 @@ describe('useFormHook()', () => {
     fireEvent.change(input, { target: { value: 'admin' } });
     // @ts-ignore
     expect(error).toHaveTextContent('email');
+  });
+
+  it('should provide form level validation info', () => {
+    const { container, getByTestId } = render(<Assert initialValue="" />);
+    const button = getByTestId('button');
+    const input = getByTestId('input');
+
+    // @ts-ignore
+    expect(button).toBeDisabled();
+
+    fireEvent.change(input, { target: { value: 'admin@cmyk.com' } });
+
+    // @ts-ignore
+    expect(button).not.toBeDisabled();
   });
 });
