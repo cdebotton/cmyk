@@ -24,8 +24,8 @@ declare module 'react' {
   };
 
   interface StateSetter<T> {
-    (state: T): void;
     (setState: (prevState: T) => T): void;
+    (state: T): void;
   }
 
   export function useState<T>(initialValue: T): [T, StateSetter<T>];

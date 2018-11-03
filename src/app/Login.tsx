@@ -38,7 +38,7 @@ interface Props extends RouteComponentProps<{}> {
 
 function Login({ className, location }: Props) {
   const client = useApolloClient();
-  const email = useFormInput({
+  const [email] = useFormInput({
     initialValue: '',
     validate: yup
       .string()
@@ -46,7 +46,7 @@ function Login({ className, location }: Props) {
       .required(),
   });
 
-  const password = useFormInput({
+  const [password] = useFormInput({
     initialValue: '',
     validate: yup.string().required(),
   });
