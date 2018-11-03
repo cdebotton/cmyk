@@ -4,7 +4,7 @@ import {
   FormEvent,
   FormEventHandler,
   useMemo,
-  useMutationEffect,
+  useEffect,
   useState,
 } from 'react';
 import { Schema } from 'yup';
@@ -127,7 +127,7 @@ function useFormHook<T>({
     [initialValues],
   );
 
-  useMutationEffect(
+  useEffect(
     () => {
       if (validationSchema && validateOnChange) {
         validateValues(values, validationSchema);
@@ -136,7 +136,7 @@ function useFormHook<T>({
     [values],
   );
 
-  useMutationEffect(
+  useEffect(
     () => {
       if (validationSchema && validateOnBlur) {
         validateValues(values, validationSchema);
@@ -145,7 +145,7 @@ function useFormHook<T>({
     [touched],
   );
 
-  useMutationEffect(
+  useEffect(
     () => {
       const isValid = Object.keys(errors).length === 0;
       setValid(isValid);
@@ -154,7 +154,7 @@ function useFormHook<T>({
   );
 
   function handleReset() {
-    setValues(initialValues);
+    setValues(lastValues);
   }
 
   async function handleSubmit(event: FormEvent<HTMLFormElement>) {
