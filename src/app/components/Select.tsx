@@ -16,9 +16,9 @@ interface Props<T> {
   label: ReactNode;
   options: Option<T>[];
   tabIndex?: number;
-  touched: boolean;
-  dirty: boolean;
-  error: string[] | null;
+  touched?: boolean;
+  dirty?: boolean;
+  error?: string;
   setValue: (value: T) => void;
 }
 

@@ -14,7 +14,7 @@ import {
   useApolloMutation,
   useApolloQuery,
 } from './hooks/Apollo';
-import useFormInput from './hooks/useFormInput';
+import useFormHook from './hooks/useFormHook';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
 
@@ -38,25 +38,30 @@ interface Props extends RouteComponentProps<{}> {
 
 function Login({ className, location }: Props) {
   const client = useApolloClient();
-  const [email] = useFormInput({
-    initialValue: '',
-    validate: yup
-      .string()
-      .email()
-      .required(),
-  });
-
-  const [password] = useFormInput({
-    initialValue: '',
-    validate: yup.string().required(),
-  });
-
-  const isValid = useMemo(
-    () => {
-      return email.error === null && password.error === null;
+  const {
+    values: { email, password },
+    handlers,
+    dirty,
+    errors,
+    touched,
+    valid,
+    handleSubmit,
+  } = useFormHook({
+    initialValues: {
+      email: '',
+      password: '',
     },
-    [email.error, password.error],
-  );
+    onSubmit: () => {
+      mutate();
+    },
+    validationSchema: yup.object().shape({
+      email: yup
+        .string()
+        .required()
+        .email(),
+      password: yup.string().required(),
+    }),
+  });
 
   if (!client) {
     throw new Error(
@@ -79,8 +84,8 @@ function Login({ className, location }: Props) {
       },
       variables: {
         data: {
-          email: email.value,
-          password: password.value,
+          email,
+          password,
         },
       },
     },
@@ -98,21 +103,28 @@ function Login({ className, location }: Props) {
   return (
     <LoginContainer className={className}>
       <GlobalStyles />
-      <Form
-        onSubmit={event => {
-          event.preventDefault();
-          mutate();
-        }}
-      >
+      <Form onSubmit={handleSubmit}>
         <LoginHeading level={1}>Login</LoginHeading>
-        <EmailInput name="email" label="Email" {...email} />
+        <EmailInput
+          name="email"
+          label="Email"
+          value={email}
+          touched={touched.email}
+          dirty={dirty.email}
+          error={errors.email}
+          {...handlers.email}
+        />
         <PasswordInput
           type="password"
           name="password"
           label="Password"
-          {...password}
+          value={password}
+          touched={touched.password}
+          dirty={dirty.password}
+          error={errors.password}
+          {...handlers.password}
         />
-        <LoginButton type="submit" disabled={!isValid}>
+        <LoginButton type="submit" disabled={!valid}>
           Go
         </LoginButton>
       </Form>

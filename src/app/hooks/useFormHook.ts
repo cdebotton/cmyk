@@ -11,6 +11,7 @@ import { Schema } from 'yup';
 
 interface Options<T> {
   initialValues: T;
+  onSubmit: (values: T) => void | Promise<any>;
   validateOnBlur?: boolean;
   validateOnChange?: boolean;
   validationSchema?: Schema<any>;
@@ -26,24 +27,33 @@ type Handlers<T> = {
   }
 };
 
+type Setters<T> = { readonly [K in keyof T]: (value: T[K]) => void };
+
 interface Form<T> {
   values: T;
   errors: StringShape<T>;
   touched: BoolShape<T>;
   dirty: BoolShape<T>;
   handlers: Handlers<T>;
+  setters: Setters<T>;
   valid: boolean;
+  submitting: boolean;
+  handleReset: VoidFunction;
+  handleSubmit: FormEventHandler<HTMLFormElement>;
 }
 
 type FormElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
 function useFormHook<T>({
   initialValues,
+  onSubmit,
   validateOnBlur = true,
   validateOnChange = true,
   validationSchema,
 }: Options<T>): Form<T> {
-  const [values, setValues] = useState(initialValues);
+  const [lastValues, setLastValues] = useState(initialValues);
+  const [submitting, setSubmitting] = useState(false);
+  const [values, setValues] = useState(lastValues);
   const [touched, setTouched] = useState<BoolShape<T>>({});
   const [dirty, setDirty] = useState<BoolShape<T>>({});
   const [errors, setErrors] = useState<StringShape<T>>({});
@@ -95,6 +105,28 @@ function useFormHook<T>({
     [initialValues],
   );
 
+  const setters = useMemo<Setters<T>>(
+    () => {
+      return Object.keys(initialValues).reduce<Setters<T>>(
+        (memo, key) => {
+          return {
+            ...(memo as any),
+            [key]: <K extends keyof T>(value: T[K]) => {
+              setValues(prevValues => {
+                return {
+                  ...(values as any),
+                  [key]: value,
+                };
+              });
+            },
+          };
+        },
+        {} as any,
+      );
+    },
+    [initialValues],
+  );
+
   useMutationEffect(
     () => {
       if (validationSchema && validateOnChange) {
@@ -121,7 +153,35 @@ function useFormHook<T>({
     [errors],
   );
 
-  return { values, touched, handlers, errors, valid, dirty };
+  function handleReset() {
+    setValues(initialValues);
+  }
+
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+
+    if (!valid) {
+      return;
+    }
+
+    setSubmitting(true);
+    await onSubmit(values);
+    setSubmitting(false);
+    setLastValues(values);
+  }
+
+  return {
+    dirty,
+    errors,
+    handleReset,
+    handleSubmit,
+    handlers,
+    setters,
+    submitting,
+    touched,
+    valid,
+    values,
+  };
 }
 
 function setErrorsFromYup<T>(_: StringShape<T>, yupError: any): StringShape<T> {

@@ -25,6 +25,7 @@ import PageHeading from './components/PageHeading';
 import Select from './components/Select';
 import SimpleInput from './components/SimpleInput';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
+import useFormHook from './hooks/useFormHook';
 import useFormInput, { Field } from './hooks/useFormInput';
 
 const EDIT_USER_QUERY = gql`
@@ -205,51 +206,47 @@ function AdminEditUser({ className, ...props }: Props) {
     return uploadResult.data;
   }
 
-  const [email, resetEmail] = useFormInput({
-    initialValue: user.email,
-    validate: yup
-      .string()
-      .email('Must be a valid email address')
-      .required('Email required'),
+  const {
+    values: { email, firstName, lastName, image, role },
+    handlers,
+    touched,
+    dirty,
+    errors,
+    setters: { image: setImage, role: setRole },
+    valid,
+    handleReset,
+    handleSubmit,
+  } = useFormHook({
+    initialValues: {
+      email: user.email,
+      firstName: user.profile.firstName,
+      image: user.profile.avatar,
+      lastName: user.profile.lastName,
+      role: user.role,
+    },
+    onSubmit: values =>
+      updateUser({
+        avatar: values.image,
+        email: values.email,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        role: values.role,
+      }),
+    validationSchema: yup.object().shape({
+      email: yup
+        .string()
+        .email('Must be a valid email address')
+        .required('Email required'),
+      firstName: yup
+        .string()
+        .min(2, 'First name must be longer than 2 characters')
+        .required('First name is required'),
+      lastName: yup
+        .string()
+        .min(2, 'Last name must be longer than 2 characters')
+        .required('Last name is required'),
+    }),
   });
-  const [firstName, resetFirstName] = useFormInput({
-    initialValue: user.profile.firstName,
-    validate: yup
-      .string()
-      .min(2, 'First name must be longer than 2 characters')
-      .required('First name is required'),
-  });
-  const [lastName, resetLastName] = useFormInput({
-    initialValue: user.profile.lastName,
-    validate: yup
-      .string()
-      .min(2, 'Last name must be longer than 2 characters')
-      .required('Last name is required'),
-  });
-  const [image, resetImage] = useFormInput({
-    initialValue: user.profile.avatar,
-  });
-  const [role, resetRole] = useFormInput<Role>({
-    initialValue: user.role,
-  });
-
-  function handleReset() {
-    resetEmail();
-    resetFirstName();
-    resetLastName();
-    resetRole();
-    resetImage();
-  }
-
-  function handleSubmit() {
-    updateUser({
-      avatar: image.value,
-      email: email.value,
-      firstName: firstName.value,
-      lastName: lastName.value,
-      role: role.value,
-    });
-  }
 
   return (
     <AdminEditUserLayout className={className}>
@@ -267,15 +264,43 @@ function AdminEditUser({ className, ...props }: Props) {
               return;
             }
 
-            image.setValue(uploadResult.uploadFile);
+            setImage(uploadResult.uploadFile);
           }}
         />
 
-        <EmailInput name="email" label="Email" {...email} />
-        <SimpleInput name="firstName" label="First name" {...firstName} />
-        <SimpleInput name="lastName" label="Last name" {...lastName} />
+        <EmailInput
+          name="email"
+          label="Email"
+          value={email}
+          touched={touched.email}
+          dirty={dirty.email}
+          error={errors.email}
+          {...handlers.email}
+        />
+        <SimpleInput
+          name="firstName"
+          label="First name"
+          value={firstName}
+          touched={touched.firstName}
+          dirty={dirty.firstName}
+          error={errors.firstName}
+          {...handlers.firstName}
+        />
+        <SimpleInput
+          name="lastName"
+          label="Last name"
+          value={lastName}
+          touched={touched.lastName}
+          dirty={dirty.lastName}
+          error={errors.lastName}
+          {...handlers.lastName}
+        />
         <Select
-          {...role}
+          value={role}
+          touched={touched.role}
+          dirty={dirty.role}
+          error={errors.role}
+          setValue={setRole}
           name="role"
           label="Role"
           options={[
@@ -285,7 +310,9 @@ function AdminEditUser({ className, ...props }: Props) {
             { label: 'Unauthorized', value: Role.UNAUTHORIZED },
           ]}
         />
-        <SaveButton format="neutral">Save</SaveButton>
+        <SaveButton format="neutral" disabled={!valid}>
+          Save
+        </SaveButton>
         <CancelButton
           onClick={() => {
             handleReset();

@@ -62,8 +62,7 @@ interface Props {
   name: string;
   dirty?: boolean;
   touched?: boolean;
-  error?: string[] | null;
-  setValue: (value: string) => void;
+  error?: string | null;
 }
 
 function SimpleInput({
@@ -72,7 +71,6 @@ function SimpleInput({
   touched,
   error,
   dirty: _,
-  setValue,
   ...field
 }: Props) {
   const [{ value: errorSpring }, setErrorSpring] = useSpring({
