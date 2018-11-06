@@ -29,7 +29,7 @@ type Handlers<T> = {
 
 type Setters<T> = { readonly [K in keyof T]: (value: T[K]) => void };
 
-interface Form<T> {
+export interface Form<T> {
   values: T;
   errors: StringShape<T>;
   touched: BoolShape<T>;
@@ -44,7 +44,7 @@ interface Form<T> {
 
 type FormElement = HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement;
 
-function useFormHook<T>({
+function useForm<T>({
   initialValues,
   onSubmit,
   validateOnBlur = true,
@@ -85,17 +85,13 @@ function useFormHook<T>({
               const { currentTarget } = event;
 
               setValues(prevState => {
-                return {
-                  ...(prevState as any),
+                return Object.assign({}, prevState, {
                   [key]: currentTarget.value,
-                };
+                });
               });
 
               setDirty(prevState => {
-                return {
-                  ...(prevState as any),
-                  [key]: true,
-                };
+                return Object.assign({}, prevState, { [key]: true });
               });
             },
           },
@@ -198,4 +194,4 @@ function setErrorsFromYup<T>(_: StringShape<T>, yupError: any): StringShape<T> {
   return newErrors;
 }
 
-export default useFormHook;
+export default useForm;

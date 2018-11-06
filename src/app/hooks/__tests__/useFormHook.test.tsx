@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render, waitForElement } from 'react-testing-library';
 import * as yup from 'yup';
-import useFormHook from '../useFormHook';
+import useFormHook from '../useForm';
 
 interface Props {
   initialValue?: string;

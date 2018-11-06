@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import { padding, rem } from 'polished';
-import React, { useMemo } from 'react';
+import React from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
@@ -14,7 +14,7 @@ import {
   useApolloMutation,
   useApolloQuery,
 } from './hooks/Apollo';
-import useFormHook from './hooks/useFormHook';
+import useForm from './hooks/useForm';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
 
@@ -46,7 +46,7 @@ function Login({ className, location }: Props) {
     touched,
     valid,
     handleSubmit,
-  } = useFormHook({
+  } = useForm({
     initialValues: {
       email: '',
       password: '',

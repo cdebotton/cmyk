@@ -25,8 +25,7 @@ import PageHeading from './components/PageHeading';
 import Select from './components/Select';
 import SimpleInput from './components/SimpleInput';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
-import useFormHook from './hooks/useFormHook';
-import useFormInput, { Field } from './hooks/useFormInput';
+import useFormHook from './hooks/useForm';
 
 const EDIT_USER_QUERY = gql`
   query EditUserQuery($where: UserWhereUniqueInput!) {
