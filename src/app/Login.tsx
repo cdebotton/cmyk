@@ -14,7 +14,7 @@ import {
   useApolloMutation,
   useApolloQuery,
 } from './hooks/Apollo';
-import useForm from './hooks/useForm';
+import { useField, useForm } from './hooks/useForm';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
 
@@ -38,15 +38,7 @@ interface Props extends RouteComponentProps<{}> {
 
 function Login({ className, location }: Props) {
   const client = useApolloClient();
-  const {
-    values: { email, password },
-    handlers,
-    dirty,
-    errors,
-    touched,
-    valid,
-    handleSubmit,
-  } = useForm({
+  const form = useForm({
     initialValues: {
       email: '',
       password: '',
@@ -54,7 +46,7 @@ function Login({ className, location }: Props) {
     onSubmit: () => {
       mutate();
     },
-    validationSchema: yup.object().shape({
+    validationSchema: yup.object<{ email: string; password: string }>().shape({
       email: yup
         .string()
         .required()
@@ -62,6 +54,11 @@ function Login({ className, location }: Props) {
       password: yup.string().required(),
     }),
   });
+
+  const { handleSubmit, valid } = form;
+
+  const email = useField('email', form);
+  const password = useField('password', form);
 
   if (!client) {
     throw new Error(
@@ -84,8 +81,8 @@ function Login({ className, location }: Props) {
       },
       variables: {
         data: {
-          email,
-          password,
+          email: email.input.value,
+          password: password.input.value,
         },
       },
     },
@@ -108,21 +105,15 @@ function Login({ className, location }: Props) {
         <EmailInput
           name="email"
           label="Email"
-          value={email}
-          touched={touched.email}
-          dirty={dirty.email}
-          error={errors.email}
-          {...handlers.email}
+          {...email.input}
+          {...email.meta}
         />
         <PasswordInput
           type="password"
           name="password"
           label="Password"
-          value={password}
-          touched={touched.password}
-          dirty={dirty.password}
-          error={errors.password}
-          {...handlers.password}
+          {...password.input}
+          {...password.meta}
         />
         <LoginButton type="submit" disabled={!valid}>
           Go

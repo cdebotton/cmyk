@@ -33,6 +33,7 @@ function getErrorShape<T>(values: T): ErrorShape<T> {
 
 interface Options<T> {
   initialValues: T;
+  onSubmit: (values: T) => void;
   validateOnBlur?: boolean;
   validateOnChange?: boolean;
   validateOnFirstRun?: boolean;
@@ -41,6 +42,8 @@ interface Options<T> {
 
 export interface Form<T> {
   valid: boolean;
+  submitting: boolean;
+  handleSubmit: () => void | Promise<void>;
   reset: VoidFunction;
 
   [CONTROLLER]: {
@@ -58,12 +61,14 @@ export interface Form<T> {
 function useForm<T>({
   initialValues,
   validationSchema,
+  onSubmit,
   validateOnBlur = true,
   validateOnChange = true,
   validateOnFirstRun = true,
 }: Options<T>): Form<T> {
   const firstRun = useRef(true);
   const [values, setValues] = useState(initialValues);
+  const [submitting, setSubmitting] = useState(false);
 
   const [dirty, setDirty] = useState<BoolShape<T>>(
     getBooleanShape(initialValues),
@@ -131,6 +136,14 @@ function useForm<T>({
     setFocused(getBooleanShape(initialValues));
   }
 
+  function handleSubmit(event: FormEvent) {
+    event.preventDefault();
+
+    setSubmitting(true);
+    onSubmit(values);
+    setSubmitting(false);
+  }
+
   if (firstRun.current === true && validateOnFirstRun) {
     validate();
     firstRun.current = false;
@@ -162,7 +175,9 @@ function useForm<T>({
   );
 
   return {
+    handleSubmit,
     reset,
+    submitting,
     valid,
     [CONTROLLER]: {
       blur,

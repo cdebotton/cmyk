@@ -11,7 +11,11 @@ describe('useForm', () => {
   }
 
   function Assert<T>({ children, initialValues, validationSchema }: Props<T>) {
-    const form = useForm({ initialValues, validationSchema });
+    const form = useForm({
+      initialValues,
+      validationSchema,
+      onSubmit: () => undefined,
+    });
     return children(form);
   }
 
@@ -166,7 +170,10 @@ describe('useInput', () => {
     }
 
     function Assert({ children }: Props) {
-      const hook = useForm({ initialValues: { field: '' } });
+      const hook = useForm({
+        initialValues: { field: '' },
+        onSubmit: () => undefined,
+      });
       const field = useField('field', hook);
 
       return (
