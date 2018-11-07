@@ -43,7 +43,7 @@ interface Options<T> {
 export interface Form<T> {
   valid: boolean;
   submitting: boolean;
-  handleSubmit: () => void | Promise<void>;
+  handleSubmit: (event: FormEvent) => void | Promise<void>;
   reset: VoidFunction;
 
   [CONTROLLER]: {
