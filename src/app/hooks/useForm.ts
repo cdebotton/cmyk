@@ -6,7 +6,10 @@ import {
   useRef,
   useState,
 } from 'react';
+
 import { Schema, ValidationError } from 'yup';
+
+export const CONTROLLER = Symbol();
 
 function isValidationError(x: any): x is ValidationError {
   return x instanceof ValidationError;
@@ -37,21 +40,25 @@ interface Options<T> {
 }
 
 export interface Form<T> {
-  dirty: BoolShape<T>;
-  errors: ErrorShape<T>;
-  focus: (name: keyof T) => void;
-  focused: BoolShape<T>;
-  blur: (name: keyof T) => void;
-  touched: BoolShape<T>;
-  change: <K extends keyof T>(name: K, value: T[K]) => void;
-  values: T;
   valid: boolean;
+  reset: VoidFunction;
+
+  [CONTROLLER]: {
+    dirty: BoolShape<T>;
+    errors: ErrorShape<T>;
+    focused: BoolShape<T>;
+    touched: BoolShape<T>;
+    values: T;
+    blur: (name: keyof T) => void;
+    change: <K extends keyof T>(name: K, value: T[K]) => void;
+    focus: (name: keyof T) => void;
+  };
 }
 
 function useForm<T>({
   initialValues,
   validationSchema,
-  // validateOnBlur = true,
+  validateOnBlur = true,
   validateOnChange = true,
   validateOnFirstRun = true,
 }: Options<T>): Form<T> {
@@ -117,6 +124,13 @@ function useForm<T>({
     });
   }
 
+  function reset() {
+    setValues(initialValues);
+    setTouched(getBooleanShape(initialValues));
+    setDirty(getBooleanShape(initialValues));
+    setFocused(getBooleanShape(initialValues));
+  }
+
   if (firstRun.current === true && validateOnFirstRun) {
     validate();
     firstRun.current = false;
@@ -131,6 +145,15 @@ function useForm<T>({
     [values],
   );
 
+  useEffect(
+    () => {
+      if (validateOnBlur) {
+        validate();
+      }
+    },
+    [touched],
+  );
+
   const valid = useMemo(
     () => {
       return Object.values(errors).every(err => err === null);
@@ -139,21 +162,35 @@ function useForm<T>({
   );
 
   return {
-    blur,
-    change,
-    dirty,
-    errors,
-    focus,
-    focused,
-    touched,
+    reset,
     valid,
-    values,
+    [CONTROLLER]: {
+      blur,
+      change,
+      dirty,
+      errors,
+      focus,
+      focused,
+      touched,
+      values,
+    },
   };
 }
 
 function useField<T, K extends keyof T>(
   name: K,
-  { values, change, blur, focus }: Form<T>,
+  {
+    [CONTROLLER]: {
+      values,
+      change,
+      blur,
+      focus,
+      dirty,
+      touched,
+      errors,
+      focused,
+    },
+  }: Form<T>,
 ) {
   const input = useMemo(
     () => {
@@ -173,7 +210,27 @@ function useField<T, K extends keyof T>(
     [values[name]],
   );
 
-  return { input };
+  const meta = useMemo(
+    () => {
+      return {
+        dirty: dirty[name],
+        errors: errors[name],
+        focused: focused[name],
+        touched: touched[name],
+      };
+    },
+    [dirty[name], touched[name], errors[name], focused[name]],
+  );
+
+  const handlers = useMemo(() => {
+    return {
+      setValue: (value: T[K]) => {
+        change(name, value);
+      },
+    };
+  }, []);
+
+  return { input, meta, handlers };
 }
 
 export { useForm, useField };

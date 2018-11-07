@@ -1,7 +1,7 @@
 import React from 'react';
 import { fireEvent, render } from 'react-testing-library';
 import * as yup from 'yup';
-import { Form, useField, useForm } from '../useForm';
+import { CONTROLLER, Form, useField, useForm } from '../useForm';
 
 describe('useForm', () => {
   interface Props<T> {
@@ -36,8 +36,8 @@ describe('useForm', () => {
       throw new Error('Form is undefined');
     }
 
-    expect(form.values.foo).toBe('bar');
-    expect(form.values.baz).toBe('bat');
+    expect(form[CONTROLLER].values.foo).toBe('bar');
+    expect(form[CONTROLLER].values.baz).toBe('bat');
   });
 
   it('should provide a means to set the value', () => {
@@ -56,11 +56,11 @@ describe('useForm', () => {
       throw new Error('Form is undefined');
     }
 
-    expect(form.values.field).toBe('');
+    expect(form[CONTROLLER].values.field).toBe('');
 
-    form.change('field', 'foo');
+    form[CONTROLLER].change('field', 'foo');
 
-    expect(form.values.field).toBe('foo');
+    expect(form[CONTROLLER].values.field).toBe('foo');
   });
 
   it('should provide a dirty prop that is set to true when the form values differ from the initial values', () => {
@@ -81,15 +81,15 @@ describe('useForm', () => {
       throw new Error('Form is undefined');
     }
 
-    expect(form.dirty.fieldA).toBe(false);
+    expect(form[CONTROLLER].dirty.fieldA).toBe(false);
 
-    form.change('fieldA', 'foo');
+    form[CONTROLLER].change('fieldA', 'foo');
 
-    expect(form.dirty.fieldA).toBe(true);
+    expect(form[CONTROLLER].dirty.fieldA).toBe(true);
 
-    form.change('fieldA', '');
+    form[CONTROLLER].change('fieldA', '');
 
-    expect(form.dirty.fieldA).toBe(false);
+    expect(form[CONTROLLER].dirty.fieldA).toBe(false);
   });
 
   it('should provide a means to focus and blur fields', () => {
@@ -110,16 +110,16 @@ describe('useForm', () => {
       throw new Error('Form is undefined');
     }
 
-    expect(form.touched.fieldA).toBe(false);
+    expect(form[CONTROLLER].touched.fieldA).toBe(false);
 
-    form.focus('fieldA');
+    form[CONTROLLER].focus('fieldA');
 
-    expect(form.focused.fieldA).toBe(true);
+    expect(form[CONTROLLER].focused.fieldA).toBe(true);
 
-    form.blur('fieldA');
+    form[CONTROLLER].blur('fieldA');
 
-    expect(form.touched.fieldA).toBe(true);
-    expect(form.focused.fieldA).toBe(false);
+    expect(form[CONTROLLER].touched.fieldA).toBe(true);
+    expect(form[CONTROLLER].focused.fieldA).toBe(false);
   });
 
   it('should provide validation', () => {
@@ -149,12 +149,12 @@ describe('useForm', () => {
       throw new Error('Form is undefined');
     }
 
-    expect(form.errors.fieldA).toEqual(['req']);
+    expect(form[CONTROLLER].errors.fieldA).toEqual(['req']);
     expect(form.valid).toBe(false);
 
-    form.change('fieldA', 'foo');
+    form[CONTROLLER].change('fieldA', 'foo');
 
-    expect(form.errors.fieldA).toBe(null);
+    expect(form[CONTROLLER].errors.fieldA).toBe(null);
     expect(form.valid).toBe(true);
   });
 });
@@ -193,27 +193,27 @@ describe('useInput', () => {
       return;
     }
 
-    expect(form.values.field).toBe('');
+    expect(form[CONTROLLER].values.field).toBe('');
     expect(input.value).toBe('');
 
     fireEvent.change(input, { target: { value: 'foo' } });
-    expect(form.values.field).toBe('foo');
+    expect(form[CONTROLLER].values.field).toBe('foo');
     expect(input.value).toBe('foo');
-    expect(form.dirty.field).toBe(true);
+    expect(form[CONTROLLER].dirty.field).toBe(true);
 
-    form.change('field', 'bar');
-    expect(form.values.field).toBe('bar');
+    form[CONTROLLER].change('field', 'bar');
+    expect(form[CONTROLLER].values.field).toBe('bar');
     expect(input.value).toBe('bar');
 
     fireEvent.change(input, { target: { value: '' } });
-    expect(form.dirty.field).toBe(false);
+    expect(form[CONTROLLER].dirty.field).toBe(false);
 
     fireEvent.focus(input);
-    expect(form.focused.field).toBe(true);
-    expect(form.touched.field).toBe(false);
+    expect(form[CONTROLLER].focused.field).toBe(true);
+    expect(form[CONTROLLER].touched.field).toBe(false);
 
     fireEvent.blur(input);
-    expect(form.focused.field).toBe(false);
-    expect(form.touched.field).toBe(true);
+    expect(form[CONTROLLER].focused.field).toBe(false);
+    expect(form[CONTROLLER].touched.field).toBe(true);
   });
 });
