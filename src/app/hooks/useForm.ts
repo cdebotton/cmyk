@@ -33,18 +33,27 @@ function getErrorShape<T>(values: T): ErrorShape<T> {
 
 interface Options<T> {
   initialValues: T;
-  onSubmit: (values: T) => void;
+  onSubmit: (values: T) => void | Promise<void>;
   validateOnBlur?: boolean;
   validateOnChange?: boolean;
   validateOnFirstRun?: boolean;
-  validationSchema?: Schema<T>;
+  validationSchema?: Schema<any>;
+}
+
+function isPromise(obj: any): obj is Promise<any> {
+  return (
+    !!obj &&
+    (typeof obj === 'object' || typeof obj === 'function') &&
+    typeof obj.then === 'function'
+  );
 }
 
 export interface Form<T> {
   valid: boolean;
+  dirty: boolean;
   submitting: boolean;
   handleSubmit: (event: FormEvent) => void | Promise<void>;
-  reset: VoidFunction;
+  handleReset: VoidFunction;
 
   [CONTROLLER]: {
     dirty: BoolShape<T>;
@@ -68,6 +77,7 @@ function useForm<T>({
 }: Options<T>): Form<T> {
   const firstRun = useRef(true);
   const [values, setValues] = useState(initialValues);
+
   const [submitting, setSubmitting] = useState(false);
 
   const [dirty, setDirty] = useState<BoolShape<T>>(
@@ -129,18 +139,21 @@ function useForm<T>({
     });
   }
 
-  function reset() {
+  function handleReset() {
     setValues(initialValues);
     setTouched(getBooleanShape(initialValues));
     setDirty(getBooleanShape(initialValues));
     setFocused(getBooleanShape(initialValues));
   }
 
-  function handleSubmit(event: FormEvent) {
+  async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
     setSubmitting(true);
-    onSubmit(values);
+    const submit = onSubmit(values);
+    if (isPromise(submit)) {
+      await submit;
+    }
     setSubmitting(false);
   }
 
@@ -174,11 +187,16 @@ function useForm<T>({
     [errors],
   );
 
+  const isDirty = useMemo(() => Object.values(dirty).some(d => d === true), [
+    dirty,
+  ]);
+
   return {
+    handleReset,
     handleSubmit,
-    reset,
     submitting,
     valid,
+    dirty: isDirty,
     [CONTROLLER]: {
       blur,
       change,

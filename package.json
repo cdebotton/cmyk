@@ -4,7 +4,7 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "build:apollo": "apollo codegen:generate --addTypename --target typescript --watch --queries=src/app/**/*.tsx",
+    "build:apollo": "apollo codegen:generate --addTypename --target typescript --queries=src/app/**/*.tsx",
     "watch:apollo": "yarn build:apollo --watch",
     "prisma:deploy": "cd db && prisma deploy",
     "graphql:get-schema": "graphql get-schema -p prisma",

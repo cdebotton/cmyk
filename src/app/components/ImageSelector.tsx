@@ -1,43 +1,35 @@
+import { ApolloError } from 'apollo-client';
 import { size } from 'polished';
-import React, { ChangeEventHandler, Component, FormEventHandler } from 'react';
+import React, {
+  ChangeEvent,
+  FormEventHandler,
+  useCallback,
+  useState,
+} from 'react';
 import styled from 'styled-components';
 
 interface Props {
   className?: string;
+  error?: ApolloError | null;
+  uploading: boolean;
   name: string;
-  file: {
+  value: {
     key: string;
     bucket: string;
     url: string;
   } | null;
-  onFileChange: FormEventHandler<HTMLInputElement>;
+  onChange: FormEventHandler<HTMLInputElement>;
 }
 
-interface State {
-  currentUrl: string | ArrayBuffer | null;
-}
+function ImageSelector({ className, name, value, onChange, uploading }: Props) {
+  const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 
-class ImageSelector extends Component<Props, State> {
-  state = { currentUrl: null };
+  const url = currentUrl || (value ? value.url : null);
+  const id = `file-${name}`;
 
-  render() {
-    const { className, file, name } = this.props;
-    const { currentUrl } = this.state;
-    const url = currentUrl || (file ? file.url : null);
-    const id = `file-${name}`;
-    return (
-      <ImageSelectorContainer className={className}>
-        {url && <Image src={url} />}
-        <FileInput id={id} onChange={this.onFileChange} />
-        <Label htmlFor={id} />
-      </ImageSelectorContainer>
-    );
-  }
-
-  onFileChange: ChangeEventHandler<HTMLInputElement> = event => {
+  const handleChange = useCallback((event: ChangeEvent<HTMLInputElement>) => {
     const reader = new FileReader();
     const files = event.currentTarget.files;
-
     if (!files || files.length === 0) {
       return;
     }
@@ -48,16 +40,23 @@ class ImageSelector extends Component<Props, State> {
       if (!readerEvent.target) {
         return;
       }
-
       const result = reader.result;
-
-      this.setState(state => ({ ...state, currentUrl: result }));
+      if (result) {
+        setCurrentUrl(result.toString());
+      }
     };
 
     reader.readAsDataURL(file);
+    onChange(event);
+  }, []);
 
-    this.props.onFileChange(event);
-  };
+  return (
+    <ImageSelectorContainer className={className} disabled={uploading}>
+      {url && <Image src={url} />}
+      {!uploading && <FileInput id={id} onChange={handleChange} />}
+      <Label htmlFor={id} />
+    </ImageSelectorContainer>
+  );
 }
 
 const Image = styled.img`
@@ -79,10 +78,11 @@ const Label = styled.label`
   cursor: pointer;
 `;
 
-const ImageSelectorContainer = styled.span`
+const ImageSelectorContainer = styled.span<{ disabled: boolean }>`
   position: relative;
   width: 100%;
   height: 100%;
+  opacity: ${props => (props.disabled ? 0.5 : 1)};
 `;
 
 export default ImageSelector;

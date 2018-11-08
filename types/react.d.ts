@@ -1,4 +1,4 @@
-import { ComponentType, ReactNode, Context } from 'react';
+import { ComponentType, ReactNode, Context, RefObject } from 'react';
 
 declare module 'react' {
   export const Suspense: ComponentType<{
@@ -55,11 +55,13 @@ declare module 'react' {
     cDU?: any[],
   ): void;
 
-  export function useCallback(fn: VoidFunction, cDU?: any[]): void;
+  export function useCallback<Fn extends Function>(fn: Fn, cDU?: any[]): Fn;
 
   export function useMemo<T>(memoizer: () => T, watch: any[]): T;
 
-  export function useRef<T>(initial?: T): { current: T | null };
+  type Mutable<T> = { -readonly [K in keyof T]: T[K] };
+
+  export function useRef<T>(initial?: T): Mutable<RefObject<T>>;
 
   type Loader<T> = Promise<{ default: ComponentType<T> }>;
 

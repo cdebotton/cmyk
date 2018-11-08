@@ -1,14 +1,8 @@
 import { padding, rem } from 'polished';
-import React, {
-  ReactNode,
-  RefObject,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import React, { ReactNode, useMemo, useRef } from 'react';
 import { animated, config, useSpring } from 'react-spring';
 import styled, { css } from 'styled-components';
+import useBoundingClientRect from '../hooks/useBoundingClientRect';
 
 type Position = 'top' | 'right' | 'bottom' | 'left';
 
@@ -54,8 +48,6 @@ const Popup = styled(animated.span)<{ position: Position }>`
   }};
 `;
 
-type Nullable<T> = { [K in keyof T]: T[K] | null };
-
 interface Props {
   children: ReactNode;
   content: ReactNode;
@@ -65,8 +57,8 @@ function Tooltip({ children, content }: Props) {
   const target = useRef<any | null>(null);
   const popup = useRef<any | null>(null);
 
-  const targetRect = useElementSize(target);
-  const popupRect = useElementSize(popup);
+  const targetRect = useBoundingClientRect(target);
+  const popupRect = useBoundingClientRect(popup);
   const position = useMemo(() => getPosition(targetRect, popupRect), [
     targetRect,
     popupRect,
@@ -107,38 +99,40 @@ function Tooltip({ children, content }: Props) {
 }
 
 function getPosition(
-  targetRect: Nullable<ClientRect>,
-  popupRect: Nullable<ClientRect>,
+  targetRect: ClientRect | DOMRect | null,
+  popupRect: ClientRect | DOMRect | null,
 ): Position {
-  const { top, right, bottom, left } = targetRect;
+  if (targetRect && popupRect) {
+    const { top, right, bottom, left } = targetRect;
 
-  const { width, height } = popupRect;
+    const { width, height } = popupRect;
 
-  if (
-    top === null ||
-    right === null ||
-    bottom === null ||
-    left === null ||
-    width === null ||
-    height === null
-  ) {
-    return 'top';
-  }
+    if (
+      top === null ||
+      right === null ||
+      bottom === null ||
+      left === null ||
+      width === null ||
+      height === null
+    ) {
+      return 'top';
+    }
 
-  if (height <= top) {
-    return 'top';
-  }
+    if (height <= top) {
+      return 'top';
+    }
 
-  if (height <= bottom) {
-    return 'bottom';
-  }
+    if (height <= bottom) {
+      return 'bottom';
+    }
 
-  if (width <= right) {
-    return 'right';
-  }
+    if (width <= right) {
+      return 'right';
+    }
 
-  if (width <= left) {
-    return 'left';
+    if (width <= left) {
+      return 'left';
+    }
   }
 
   return 'top';
@@ -156,29 +150,6 @@ function getOrigin(position: Position) {
     case 'left':
       return `translate3d(${rem(TRAVEL)}, 0rem, 0rem)`;
   }
-}
-
-function useElementSize<T extends HTMLElement | null>(ref: RefObject<T>) {
-  const [rect, setRect] = useState<Nullable<ClientRect>>({
-    bottom: null,
-    height: null,
-    left: null,
-    right: null,
-    top: null,
-    width: null,
-  });
-
-  useLayoutEffect(
-    () => {
-      if (ref.current !== null) {
-        const clientRect = ref.current.getBoundingClientRect();
-        setRect(clientRect);
-      }
-    },
-    [ref.current],
-  );
-
-  return rect;
 }
 
 export default Tooltip;

@@ -1,6 +1,6 @@
 import { FieldProps } from 'formik';
 import { padding, rem } from 'polished';
-import React, { forwardRef, HTMLProps, Ref, useEffect, useState } from 'react';
+import React, { HTMLProps, useEffect, useState } from 'react';
 import { animated, config, useSpring } from 'react-spring';
 import styled from 'styled-components';
 import InputLabel from './InputLabel';

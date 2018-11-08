@@ -1,6 +1,6 @@
 import gql from 'graphql-tag';
 import { padding, rem } from 'polished';
-import React, { FormEvent, lazy } from 'react';
+import React, { FormEvent, lazy, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
@@ -14,18 +14,14 @@ import {
   UpdateUserMutation,
   UpdateUserMutationVariables,
 } from './__generated__/UpdateUserMutation';
-import {
-  UploadFileMutation,
-  UploadFileMutationVariables,
-} from './__generated__/UploadFileMutation';
 import Button from './components/Button';
+import EditorLayout, { Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';
-import Layout from './components/Layout';
-import PageHeading from './components/PageHeading';
 import Select from './components/Select';
 import SimpleInput from './components/SimpleInput';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
-import useFormHook from './hooks/useForm';
+import useFileUpload from './hooks/useFileUpload';
+import { useField, useForm } from './hooks/useForm';
 
 const EDIT_USER_QUERY = gql`
   query EditUserQuery($where: UserWhereUniqueInput!) {
@@ -71,32 +67,12 @@ const USER_UPDATE_MUTATION = gql`
   }
 `;
 
-const UPLOAD_FILE_MUTATION = gql`
-  mutation UploadFileMutation($file: Upload!) {
-    uploadFile(file: $file) {
-      id
-      bucket
-      key
-      url
-    }
-  }
-`;
-
-const AdminEditUserLayout = styled(Layout)`
-  align-content: start;
-`;
-
-const EditUserHeading = styled(PageHeading)`
-  grid-column: 2 / span 1;
-`;
-
 const UserForm = styled.form`
   grid-column: 2 / span 1;
   grid-gap: ${rem(16)};
   display: grid;
   grid-template-columns: ${rem(128)} repeat(4, 1fr);
   align-content: start;
-
   ${padding(0, rem(32))};
 `;
 
@@ -153,19 +129,15 @@ function AdminEditUser({ className, ...props }: Props) {
       return;
     }
 
-    const avatar = values.avatar
-      ? {
-          connect: { id: values.avatar.id },
-        }
-      : null;
-
     await updateUserMutation({
       variables: {
         data: {
           email: values.email,
           profile: {
             update: {
-              avatar,
+              avatar: values.avatar
+                ? { connect: { id: values.avatar.id } }
+                : null,
               firstName: values.firstName,
               lastName: values.lastName,
             },
@@ -179,10 +151,48 @@ function AdminEditUser({ className, ...props }: Props) {
     history.push('/admin/users');
   }
 
-  const updateFileMutation = useApolloMutation<
-    UploadFileMutation,
-    UploadFileMutationVariables
-  >(UPLOAD_FILE_MUTATION);
+  const validationSchema = yup.object().shape({
+    email: yup
+      .string()
+      .email('Must be a valid email address')
+      .required('Email required'),
+    firstName: yup
+      .string()
+      .min(2, 'First name must be longer than 2 characters')
+      .required('First name is required'),
+    lastName: yup
+      .string()
+      .min(2, 'Last name must be longer than 2 characters')
+      .required('Last name is required'),
+  });
+
+  const form = useForm({
+    validationSchema,
+    initialValues: {
+      avatar: user.profile.avatar,
+      email: user.email,
+      firstName: user.profile.firstName,
+      lastName: user.profile.lastName,
+      role: user.role,
+    },
+    onSubmit: values => {
+      return updateUser({
+        avatar: values.avatar,
+        email: values.email,
+        firstName: values.firstName,
+        lastName: values.lastName,
+        role: values.role,
+      });
+    },
+  });
+
+  const email = useField('email', form);
+  const firstName = useField('firstName', form);
+  const lastName = useField('lastName', form);
+  const avatar = useField('avatar', form);
+  const role = useField('role', form);
+
+  const [upload, { data, error, uploading }] = useFileUpload();
 
   async function handleFileChange(event: FormEvent<HTMLInputElement>) {
     if (!event.currentTarget.files) {
@@ -191,115 +201,51 @@ function AdminEditUser({ className, ...props }: Props) {
 
     const file = event.currentTarget.files[0];
 
-    const uploadResult = await updateFileMutation({
-      // update: (cache, { data: uploadData }) => {},
-      variables: {
-        file,
-      },
-    });
-
-    if (!(uploadResult && uploadResult.data)) {
-      return;
-    }
-
-    return uploadResult.data;
+    upload(file);
   }
 
-  const {
-    values: { email, firstName, lastName, image, role },
-    handlers,
-    touched,
-    dirty,
-    errors,
-    setters: { image: setImage, role: setRole },
-    valid,
-    handleReset,
-    handleSubmit,
-  } = useFormHook({
-    initialValues: {
-      email: user.email,
-      firstName: user.profile.firstName,
-      image: user.profile.avatar,
-      lastName: user.profile.lastName,
-      role: user.role,
+  useEffect(
+    () => {
+      if (data) {
+        avatar.handlers.setValue(data);
+      }
     },
-    onSubmit: values =>
-      updateUser({
-        avatar: values.image,
-        email: values.email,
-        firstName: values.firstName,
-        lastName: values.lastName,
-        role: values.role,
-      }),
-    validationSchema: yup.object().shape({
-      email: yup
-        .string()
-        .email('Must be a valid email address')
-        .required('Email required'),
-      firstName: yup
-        .string()
-        .min(2, 'First name must be longer than 2 characters')
-        .required('First name is required'),
-      lastName: yup
-        .string()
-        .min(2, 'Last name must be longer than 2 characters')
-        .required('Last name is required'),
-    }),
-  });
+    [data],
+  );
 
   return (
-    <AdminEditUserLayout className={className}>
-      <EditUserHeading>Edit User {user.email}</EditUserHeading>
-
-      <UserForm onSubmit={handleSubmit} autoComplete="off">
+    <EditorLayout className={className}>
+      <Heading>Edit User {user.email}</Heading>
+      <UserForm onSubmit={form.handleSubmit} autoComplete="off">
         <AvatarInput
-          file={user.profile.avatar}
+          value={avatar.input.value}
           name="avatar"
-          {...image}
-          onFileChange={async event => {
-            const uploadResult = await handleFileChange(event);
-
-            if (!uploadResult) {
-              return;
-            }
-
-            setImage(uploadResult.uploadFile);
-          }}
+          onChange={handleFileChange}
+          error={error}
+          uploading={uploading}
         />
-
         <EmailInput
           name="email"
           label="Email"
-          value={email}
-          touched={touched.email}
-          dirty={dirty.email}
-          error={errors.email}
-          {...handlers.email}
+          {...email.input}
+          {...email.meta}
         />
         <SimpleInput
           name="firstName"
           label="First name"
-          value={firstName}
-          touched={touched.firstName}
-          dirty={dirty.firstName}
-          error={errors.firstName}
-          {...handlers.firstName}
+          {...firstName.input}
+          {...firstName.meta}
         />
         <SimpleInput
           name="lastName"
           label="Last name"
-          value={lastName}
-          touched={touched.lastName}
-          dirty={dirty.lastName}
-          error={errors.lastName}
-          {...handlers.lastName}
+          {...lastName.input}
+          {...lastName.meta}
         />
         <Select
-          value={role}
-          touched={touched.role}
-          dirty={dirty.role}
-          error={errors.role}
-          setValue={setRole}
+          {...role.input}
+          {...role.meta}
+          {...role.handlers}
           name="role"
           label="Role"
           options={[
@@ -309,19 +255,22 @@ function AdminEditUser({ className, ...props }: Props) {
             { label: 'Unauthorized', value: Role.UNAUTHORIZED },
           ]}
         />
-        <SaveButton format="neutral" disabled={!valid}>
-          Save
+        <SaveButton
+          format="neutral"
+          disabled={!form.valid || form.submitting || !form.dirty}
+        >
+          {form.submitting ? 'Saving...' : 'Save'}
         </SaveButton>
         <CancelButton
           onClick={() => {
-            handleReset();
+            form.handleReset();
             history.goBack();
           }}
         >
           Cancel
         </CancelButton>
       </UserForm>
-    </AdminEditUserLayout>
+    </EditorLayout>
   );
 }
 
