@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-import { rem } from 'polished';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
@@ -12,9 +11,8 @@ import {
 import { Users } from './__generated__/Users';
 import { USERS_QUERY } from './AdminUsers';
 import Button from './components/Button';
-import Heading from './components/Heading';
+import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';
-import PageLayout from './components/PageLayout';
 import Select from './components/Select';
 import { useApolloMutation } from './hooks/Apollo';
 import { useField, useForm } from './hooks/useForm';
@@ -34,12 +32,6 @@ const CREATE_USER_MUTATION = gql`
       }
     }
   }
-`;
-
-const NewUserForm = styled.form`
-  display: grid;
-  grid-gap: ${rem(16)};
-  grid-template-columns: repeat(4, 1fr);
 `;
 
 const EmailField = styled(Input)`
@@ -127,9 +119,10 @@ function AdminNewUser({ history }: Props) {
   const role = useField('role', form);
 
   return (
-    <PageLayout>
+    <EditorLayout>
       <Heading>New user</Heading>
-      <NewUserForm onSubmit={form.handleSubmit}>
+
+      <Form onSubmit={form.handleSubmit}>
         <EmailField name="email" label="Email" {...email.input} {...email.meta} />
         <Input name="firstName" label="First name" {...firstName.input} {...firstName.meta} />
         <Input name="lastName" label="Last name" {...lastName.input} {...lastName.meta} />
@@ -157,8 +150,8 @@ function AdminNewUser({ history }: Props) {
           Create
         </Button>
         <Button type="reset">Cancel</Button>
-      </NewUserForm>
-    </PageLayout>
+      </Form>
+    </EditorLayout>
   );
 }
 

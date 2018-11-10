@@ -1,11 +1,9 @@
 import gql from 'graphql-tag';
-import { padding, rem } from 'polished';
 import React from 'react';
-import styled from 'styled-components';
+import { RouteComponentProps } from 'react-router';
 import { Documents } from './__generated__/Documents';
-import Heading from './components/Heading';
-import PageLayout from './components/PageLayout';
-import { Table, TableRow } from './components/Table';
+import List, { Item } from './components/List';
+import ListLayout, { CreateLink, Heading } from './components/ListLayout';
 import { useApolloQuery } from './hooks/Apollo';
 
 const DOCUMENTS_QUERY = gql`
@@ -17,26 +15,23 @@ const DOCUMENTS_QUERY = gql`
   }
 `;
 
-const DocumentsHeading = styled(Heading)`
-  ${padding(rem(32))};
-`;
+interface Props extends RouteComponentProps<{}> {}
 
-function AdminDocuments() {
+function AdminDocuments({ match: { url } }: Props) {
   const {
     data: { documents },
   } = useApolloQuery<Documents>(DOCUMENTS_QUERY);
 
   return (
-    <PageLayout>
-      <DocumentsHeading>Documents</DocumentsHeading>
-      <Table controls={<div>HI</div>}>
-        {documents.map(document => (
-          <TableRow key={`DOCUMENT_${document.id}`}>
-            <code>{JSON.stringify(document, null, 2)}</code>
-          </TableRow>
-        ))}
-      </Table>
-    </PageLayout>
+    <ListLayout>
+      <Heading>Documents</Heading>
+      <CreateLink to={`${url}/new`}>New document</CreateLink>
+      <List hidden={documents.length === 0}>
+        {documents.map(({ id, __typename }) => {
+          return <Item to={`${url}/${id}`} key={`${__typename}:${id}`} label={document.title} />;
+        })}
+      </List>
+    </ListLayout>
   );
 }
 

@@ -12,6 +12,13 @@ export enum Role {
   USER = "USER",
 }
 
+export interface DocumentCreateInput {
+  publishDate: any;
+  title: string;
+  type: DocumentTypeCreateOneWithoutDocumentsInput;
+  author?: UserCreateOneWithoutDocumentsInput | null;
+}
+
 export interface DocumentCreateManyWithoutAuthorInput {
   create?: DocumentCreateWithoutAuthorInput[] | null;
   connect?: DocumentWhereUniqueInput[] | null;
@@ -174,6 +181,19 @@ export interface UserCreateInput {
   role?: Role | null;
   profile: ProfileCreateOneWithoutUserInput;
   documents?: DocumentCreateManyWithoutAuthorInput | null;
+}
+
+export interface UserCreateOneWithoutDocumentsInput {
+  create?: UserCreateWithoutDocumentsInput | null;
+  connect?: UserWhereUniqueInput | null;
+}
+
+export interface UserCreateWithoutDocumentsInput {
+  email: string;
+  password: string;
+  lastLogin?: any | null;
+  role?: Role | null;
+  profile: ProfileCreateOneWithoutUserInput;
 }
 
 export interface UserUpdateInput {

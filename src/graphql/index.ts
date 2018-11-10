@@ -1,8 +1,4 @@
-import {
-  ApolloServer,
-  GraphQLUpload,
-  makeExecutableSchema,
-} from 'apollo-server';
+import { ApolloServer, GraphQLUpload, makeExecutableSchema } from 'apollo-server';
 import { Context } from 'apollo-server-core';
 import { importSchema } from 'graphql-import';
 import jwt from 'jsonwebtoken';

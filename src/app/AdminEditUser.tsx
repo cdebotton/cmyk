@@ -1,5 +1,4 @@
 import gql from 'graphql-tag';
-import { padding, rem } from 'polished';
 import React, { FormEvent, lazy, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
@@ -15,7 +14,7 @@ import {
   UpdateUserMutationVariables,
 } from './__generated__/UpdateUserMutation';
 import Button from './components/Button';
-import EditorLayout, { Heading } from './components/EditorLayout';
+import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
 import Select from './components/Select';
@@ -62,15 +61,6 @@ const USER_UPDATE_MUTATION = gql`
       }
     }
   }
-`;
-
-const UserForm = styled.form`
-  grid-column: 2 / span 1;
-  grid-gap: ${rem(16)};
-  display: grid;
-  grid-template-columns: ${rem(128)} repeat(4, 1fr);
-  align-content: start;
-  ${padding(0, rem(32))};
 `;
 
 const AvatarInput = styled(ImageSelector)`
@@ -210,7 +200,7 @@ function AdminEditUser({ className, ...props }: Props) {
   return (
     <EditorLayout className={className}>
       <Heading>Edit User {user.email}</Heading>
-      <UserForm onSubmit={form.handleSubmit} autoComplete="off">
+      <Form onSubmit={form.handleSubmit} autoComplete="off">
         <AvatarInput
           value={avatar.input.value}
           name="avatar"
@@ -245,7 +235,7 @@ function AdminEditUser({ className, ...props }: Props) {
         >
           Cancel
         </CancelButton>
-      </UserForm>
+      </Form>
     </EditorLayout>
   );
 }

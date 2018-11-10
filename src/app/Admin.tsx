@@ -72,8 +72,7 @@ const Header = styled.header`
 
 const Navigation = styled.nav`
   display: grid;
-  grid-template-columns: ${props =>
-    `repeat(${React.Children.count(props.children)}, max-content)`};
+  grid-template-columns: ${props => `repeat(${React.Children.count(props.children)}, max-content)`};
   grid-gap: ${rem(8)};
 `;
 
@@ -96,6 +95,7 @@ const AdminDashboard = lazy(() => import('./AdminDashboard'));
 const AdminNewUser = lazy(() => import('./AdminNewUser'));
 const AdminEditUser = lazy(() => import('./AdminEditUser'));
 const AdminUsers = lazy(() => import('./AdminUsers'));
+const AdminNewDocument = lazy(() => import('./AdminNewDocument'));
 const AdminDocuments = lazy(() => import('./AdminDocuments'));
 const AdminFiles = lazy(() => import('./AdminFiles'));
 const NotFound = lazy(() => import('./NotFound'));
@@ -115,17 +115,12 @@ function Admin({ className, match }: Props) {
   const avatar = profile && profile.avatar ? profile.avatar.url : '';
 
   return (
-    <ErrorBoundary
-      handleError={(error, info) => <ClientError error={error} info={info} />}
-    >
+    <ErrorBoundary handleError={(error, info) => <ClientError error={error} info={info} />}>
       <ThemeProvider theme={{ mode: 'dark', size: 'medium' }}>
         <Layout className={className}>
           <GlobalStyles />
           <Header>
-            <Link
-              hidden={!user}
-              to={`${match.url}/users/${user ? user.id : ''}`}
-            >
+            <Link hidden={!user} to={`${match.url}/users/${user ? user.id : ''}`}>
               <Avatar size={64} src={avatar} />
             </Link>
 
@@ -153,15 +148,10 @@ function Admin({ className, match }: Props) {
             <Switch>
               <Route exact path={`${match.url}`} component={AdminDashboard} />
               <Route path={`${match.url}/users/new`} component={AdminNewUser} />
-              <Route
-                path={`${match.url}/users/:userId`}
-                component={AdminEditUser}
-              />
+              <Route path={`${match.url}/users/:userId`} component={AdminEditUser} />
               <Route path={`${match.url}/users`} component={AdminUsers} />
-              <Route
-                path={`${match.url}/documents`}
-                component={AdminDocuments}
-              />
+              <Route path={`${match.url}/documents/new`} component={AdminNewDocument} />
+              <Route path={`${match.url}/documents`} component={AdminDocuments} />
               <Route path={`${match.url}/media`} component={AdminFiles} />
               <Route component={NotFound} />
             </Switch>
