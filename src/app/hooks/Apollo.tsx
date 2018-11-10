@@ -8,20 +8,11 @@ import ApolloClient, {
   QueryOptions,
 } from 'apollo-client';
 import { DocumentNode } from 'graphql';
-import React, {
-  createContext,
-  ReactNode,
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-} from 'react';
+import React, { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
 import { MutationFn, MutationOptions } from 'react-apollo';
 import isEqual from 'react-fast-compare';
 
-const ApolloContext = createContext<ApolloClient<NormalizedCacheObject> | null>(
-  null,
-);
+const ApolloContext = createContext<ApolloClient<NormalizedCacheObject> | null>(null);
 
 interface ProviderProps {
   children: ReactNode;
@@ -29,9 +20,7 @@ interface ProviderProps {
 }
 
 export function ApolloProvider({ children, client }: ProviderProps) {
-  return (
-    <ApolloContext.Provider value={client}>{children}</ApolloContext.Provider>
-  );
+  return <ApolloContext.Provider value={client}>{children}</ApolloContext.Provider>;
 }
 
 export function useApolloClient() {
@@ -43,10 +32,7 @@ export function useApolloQuery<TData, TVariables = OperationVariables>(
   {
     variables,
     ...restOptions
-  }: Pick<
-    QueryOptions<TVariables>,
-    Exclude<keyof QueryOptions<TVariables>, 'query'>
-  > = {},
+  }: Pick<QueryOptions<TVariables>, Exclude<keyof QueryOptions<TVariables>, 'query'>> = {},
 ): ApolloQueryResult<TData> {
   const client = useApolloClient();
 
@@ -87,12 +73,7 @@ export function useApolloQuery<TData, TVariables = OperationVariables>(
     },
   };
 
-  if (
-    !(
-      query === previousQuery.current &&
-      isEqual(variables, previousVariables.current)
-    )
-  ) {
+  if (!(query === previousQuery.current && isEqual(variables, previousVariables.current))) {
     previousQuery.current = query;
     previousVariables.current = variables;
 
@@ -128,8 +109,7 @@ export function useApolloMutation<TData, TVariables = OperationVariables>(
     throw new Error('No client, wrap app in ApolloProvider');
   }
 
-  return localOptions =>
-    client.mutate({ mutation, ...baseOptions, ...localOptions });
+  return localOptions => client.mutate({ mutation, ...baseOptions, ...localOptions });
 }
 
 function objToKey<T extends any>(obj?: T): string | null {
