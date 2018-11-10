@@ -1,14 +1,15 @@
 import { modularScale, rem } from 'polished';
-import React, { ReactNode } from 'react';
+import React, { ReactNode, useMemo } from 'react';
 import { animated, config, useSpring } from 'react-spring';
 import styled from 'styled-components';
 
-const Label = styled(animated.label)`
+const Label = styled(animated.label)<{ blockEvents: boolean }>`
   cursor: pointer;
   left: ${rem(6)};
   padding: ${rem(2)};
   position: absolute;
   top: 0;
+  pointer-events: ${props => (props.blockEvents ? 'none' : 'inherit')};
 `;
 
 const LabelBacker = styled(animated.span)`
@@ -30,34 +31,33 @@ interface Props {
 }
 
 function InputLabel({ children, focused, empty, htmlFor }: Props) {
-  const [{ x, y }] = useSpring({
+  const colorSpring = useMemo(
+    () => {
+      if (empty || (!empty && focused)) {
+        return '#000';
+      }
+
+      return '#fff';
+    },
+    [focused, empty],
+  );
+
+  const [labelSpring] = useSpring({
+    color: colorSpring,
     config: config.stiff,
-    x: empty ? 0 : 1,
-    y: focused ? 1 : 0,
+    fontSize: empty ? modularScale(0) : modularScale(-1),
+    letterSpacing: empty ? rem(0) : rem(1),
+    transform: empty ? `translate3d(0, ${rem(5)}, 0)` : `translate3d(0, ${rem(-20)}, 0)`,
+  });
+
+  const [backerSpring] = useSpring({
+    opacity: focused ? 1 : 0,
+    transform: focused ? 'scaleX(1)' : 'scaleX(0)',
   });
 
   return (
-    <Label
-      htmlFor={htmlFor}
-      style={{
-        color: y.interpolate({
-          output: ['#fff', '#000'],
-          range: [0, 1],
-        }),
-        fontSize: x.interpolate(value => modularScale(-value)),
-        letterSpacing: x.interpolate(value => `${value}px`),
-        pointerEvents: empty ? 'none' : 'inherit',
-        transform: x
-          .interpolate({ range: [0, 1], output: [5, -20] })
-          .interpolate(value => `translate3d(0, ${rem(value)}, 0)`),
-      }}
-    >
-      <LabelBacker
-        style={{
-          opacity: y,
-          transform: y.interpolate(value => `scaleX(${value})`),
-        }}
-      />
+    <Label htmlFor={htmlFor} style={labelSpring} blockEvents={empty}>
+      <LabelBacker style={backerSpring} />
       {children}
     </Label>
   );
