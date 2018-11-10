@@ -1,6 +1,5 @@
-import { FieldProps } from 'formik';
 import { padding, rem } from 'polished';
-import React, { HTMLProps, useEffect, useState } from 'react';
+import React, { ChangeEventHandler, FormEventHandler, HTMLProps, useEffect, useState } from 'react';
 import { animated, config, useSpring } from 'react-spring';
 import styled from 'styled-components';
 import InputLabel from './InputLabel';
@@ -47,13 +46,20 @@ const ErrorLabel = styled(animated.span)`
   left: 0;
 `;
 
-interface Props extends FieldProps<any> {
+interface Props {
   className?: string;
   label: string;
+  value: string;
+  onChange: ChangeEventHandler<HTMLInputElement>;
+  onBlur: FormEventHandler<HTMLInputElement>;
   type?: HTMLProps<HTMLInputElement>['type'];
+  name: string;
+  dirty?: boolean;
+  touched?: boolean;
+  error?: string | null;
 }
 
-function Input({ className, field, label, form, ...props }: Props) {
+function Input({ className, label, touched, error, dirty: _, ...field }: Props) {
   const [{ value: errorSpring }, setErrorSpring] = useSpring({
     config: config.default,
     value: field.value !== '' ? 1 : 0,
@@ -68,8 +74,6 @@ function Input({ className, field, label, form, ...props }: Props) {
   });
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
-  const touched = form.touched[field.name];
-  const error = form.errors[field.name];
   const id = `field-${field.name}`;
   const showError = touched === true && error !== undefined;
 
@@ -87,7 +91,6 @@ function Input({ className, field, label, form, ...props }: Props) {
     >
       <InputWrapper>
         <InputField
-          {...props}
           {...field}
           id={id}
           placeholder={undefined}
@@ -112,17 +115,13 @@ function Input({ className, field, label, form, ...props }: Props) {
         </InputLabel>
         <InputBorder
           style={{
-            backgroundColor: hoverSpring.interpolate(
-              x => `hsla(212, 50%, 50%, ${x})`,
-            ),
+            backgroundColor: hoverSpring.interpolate(x => `hsla(212, 50%, 50%, ${x})`),
             transform: hoverSpring.interpolate(x => `scaleX(${x})`),
           }}
         />
         <InputBorder
           style={{
-            backgroundColor: focusSpring.interpolate(
-              (x: number) => `hsla(90, 50%, 50%, ${x})`,
-            ),
+            backgroundColor: focusSpring.interpolate((x: number) => `hsla(90, 50%, 50%, ${x})`),
             transform: focusSpring.interpolate(x => `scaleX(${x})`),
           }}
         />
@@ -130,9 +129,7 @@ function Input({ className, field, label, form, ...props }: Props) {
           hidden={!showError}
           style={{
             opacity: errorSpring,
-            transform: errorSpring.interpolate(
-              x => `translate3d(0, ${rem(x * 16)}, 0)`,
-            ),
+            transform: errorSpring.interpolate(x => `translate3d(0, ${rem(x * 16)}, 0)`),
           }}
         >
           {error}

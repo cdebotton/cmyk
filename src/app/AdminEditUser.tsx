@@ -17,8 +17,8 @@ import {
 import Button from './components/Button';
 import EditorLayout, { Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';
+import Input from './components/Input';
 import Select from './components/Select';
-import SimpleInput from './components/SimpleInput';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
 import useFileUpload from './hooks/useFileUpload';
 import { useField, useForm } from './hooks/useForm';
@@ -45,10 +45,7 @@ const EDIT_USER_QUERY = gql`
 `;
 
 const USER_UPDATE_MUTATION = gql`
-  mutation UpdateUserMutation(
-    $data: UserUpdateInput!
-    $where: UserWhereUniqueInput!
-  ) {
+  mutation UpdateUserMutation($data: UserUpdateInput!, $where: UserWhereUniqueInput!) {
     updateUser(data: $data, where: $where) {
       id
       email
@@ -81,7 +78,7 @@ const AvatarInput = styled(ImageSelector)`
   grid-row: span 2;
 `;
 
-const EmailInput = styled(SimpleInput)`
+const EmailInput = styled(Input)`
   grid-column: span 2;
 `;
 
@@ -119,10 +116,9 @@ function AdminEditUser({ className, ...props }: Props) {
     return <NotFound {...props} />;
   }
 
-  const updateUserMutation = useApolloMutation<
-    UpdateUserMutation,
-    UpdateUserMutationVariables
-  >(USER_UPDATE_MUTATION);
+  const updateUserMutation = useApolloMutation<UpdateUserMutation, UpdateUserMutationVariables>(
+    USER_UPDATE_MUTATION,
+  );
 
   async function updateUser(values: Values) {
     if (!user) {
@@ -135,9 +131,7 @@ function AdminEditUser({ className, ...props }: Props) {
           email: values.email,
           profile: {
             update: {
-              avatar: values.avatar
-                ? { connect: { id: values.avatar.id } }
-                : null,
+              avatar: values.avatar ? { connect: { id: values.avatar.id } } : null,
               firstName: values.firstName,
               lastName: values.lastName,
             },
@@ -224,24 +218,9 @@ function AdminEditUser({ className, ...props }: Props) {
           error={error}
           uploading={uploading}
         />
-        <EmailInput
-          name="email"
-          label="Email"
-          {...email.input}
-          {...email.meta}
-        />
-        <SimpleInput
-          name="firstName"
-          label="First name"
-          {...firstName.input}
-          {...firstName.meta}
-        />
-        <SimpleInput
-          name="lastName"
-          label="Last name"
-          {...lastName.input}
-          {...lastName.meta}
-        />
+        <EmailInput name="email" label="Email" {...email.input} {...email.meta} />
+        <Input name="firstName" label="First name" {...firstName.input} {...firstName.meta} />
+        <Input name="lastName" label="Last name" {...lastName.input} {...lastName.meta} />
         <Select
           {...role.input}
           {...role.meta}
@@ -255,10 +234,7 @@ function AdminEditUser({ className, ...props }: Props) {
             { label: 'Unauthorized', value: Role.UNAUTHORIZED },
           ]}
         />
-        <SaveButton
-          format="neutral"
-          disabled={!form.valid || form.submitting || !form.dirty}
-        >
+        <SaveButton format="neutral" disabled={!form.valid || form.submitting || !form.dirty}>
           {form.submitting ? 'Saving...' : 'Save'}
         </SaveButton>
         <CancelButton

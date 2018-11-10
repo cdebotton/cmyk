@@ -8,12 +8,8 @@ import { Login as LoginMutation, LoginVariables } from './__generated__/Login';
 import { Session } from './__generated__/Session';
 import Button from './components/Button';
 import Heading from './components/Heading';
-import SimpleInput from './components/SimpleInput';
-import {
-  useApolloClient,
-  useApolloMutation,
-  useApolloQuery,
-} from './hooks/Apollo';
+import Input from './components/Input';
+import { useApolloClient, useApolloMutation, useApolloQuery } from './hooks/Apollo';
 import { useField, useForm } from './hooks/useForm';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
@@ -61,38 +57,30 @@ function Login({ className, location }: Props) {
   const password = useField('password', form);
 
   if (!client) {
-    throw new Error(
-      "Can't find Apollo client, please wrap application in <ApolloProvider />",
-    );
+    throw new Error("Can't find Apollo client, please wrap application in <ApolloProvider />");
   }
 
   const {
     data: { session },
   } = useApolloQuery<Session>(sessionQuery);
 
-  const mutate = useApolloMutation<LoginMutation, LoginVariables>(
-    loginMutation,
-    {
-      update: (proxy, { data: result }) => {
-        if (result && result.login) {
-          localStorage.setItem('jwt', result.login);
-          client.resetStore();
-        }
-      },
-      variables: {
-        data: {
-          email: email.input.value,
-          password: password.input.value,
-        },
+  const mutate = useApolloMutation<LoginMutation, LoginVariables>(loginMutation, {
+    update: (proxy, { data: result }) => {
+      if (result && result.login) {
+        localStorage.setItem('jwt', result.login);
+        client.resetStore();
+      }
+    },
+    variables: {
+      data: {
+        email: email.input.value,
+        password: password.input.value,
       },
     },
-  );
+  });
 
   if (session) {
-    const to =
-      location.state && location.state.attempt
-        ? location.state.attempt
-        : '/admin';
+    const to = location.state && location.state.attempt ? location.state.attempt : '/admin';
 
     return <Redirect to={to} />;
   }
@@ -102,12 +90,7 @@ function Login({ className, location }: Props) {
       <GlobalStyles />
       <Form onSubmit={handleSubmit}>
         <LoginHeading level={1}>Login</LoginHeading>
-        <EmailInput
-          name="email"
-          label="Email"
-          {...email.input}
-          {...email.meta}
-        />
+        <EmailInput name="email" label="Email" {...email.input} {...email.meta} />
         <PasswordInput
           type="password"
           name="password"
@@ -147,9 +130,9 @@ const LoginHeading = styled(Heading)`
   grid-column: 1 / span 2;
 `;
 
-const EmailInput = styled(SimpleInput)``;
+const EmailInput = styled(Input)``;
 
-const PasswordInput = styled(SimpleInput)``;
+const PasswordInput = styled(Input)``;
 
 const LoginButton = styled(Button)`
   grid-column: 2 / span 1;

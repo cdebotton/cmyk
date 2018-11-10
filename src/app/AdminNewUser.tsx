@@ -13,9 +13,9 @@ import { Users } from './__generated__/Users';
 import { USERS_QUERY } from './AdminUsers';
 import Button from './components/Button';
 import Heading from './components/Heading';
+import Input from './components/Input';
 import PageLayout from './components/PageLayout';
 import Select from './components/Select';
-import SimpleInput from './components/SimpleInput';
 import { useApolloMutation } from './hooks/Apollo';
 import { useField, useForm } from './hooks/useForm';
 
@@ -42,7 +42,7 @@ const NewUserForm = styled.form`
   grid-template-columns: repeat(4, 1fr);
 `;
 
-const EmailField = styled(SimpleInput)`
+const EmailField = styled(Input)`
   grid-column: 1 / span 2;
 `;
 
@@ -131,10 +131,10 @@ function AdminNewUser({ history }: Props) {
       <Heading>New user</Heading>
       <NewUserForm onSubmit={form.handleSubmit}>
         <EmailField name="email" label="Email" {...email.input} {...email.meta} />
-        <SimpleInput name="firstName" label="First name" {...firstName.input} {...firstName.meta} />
-        <SimpleInput name="lastName" label="Last name" {...lastName.input} {...lastName.meta} />
-        <SimpleInput name="password" label="Password" {...password.input} {...password.meta} />
-        <SimpleInput
+        <Input name="firstName" label="First name" {...firstName.input} {...firstName.meta} />
+        <Input name="lastName" label="Last name" {...lastName.input} {...lastName.meta} />
+        <Input name="password" label="Password" {...password.input} {...password.meta} />
+        <Input
           name="repeatPassword"
           label="Repeat password"
           {...repeatPassword.input}
