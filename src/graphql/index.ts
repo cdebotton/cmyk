@@ -14,7 +14,7 @@ import Session from './resolvers/Session';
 import { TypeMap } from './resolvers/TypeMap';
 import User from './resolvers/User';
 
-const { PORT } = process.env;
+const { PORT, APOLLO_ENGINE_SERVICE, APOLLO_ENGINE_KEY } = process.env;
 
 interface Resolvers extends IResolvers<TypeMap> {
   Upload: typeof GraphQLUpload;
@@ -86,7 +86,12 @@ const server = new ApolloServer({
       session,
     };
   },
+  engine: {
+    apiKey: `service:${APOLLO_ENGINE_SERVICE}:${APOLLO_ENGINE_KEY}`,
+  },
   uploads: true,
 });
 
-server.listen(PORT);
+server.listen(PORT).then(info => {
+  process.stdout.write(`Listening at ${info.url}`);
+});

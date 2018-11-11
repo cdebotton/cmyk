@@ -2,6 +2,6 @@
   "extension": [".ts", ".graphql"],
   "watch": ["src/http", "src/graphql"],
   "execMap": {
-    "ts": "babel-node --extensions .ts"
+    "ts": "node -r dotenv/config ./node_modules/.bin/babel-node --extensions .ts"
   }
 }
