@@ -78,7 +78,7 @@ function AdminUsers({ className, match }: Props) {
           query: USERS_QUERY,
         });
       },
-      variables: { where: { id: userId } },
+      variables: { id: userId },
     });
     setPortalNode(null);
   };
