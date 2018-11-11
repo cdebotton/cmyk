@@ -6,7 +6,7 @@ import React, { lazy, Suspense } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
-import { CurrentUserQuery } from './__generated__/CurrentUserQuery';
+import { TCurrentUser } from './__generated__/TCurrentUser';
 import ClientError from './ClientError';
 import Avatar from './components/Avatar';
 import Button from './components/Button';
@@ -22,7 +22,7 @@ interface Props extends RouteComponentProps<{}> {
 }
 
 const CURRENT_USER_QUERY = gql`
-  query CurrentUserQuery {
+  query TCurrentUser {
     session {
       user {
         id
@@ -109,7 +109,7 @@ function Admin({ className, match }: Props) {
 
   const {
     data: { session },
-  } = useApolloQuery<CurrentUserQuery>(CURRENT_USER_QUERY);
+  } = useApolloQuery<TCurrentUser>(CURRENT_USER_QUERY);
   const user = session && session.user;
   const profile = user && user.profile;
   const avatar = profile && profile.avatar ? profile.avatar.url : '';
