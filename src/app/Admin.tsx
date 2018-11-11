@@ -123,7 +123,6 @@ function Admin({ className, match }: Props) {
             <Link hidden={!user} to={`${match.url}/users/${user ? user.id : ''}`}>
               <Avatar size={64} src={avatar} />
             </Link>
-
             <Navigation>
               <PageLink exact to={match.url}>
                 Home
@@ -144,7 +143,7 @@ function Admin({ className, match }: Props) {
               <FontAwesomeIcon icon={faAngry} />
             </LogoutButton>
           </Header>
-          <Suspense maxDuration={300} fallback={<Loader />}>
+          <Suspense fallback={<Loader />}>
             <Switch>
               <Route exact path={`${match.url}`} component={AdminDashboard} />
               <Route path={`${match.url}/users/new`} component={AdminNewUser} />

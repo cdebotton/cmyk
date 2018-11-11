@@ -1,21 +1,17 @@
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import styled from 'styled-components';
-import Heading from './components/Heading';
-import PageLayout from './components/PageLayout';
+import ListLayout, { Heading } from './components/ListLayout';
 
-interface IProps extends RouteComponentProps<{}> {
+interface Props extends RouteComponentProps<{}> {
   className?: string;
 }
 
-function Dashboard({ className }: IProps) {
+function Dashboard({ className }: Props) {
   return (
-    <PageLayout className={className}>
+    <ListLayout className={className}>
       <Heading>Dashboard</Heading>
-    </PageLayout>
+    </ListLayout>
   );
 }
 
-export default styled(Dashboard)`
-  position: relative;
-`;
+export default Dashboard;

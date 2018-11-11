@@ -43,9 +43,7 @@ function AdminFiles({ match }: Props) {
 
   const { setPortalNode } = useContext(PortalContext);
 
-  const mutate = useApolloMutation<DeleteFile, DeleteFileVariables>(
-    DELETE_FILE_MUTATION,
-  );
+  const mutate = useApolloMutation<DeleteFile, DeleteFileVariables>(DELETE_FILE_MUTATION);
 
   function deleteFile(id: string) {
     return mutate({

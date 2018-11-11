@@ -1,15 +1,8 @@
 module.exports = {
-  schemas: {
-    gql: {
-      schema: 'schema.json',
-      endpoint: 'http://localhost:3002',
+  client: {
+    service: {
+      localSchemaFile: './schema.json',
     },
+    includes: ['src/app/**/*.{ts,tsx}'],
   },
-  queries: [
-    {
-      schema: 'gql',
-      includes: ['src/app/**/*.tsx'],
-      excludes: ['node_modules/**'],
-    },
-  ],
 };
