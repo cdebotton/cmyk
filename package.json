@@ -4,12 +4,10 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "prebuild:apollo": "yarn build:schema",
     "build:apollo": "apollo codegen:generate --addTypename --target typescript",
     "watch:apollo": "yarn build:apollo --watch --queries '**/*.{tsx,ts}'",
-    "build:schema": "apollo schema:download",
     "build:prisma": "prisma deploy",
-    "watch:prisma": "prisma deploy --watch",
+    "watch:prisma": "yarn build:prisma --watch",
     "prebuild:http": "rm -rf dist/http",
     "build:http": "PUBLIC_PATH=/dist/ NODE_ENV=development BABEL_TARGET=node babel -d dist/http src/http --extensions .ts",
     "prebuild:graphql": "rm -rf dist/graphql",
