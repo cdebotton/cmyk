@@ -1,0 +1,130 @@
+enum Role {
+  ADMIN
+  EDITOR
+  USER
+  UNAUTHORIZED
+}
+
+scalar DateTime
+scalar Upload
+scalar Date
+
+type Query {
+  session: Session
+  files: [File!]!
+  user(id: ID!): User
+  users: [User!]!
+  document(id: ID!): Document
+  documents: [Document!]!
+  documentTypes: [DocumentType!]!
+  documentType(id: ID!): DocumentType
+}
+
+type Mutation {
+  login(input: LoginInput!): String
+  uploadFile(file: Upload!): File!
+  deleteFile(id: ID!): File
+  createUser(input: UserCreateInput!): User!
+  deleteUser(id: ID!): User
+  updateUser(input: UserUpdateInput!, id: ID!): User
+  createDocument(input: DocumentCreateInput!): Document!
+  updateDocument(input: DocumentUpdateInput!, id: String!): Document
+}
+
+input LoginInput {
+  email: String!
+  password: String!
+}
+
+input UserCreateInput {
+  email: String!
+  password: String!
+  repeatPassword: String!
+  firstName: String!
+  lastName: String!
+  role: Role!
+  avatar: ID
+}
+
+input UserUpdateInput {
+  email: String!
+  firstName: String!
+  lastName: String!
+  password: String
+  repeatPassword: String
+  role: Role!
+  avatar: ID
+}
+
+input DocumentCreateInput {
+  title: String!
+  publishDate: DateTime!
+  type: ID!
+  author: ID!
+}
+
+input DocumentUpdateInput {
+  title: String!
+  publishDate: DateTime!
+  type: ID!
+  author: ID!
+}
+
+type Session {
+  iat: Int!
+  user: User!
+}
+
+type User {
+  createdAt: Date!
+  documents: [Document!]!
+  email: String!
+  id: ID!
+  lastLogin: Date
+  password: String!
+  profile: Profile!
+  role: Role!
+  updatedAt: Date
+}
+
+type Profile {
+  avatar: File
+  createdAt: Date!
+  dateOfBirth: Date
+  firstName: String!
+  id: ID!
+  lastName: String!
+  updatedAt: Date
+  user: User!
+}
+
+type Document {
+  author: User!
+  createdAt: Date!
+  id: ID!
+  publishDate: DateTime!
+  title: String!
+  type: DocumentType!
+  updatedAt: Date
+}
+
+type DocumentType {
+  createdAt: Date!
+  documents: [Document!]!
+  id: ID!
+  title: String!
+  updatedAt: Date
+}
+
+type File {
+  bucket: String!
+  createdAt: Date!
+  encoding: String!
+  etag: String!
+  id: ID!
+  key: String!
+  mimetype: String!
+  size: Int!
+  updatedAt: Date
+  url: String!
+}

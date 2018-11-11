@@ -23,8 +23,8 @@ import useFileUpload from './hooks/useFileUpload';
 import { useField, useForm } from './hooks/useForm';
 
 const EDIT_USER_QUERY = gql`
-  query EditUserQuery($where: UserWhereUniqueInput!) {
-    user(where: $where) {
+  query EditUserQuery($id: ID!) {
+    user(id: $id) {
       id
       email
       role
@@ -44,8 +44,8 @@ const EDIT_USER_QUERY = gql`
 `;
 
 const USER_UPDATE_MUTATION = gql`
-  mutation UpdateUserMutation($data: UserUpdateInput!, $where: UserWhereUniqueInput!) {
-    updateUser(data: $data, where: $where) {
+  mutation UpdateUserMutation($input: UserUpdateInput!, $id: ID!) {
+    updateUser(input: $input, id: $id) {
       id
       email
       role
@@ -99,7 +99,7 @@ function AdminEditUser({ className, ...props }: Props) {
   const {
     data: { user },
   } = useApolloQuery<EditUserQuery, EditUserQueryVariables>(EDIT_USER_QUERY, {
-    variables: { where: { id: match.params.userId } },
+    variables: { id: match.params.userId },
   });
 
   if (!user) {
@@ -117,18 +117,14 @@ function AdminEditUser({ className, ...props }: Props) {
 
     await updateUserMutation({
       variables: {
-        data: {
+        input: {
           email: values.email,
-          profile: {
-            update: {
-              avatar: values.avatar ? { connect: { id: values.avatar.id } } : null,
-              firstName: values.firstName,
-              lastName: values.lastName,
-            },
-          },
+          avatar: values.avatar ? values.avatar.id : null,
+          firstName: values.firstName,
+          lastName: values.lastName,
           role: values.role,
         },
-        where: { id: user.id },
+        id: user.id,
       },
     });
 

@@ -1,15 +1,11 @@
-import { ProfileResolvers } from '../__generated__/resolvers';
-import { TypeMap } from './TypeMap';
+import { ProfileResolvers } from '../__generated__/graphqlgen';
 
-const Profile: ProfileResolvers.Type<TypeMap> = {
-  avatar: parent => parent.avatar,
-  createdAt: parent => parent.createdAt,
-  dateOfBirth: parent => parent.dateOfBirth,
-  firstName: parent => parent.firstName,
-  id: parent => parent.id,
-  lastName: parent => parent.lastName,
-  updatedAt: parent => parent.updatedAt,
-  user: parent => parent.user,
+const Profile: ProfileResolvers.Type = {
+  ...ProfileResolvers.defaultResolvers,
+  avatar: ({ id }, _args, ctx) => ctx.db.profile({ id }).avatar(),
+  firstName: ({ id }, _args, ctx) => ctx.db.profile({ id }).firstName(),
+  lastName: ({ id }, _args, ctx) => ctx.db.profile({ id }).lastName(),
+  user: ({ id }, _args, ctx) => ctx.db.profile({ id }).user(),
 };
 
 export default Profile;

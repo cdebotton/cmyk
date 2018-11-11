@@ -1,13 +1,13 @@
 import gql from 'graphql-tag';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { Documents } from './__generated__/Documents';
+import { TDocuments } from './__generated__/TDocuments';
 import List, { Item } from './components/List';
 import ListLayout, { CreateLink, Heading } from './components/ListLayout';
 import { useApolloQuery } from './hooks/Apollo';
 
 const DOCUMENTS_QUERY = gql`
-  query Documents {
+  query TDocuments {
     documents {
       id
       title
@@ -20,7 +20,7 @@ interface Props extends RouteComponentProps<{}> {}
 function AdminDocuments({ match: { url } }: Props) {
   const {
     data: { documents },
-  } = useApolloQuery<Documents>(DOCUMENTS_QUERY);
+  } = useApolloQuery<TDocuments>(DOCUMENTS_QUERY);
 
   return (
     <ListLayout>

@@ -29,5 +29,5 @@ export interface CreateUserMutation {
 }
 
 export interface CreateUserMutationVariables {
-  data: UserCreateInput;
+  input: UserCreateInput;
 }

@@ -2,15 +2,15 @@
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: Documents
+// GraphQL query operation: TDocumentTypes
 // ====================================================
 
-export interface Documents_documents {
-  __typename: "Document";
+export interface TDocumentTypes_documentTypes {
+  __typename: "DocumentType";
   id: string;
   title: string;
 }
 
-export interface Documents {
-  documents: Documents_documents[];
+export interface TDocumentTypes {
+  documentTypes: TDocumentTypes_documentTypes[];
 }

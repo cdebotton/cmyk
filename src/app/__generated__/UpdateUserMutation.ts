@@ -1,7 +1,7 @@
 /* tslint:disable */
 // This file was automatically generated and should not be edited.
 
-import { UserUpdateInput, UserWhereUniqueInput, Role } from "./../../../__generated__/globalTypes";
+import { UserUpdateInput, Role } from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL mutation operation: UpdateUserMutation
@@ -35,6 +35,6 @@ export interface UpdateUserMutation {
 }
 
 export interface UpdateUserMutationVariables {
-  data: UserUpdateInput;
-  where: UserWhereUniqueInput;
+  input: UserUpdateInput;
+  id: string;
 }

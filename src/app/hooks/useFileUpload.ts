@@ -2,14 +2,14 @@ import { ApolloError } from 'apollo-client';
 import gql from 'graphql-tag';
 import { useState } from 'react';
 import {
-  UploadFileMutation,
-  UploadFileMutation_uploadFile,
-  UploadFileMutationVariables,
-} from './__generated__/UploadFileMutation';
+  TUploadFile,
+  TUploadFile_uploadFile,
+  TUploadFileVariables,
+} from './__generated__/TUploadFile';
 import { useApolloMutation } from './Apollo';
 
 const UPLOAD_FILE_MUTATION = gql`
-  mutation UploadFileMutation($file: Upload!) {
+  mutation TUploadFile($file: Upload!) {
     uploadFile(file: $file) {
       __typename
       id
@@ -22,7 +22,7 @@ const UPLOAD_FILE_MUTATION = gql`
 
 type Uploader = (file: File) => Promise<void>;
 interface Context {
-  data: UploadFileMutation_uploadFile | null;
+  data: TUploadFile_uploadFile | null;
   error: ApolloError | null;
   uploading: boolean;
 }
@@ -30,12 +30,11 @@ interface Context {
 function useFileUpload(): [Uploader, Context] {
   const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<ApolloError | null>(null);
-  const [data, setData] = useState<UploadFileMutation_uploadFile | null>(null);
+  const [data, setData] = useState<TUploadFile_uploadFile | null>(null);
 
-  const uploadFileMutation = useApolloMutation<
-    UploadFileMutation,
-    UploadFileMutationVariables
-  >(UPLOAD_FILE_MUTATION);
+  const uploadFileMutation = useApolloMutation<TUploadFile, TUploadFileVariables>(
+    UPLOAD_FILE_MUTATION,
+  );
 
   async function upload(file: File) {
     setUploading(true);

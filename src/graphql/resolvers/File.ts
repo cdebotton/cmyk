@@ -1,17 +1,8 @@
 import { S3 } from 'aws-sdk';
-import { FileResolvers } from '../__generated__/resolvers';
-import { TypeMap } from './TypeMap';
+import { FileResolvers } from '../__generated__/graphqlgen';
 
-const File: FileResolvers.Type<TypeMap> = {
-  bucket: parent => parent.bucket,
-  createdAt: parent => parent.createdAt,
-  encoding: parent => parent.encoding,
-  etag: parent => parent.etag,
-  id: parent => parent.id,
-  key: parent => parent.key,
-  mimetype: parent => parent.mimetype,
-  size: parent => parent.size,
-  updatedAt: parent => parent.updatedAt,
+const File: FileResolvers.Type = {
+  ...FileResolvers.defaultResolvers,
   url: parent => {
     const s3 = new S3();
     const [bucket, ...path] = parent.url.split('/');

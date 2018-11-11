@@ -1,8 +1,6 @@
 /* tslint:disable */
 // This file was automatically generated and should not be edited.
 
-import { FileWhereUniqueInput } from "./../../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL mutation operation: DeleteFile
 // ====================================================
@@ -17,5 +15,5 @@ export interface DeleteFile {
 }
 
 export interface DeleteFileVariables {
-  where: FileWhereUniqueInput;
+  id: string;
 }

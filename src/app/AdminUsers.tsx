@@ -40,8 +40,8 @@ export const USERS_QUERY = gql`
 `;
 
 const DELETE_USER_MUTATION = gql`
-  mutation DeleteUserMutation($where: UserWhereUniqueInput!) {
-    deleteUser(where: $where) {
+  mutation DeleteUserMutation($id: ID!) {
+    deleteUser(id: $id) {
       id
     }
   }

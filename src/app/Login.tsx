@@ -15,8 +15,8 @@ import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
 
 const loginMutation = gql`
-  mutation Login($data: LoginInput!) {
-    login(data: $data)
+  mutation Login($input: LoginInput!) {
+    login(input: $input)
   }
 `;
 

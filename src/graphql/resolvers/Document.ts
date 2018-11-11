@@ -1,14 +1,9 @@
-import { DocumentResolvers } from '../__generated__/resolvers';
-import { TypeMap } from './TypeMap';
+import { DocumentResolvers } from '../__generated__/graphqlgen';
 
-const Document: DocumentResolvers.Type<TypeMap> = {
-  author: parent => parent.author,
-  createdAt: parent => parent.createdAt,
-  id: parent => parent.id,
-  publishDate: parent => parent.publishDate,
-  title: parent => parent.title,
-  type: parent => parent.type,
-  updatedAt: parent => parent.updatedAt,
+const Document: DocumentResolvers.Type = {
+  ...DocumentResolvers.defaultResolvers,
+  author: (parent, _args, ctx) => ctx.db.document({ id: parent.id }).author(),
+  type: (parent, _args, ctx) => ctx.db.document({ id: parent.id }).type(),
 };
 
 export default Document;

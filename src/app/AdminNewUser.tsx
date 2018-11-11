@@ -18,8 +18,8 @@ import { useApolloMutation } from './hooks/Apollo';
 import { useField, useForm } from './hooks/useForm';
 
 const CREATE_USER_MUTATION = gql`
-  mutation CreateUserMutation($data: UserCreateInput!) {
-    createUser(data: $data) {
+  mutation CreateUserMutation($input: UserCreateInput!) {
+    createUser(input: $input) {
       id
       email
       createdAt
@@ -94,15 +94,12 @@ function AdminNewUser({ history }: Props) {
           });
         },
         variables: {
-          data: {
+          input: {
             email: values.email,
             password: values.password,
-            profile: {
-              create: {
-                firstName: values.firstName,
-                lastName: values.lastName,
-              },
-            },
+            repeatPassword: values.repeatPassword,
+            firstName: values.firstName,
+            lastName: values.lastName,
             role: values.role,
           },
         },

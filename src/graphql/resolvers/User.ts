@@ -1,25 +1,9 @@
-import { UserResolvers } from '../__generated__/resolvers';
-import { TypeMap } from './TypeMap';
+import { UserResolvers } from '../__generated__/graphqlgen';
 
-const Session: UserResolvers.Type<TypeMap> = {
-  createdAt: parent => parent.createdAt,
-  documents: parent => parent.documents,
-  email: parent => parent.email,
-  id: parent => parent.id,
-  lastLogin: parent => parent.lastLogin,
-  password: parent => parent.password,
-  profile: async (parent, args, { db }, info) => {
-    const [profile] = await db.query.profiles(
-      {
-        where: { user: { id: parent.id } },
-      },
-      info,
-    );
-
-    return profile;
-  },
-  role: parent => parent.role,
-  updatedAt: parent => parent.updatedAt,
+const User: UserResolvers.Type = {
+  ...UserResolvers.defaultResolvers,
+  documents: ({ id }, _args, { db: { user } }) => user({ id }).documents(),
+  profile: async ({ id }, _args, { db: { user } }) => user({ id }).profile(),
 };
 
-export default Session;
+export default User;

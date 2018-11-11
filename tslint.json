@@ -10,5 +10,10 @@
     "variable-name": [true, "allow-leading-underscore", "allow-pascal-case"],
     "object-literal-sort-keys": [true, "shorthand-first"],
     "no-namespace": [false]
-  }
+  },
+  "linterOptions": {
+    "exclude": [
+      "**/__generated__/**"
+    ]
+  },
 }

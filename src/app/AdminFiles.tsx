@@ -27,8 +27,8 @@ const FILES_QUERY = gql`
 `;
 
 const DELETE_FILE_MUTATION = gql`
-  mutation DeleteFile($where: FileWhereUniqueInput!) {
-    deleteFile(where: $where) {
+  mutation DeleteFile($id: ID!) {
+    deleteFile(id: $id) {
       id
     }
   }
@@ -66,7 +66,7 @@ function AdminFiles({ match }: Props) {
           query: FILES_QUERY,
         });
       },
-      variables: { where: { id } },
+      variables: { id },
     });
   }
 

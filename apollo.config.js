@@ -1,8 +1,7 @@
 module.exports = {
   client: {
     service: {
-      name: 'cdebotton-7244',
-      localSchemaFile: './schema.json',
+      localSchemaFile: './src/graphql/schema.graphql',
     },
     includes: ['src/app/**/*.{ts,tsx}'],
   },

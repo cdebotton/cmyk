@@ -4,18 +4,18 @@
 import { DocumentCreateInput } from "./../../../__generated__/globalTypes";
 
 // ====================================================
-// GraphQL mutation operation: CreateDocument
+// GraphQL mutation operation: TCreateDocument
 // ====================================================
 
-export interface CreateDocument_createDocument {
+export interface TCreateDocument_createDocument {
   __typename: "Document";
   id: string;
 }
 
-export interface CreateDocument {
-  createDocument: CreateDocument_createDocument;
+export interface TCreateDocument {
+  createDocument: TCreateDocument_createDocument;
 }
 
-export interface CreateDocumentVariables {
-  data: DocumentCreateInput;
+export interface TCreateDocumentVariables {
+  input: DocumentCreateInput;
 }

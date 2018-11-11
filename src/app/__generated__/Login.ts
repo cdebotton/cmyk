@@ -12,5 +12,5 @@ export interface Login {
 }
 
 export interface LoginVariables {
-  data: LoginInput;
+  input: LoginInput;
 }

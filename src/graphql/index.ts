@@ -2,8 +2,7 @@ import { ApolloServer, GraphQLUpload, makeExecutableSchema } from 'apollo-server
 import { Context } from 'apollo-server-core';
 import { importSchema } from 'graphql-import';
 import jwt from 'jsonwebtoken';
-import { Prisma } from 'prisma-binding';
-import { IResolvers } from './__generated__/resolvers';
+import { Prisma, prisma } from './__generated__/prisma-client';
 import Document from './resolvers/Document';
 import DocumentType from './resolvers/DocumentType';
 import File from './resolvers/File';
@@ -11,31 +10,25 @@ import Mutation from './resolvers/Mutation';
 import Profile from './resolvers/Profile';
 import Query from './resolvers/Query';
 import Session from './resolvers/Session';
-import { TypeMap } from './resolvers/TypeMap';
 import User from './resolvers/User';
 
-const { PORT, APOLLO_ENGINE_SERVICE, APOLLO_ENGINE_KEY } = process.env;
+const { PORT, ENGINE_API_NAME, ENGINE_API_KEY } = process.env;
 
-interface Resolvers extends IResolvers<TypeMap> {
-  Upload: typeof GraphQLUpload;
-}
+const typeDefs = importSchema('src/graphql/schema.graphql');
 
-const typeDefs = importSchema('src/graphql/schema/typeDefs.graphql');
-const resolvers: Resolvers = {
-  Document,
-  DocumentType,
-  File,
-  Mutation,
-  Profile,
-  Query,
-  Session,
-  User,
-  Upload: GraphQLUpload,
-};
-
-const schema = makeExecutableSchema<TypeMap['Context']>({
+const schema = makeExecutableSchema({
   // @ts-ignore
-  resolvers,
+  resolvers: {
+    Document,
+    DocumentType,
+    File,
+    Mutation,
+    Profile,
+    Query,
+    Session,
+    User,
+    Upload: GraphQLUpload,
+  },
   typeDefs,
 });
 
@@ -62,7 +55,7 @@ async function getSession(db: Prisma, authorization?: string) {
 
   const t = decoded as IToken;
 
-  const user = await db.query.user({ where: { id: t.userId } });
+  const user = await db.user({ id: t.userId });
 
   return {
     user,
@@ -73,21 +66,16 @@ async function getSession(db: Prisma, authorization?: string) {
 const server = new ApolloServer({
   schema,
   context: (ctx: Context) => {
-    const db = new Prisma({
-      endpoint: 'http://localhost:4466',
-      typeDefs: 'src/graphql/schema/prisma.graphql',
-    });
-
-    const session = getSession(db, ctx.req.headers.authorization);
+    const session = getSession(prisma, ctx.req.headers.authorization);
 
     return {
       ...ctx,
-      db,
+      db: prisma,
       session,
     };
   },
   engine: {
-    apiKey: `service:${APOLLO_ENGINE_SERVICE}:${APOLLO_ENGINE_KEY}`,
+    apiKey: `service:${ENGINE_API_NAME}:${ENGINE_API_KEY}`,
   },
   uploads: true,
 });

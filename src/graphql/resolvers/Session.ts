@@ -1,9 +1,7 @@
-import { SessionResolvers } from '../__generated__/resolvers';
-import { TypeMap } from './TypeMap';
+import { SessionResolvers } from '../__generated__/graphqlgen';
 
-const Session: SessionResolvers.Type<TypeMap> = {
-  iat: parent => parent.iat,
-  user: parent => parent.user,
+const Session: SessionResolvers.Type = {
+  ...SessionResolvers.defaultResolvers,
 };
 
 export default Session;

@@ -1,7 +1,7 @@
 /* tslint:disable */
 // This file was automatically generated and should not be edited.
 
-import { UserWhereUniqueInput, Role } from "./../../../__generated__/globalTypes";
+import { Role } from "./../../../__generated__/globalTypes";
 
 // ====================================================
 // GraphQL query operation: EditUserQuery
@@ -36,5 +36,5 @@ export interface EditUserQuery {
 }
 
 export interface EditUserQueryVariables {
-  where: UserWhereUniqueInput;
+  id: string;
 }

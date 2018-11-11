@@ -1,8 +1,6 @@
 /* tslint:disable */
 // This file was automatically generated and should not be edited.
 
-import { UserWhereUniqueInput } from "./../../../__generated__/globalTypes";
-
 // ====================================================
 // GraphQL mutation operation: DeleteUserMutation
 // ====================================================
@@ -17,5 +15,5 @@ export interface DeleteUserMutation {
 }
 
 export interface DeleteUserMutationVariables {
-  where: UserWhereUniqueInput;
+  id: string;
 }
