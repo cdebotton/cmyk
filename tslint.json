@@ -13,7 +13,7 @@
   },
   "linterOptions": {
     "exclude": [
-      "**/__generated__/**"
+      "**/generated/**"
     ]
   },
 }

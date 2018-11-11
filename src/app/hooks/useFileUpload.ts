@@ -1,11 +1,7 @@
 import { ApolloError } from 'apollo-client';
 import gql from 'graphql-tag';
 import { useState } from 'react';
-import {
-  TUploadFile,
-  TUploadFile_uploadFile,
-  TUploadFileVariables,
-} from './__generated__/TUploadFile';
+import { TUploadFile, TUploadFile_uploadFile, TUploadFileVariables } from './generated/TUploadFile';
 import { useApolloMutation } from './Apollo';
 
 const UPLOAD_FILE_MUTATION = gql`

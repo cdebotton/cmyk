@@ -3,12 +3,9 @@ import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
-import { Role } from '../../__generated__/globalTypes';
-import {
-  CreateUserMutation,
-  CreateUserMutationVariables,
-} from './__generated__/CreateUserMutation';
-import { Users } from './__generated__/Users';
+import { Role } from '../../generated/globalTypes';
+import { CreateUserMutation, CreateUserMutationVariables } from './generated/CreateUserMutation';
+import { Users } from './generated/Users';
 import { USERS_QUERY } from './AdminUsers';
 import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';

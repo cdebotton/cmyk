@@ -3,16 +3,13 @@ import React, { FormEvent, lazy, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
-import { Role } from '../../__generated__/globalTypes';
+import { Role } from '../../generated/globalTypes';
 import {
   EditUserQuery,
   EditUserQuery_user_profile_avatar,
   EditUserQueryVariables,
-} from './__generated__/EditUserQuery';
-import {
-  UpdateUserMutation,
-  UpdateUserMutationVariables,
-} from './__generated__/UpdateUserMutation';
+} from './generated/EditUserQuery';
+import { UpdateUserMutation, UpdateUserMutationVariables } from './generated/UpdateUserMutation';
 import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';

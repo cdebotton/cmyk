@@ -1,4 +1,4 @@
-import { ProfileResolvers } from '../__generated__/graphqlgen';
+import { ProfileResolvers } from '../generated/graphqlgen';
 
 const Profile: ProfileResolvers.Type = {
   ...ProfileResolvers.defaultResolvers,

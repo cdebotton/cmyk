@@ -2,7 +2,7 @@ import { S3 } from 'aws-sdk';
 import { compare, genSalt, hash } from 'bcryptjs';
 import { sign } from 'jsonwebtoken';
 import { PassThrough } from 'stream';
-import { MutationResolvers } from '../__generated__/graphqlgen';
+import { MutationResolvers } from '../generated/graphqlgen';
 
 const BadCredentials = new Error('Bad credentials');
 

@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 import React from 'react';
 import { RouteComponentProps } from 'react-router';
-import { TDocuments } from './__generated__/TDocuments';
+import { TDocuments } from './generated/TDocuments';
 import List, { Item } from './components/List';
 import ListLayout, { CreateLink, Heading } from './components/ListLayout';
 import { useApolloQuery } from './hooks/Apollo';

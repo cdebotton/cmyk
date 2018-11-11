@@ -1,4 +1,4 @@
-import { SessionResolvers } from '../__generated__/graphqlgen';
+import { SessionResolvers } from '../generated/graphqlgen';
 
 const Session: SessionResolvers.Type = {
   ...SessionResolvers.defaultResolvers,

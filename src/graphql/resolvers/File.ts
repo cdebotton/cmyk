@@ -1,5 +1,5 @@
 import { S3 } from 'aws-sdk';
-import { FileResolvers } from '../__generated__/graphqlgen';
+import { FileResolvers } from '../generated/graphqlgen';
 
 const File: FileResolvers.Type = {
   ...FileResolvers.defaultResolvers,

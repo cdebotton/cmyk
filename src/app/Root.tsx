@@ -13,13 +13,9 @@ function Root() {
 
   return (
     <PortalContext.Provider value={{ portalNode, setPortalNode }}>
-      <Suspense maxDuration={300} fallback={<Loader size="large" />}>
+      <Suspense fallback={<Loader size="large" />}>
         <Switch>
-          <ProtectedRoute
-            canAccess={session => session !== null}
-            path="/admin"
-            component={Admin}
-          />
+          <ProtectedRoute canAccess={session => session !== null} path="/admin" component={Admin} />
           <Route path="/login" component={Login} />
           <Route component={NotFound} />
         </Switch>

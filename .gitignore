@@ -102,5 +102,3 @@ vendor/react
 
 dist
 .migrations
-
-**/__generated__

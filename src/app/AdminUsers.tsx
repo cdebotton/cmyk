@@ -1,11 +1,8 @@
 import gql from 'graphql-tag';
 import React, { useContext } from 'react';
 import { RouteComponentProps } from 'react-router';
-import {
-  DeleteUserMutation,
-  DeleteUserMutationVariables,
-} from './__generated__/DeleteUserMutation';
-import { Users } from './__generated__/Users';
+import { DeleteUserMutation, DeleteUserMutationVariables } from './generated/DeleteUserMutation';
+import { Users } from './generated/Users';
 import Confirm from './components/Confirm';
 import List, { Item } from './components/List';
 import ListLayout, { CreateLink, Heading } from './components/ListLayout';

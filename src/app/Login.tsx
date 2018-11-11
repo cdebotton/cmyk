@@ -4,8 +4,8 @@ import React from 'react';
 import { Redirect, RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
-import { Login as LoginMutation, LoginVariables } from './__generated__/Login';
-import { Session } from './__generated__/Session';
+import { Login as LoginMutation, LoginVariables } from './generated/Login';
+import { Session } from './generated/Session';
 import Button from './components/Button';
 import Heading from './components/Heading';
 import Input from './components/Input';
@@ -72,7 +72,7 @@ function Login({ className, location }: Props) {
       }
     },
     variables: {
-      data: {
+      input: {
         email: email.input.value,
         password: password.input.value,
       },

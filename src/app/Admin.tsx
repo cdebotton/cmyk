@@ -6,7 +6,7 @@ import React, { lazy, Suspense } from 'react';
 import { Route, RouteComponentProps, Switch } from 'react-router';
 import { Link, NavLink } from 'react-router-dom';
 import styled, { ThemeProvider } from 'styled-components';
-import { TCurrentUser } from './__generated__/TCurrentUser';
+import { TCurrentUser } from './generated/TCurrentUser';
 import ClientError from './ClientError';
 import Avatar from './components/Avatar';
 import Button from './components/Button';

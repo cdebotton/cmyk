@@ -53,7 +53,7 @@ function useMediaQuery<T extends MediaQueries>(mediaQueries: T) {
 
   const matchQuery = useCallback((query: keyof T) => {
     return activeQuery.some(q => q === query);
-  });
+  }, []);
 
   return matchQuery;
 }

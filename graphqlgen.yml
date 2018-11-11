@@ -2,7 +2,7 @@ language: typescript
 schema: ./src/graphql/schema.graphql
 models:
   files:
-    - ./src/graphql/__generated__/prisma-client
+    - ./src/graphql/generated/prisma-client
     - ./src/graphql/models.ts
-output: ./src/graphql/__generated__/graphqlgen.ts
+output: ./src/graphql/generated/graphqlgen.ts
 context: ./src/graphql/types.ts:Context

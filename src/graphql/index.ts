@@ -2,7 +2,7 @@ import { ApolloServer, GraphQLUpload, makeExecutableSchema } from 'apollo-server
 import { Context } from 'apollo-server-core';
 import { importSchema } from 'graphql-import';
 import jwt from 'jsonwebtoken';
-import { Prisma, prisma } from './__generated__/prisma-client';
+import { Prisma, prisma } from './generated/prisma-client';
 import Document from './resolvers/Document';
 import DocumentType from './resolvers/DocumentType';
 import File from './resolvers/File';

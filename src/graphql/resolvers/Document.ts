@@ -1,4 +1,4 @@
-import { DocumentResolvers } from '../__generated__/graphqlgen';
+import { DocumentResolvers } from '../generated/graphqlgen';
 
 const Document: DocumentResolvers.Type = {
   ...DocumentResolvers.defaultResolvers,

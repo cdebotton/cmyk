@@ -1,4 +1,4 @@
-import { QueryResolvers } from '../__generated__/graphqlgen';
+import { QueryResolvers } from '../generated/graphqlgen';
 
 const Query: QueryResolvers.Type = {
   document: (_parent, { id }, { db }) => db.document({ id }),

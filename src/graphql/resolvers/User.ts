@@ -1,4 +1,4 @@
-import { UserResolvers } from '../__generated__/graphqlgen';
+import { UserResolvers } from '../generated/graphqlgen';
 
 const User: UserResolvers.Type = {
   ...UserResolvers.defaultResolvers,

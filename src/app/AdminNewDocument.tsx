@@ -1,8 +1,8 @@
 import gql from 'graphql-tag';
 import React from 'react';
 import * as yup from 'yup';
-import { TCreateDocument, TCreateDocumentVariables } from './__generated__/TCreateDocument';
-import { TDocumentTypes } from './__generated__/TDocumentTypes';
+import { TCreateDocument, TCreateDocumentVariables } from './generated/TCreateDocument';
+import { TDocumentTypes } from './generated/TDocumentTypes';
 import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';

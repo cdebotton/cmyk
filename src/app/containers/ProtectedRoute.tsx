@@ -1,23 +1,13 @@
 import gql from 'graphql-tag';
 import React, { ReactNode } from 'react';
 import { StaticContext } from 'react-router';
-import {
-  Redirect,
-  Route,
-  RouteComponentProps,
-  RouteProps,
-} from 'react-router-dom';
+import { Redirect, Route, RouteComponentProps, RouteProps } from 'react-router-dom';
 import { useApolloQuery } from '../hooks/Apollo';
-import {
-  ProtectedSession,
-  ProtectedSession_session,
-} from './__generated__/ProtectedSession';
+import { ProtectedSession, ProtectedSession_session } from './generated/ProtectedSession';
 
 interface Props extends RouteProps {
   canAccess: (session: ProtectedSession_session | null) => boolean;
-  children?: ((
-    props: RouteComponentProps<any, StaticContext, any>,
-  ) => ReactNode);
+  children?: ((props: RouteComponentProps<any, StaticContext, any>) => ReactNode);
 }
 
 const query = gql`
@@ -31,13 +21,7 @@ const query = gql`
   }
 `;
 
-function ProtectedRoute({
-  canAccess,
-  component: Component,
-  children,
-  render,
-  ...rest
-}: Props) {
+function ProtectedRoute({ canAccess, component: Component, children, render, ...rest }: Props) {
   const {
     data: { session },
   } = useApolloQuery<ProtectedSession>(query);
