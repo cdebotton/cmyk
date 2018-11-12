@@ -34,7 +34,7 @@ type Document {
   publishDate: DateTime!
   title: String!
   author: User! @relation(name: "UserDocuments")
-  # blocks: [Block!]! @relation(name: "DocumentBlocks", onDelete: CASCADE)
+  blocks: [Block!]! @relation(name: "DocumentBlocks", onDelete: CASCADE)
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -48,6 +48,14 @@ type File {
   bucket: String!
   size: Int!
   url: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type Block {
+  id: ID! @unique
+  name: String!
+  document: Document! @relation(name: "DocumentBlocks")
   createdAt: DateTime!
   updatedAt: DateTime!
 }

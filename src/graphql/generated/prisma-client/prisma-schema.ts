@@ -1,4 +1,8 @@
-export const typeDefs = /* GraphQL */ `type AggregateDocument {
+export const typeDefs = /* GraphQL */ `type AggregateBlock {
+  count: Int!
+}
+
+type AggregateDocument {
   count: Int!
 }
 
@@ -18,6 +22,163 @@ type BatchPayload {
   count: Long!
 }
 
+type Block {
+  id: ID!
+  name: String!
+  document: Document!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type BlockConnection {
+  pageInfo: PageInfo!
+  edges: [BlockEdge]!
+  aggregate: AggregateBlock!
+}
+
+input BlockCreateInput {
+  name: String!
+  document: DocumentCreateOneWithoutBlocksInput!
+}
+
+input BlockCreateManyWithoutDocumentInput {
+  create: [BlockCreateWithoutDocumentInput!]
+  connect: [BlockWhereUniqueInput!]
+}
+
+input BlockCreateWithoutDocumentInput {
+  name: String!
+}
+
+type BlockEdge {
+  node: Block!
+  cursor: String!
+}
+
+enum BlockOrderByInput {
+  id_ASC
+  id_DESC
+  name_ASC
+  name_DESC
+  createdAt_ASC
+  createdAt_DESC
+  updatedAt_ASC
+  updatedAt_DESC
+}
+
+type BlockPreviousValues {
+  id: ID!
+  name: String!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+type BlockSubscriptionPayload {
+  mutation: MutationType!
+  node: Block
+  updatedFields: [String!]
+  previousValues: BlockPreviousValues
+}
+
+input BlockSubscriptionWhereInput {
+  mutation_in: [MutationType!]
+  updatedFields_contains: String
+  updatedFields_contains_every: [String!]
+  updatedFields_contains_some: [String!]
+  node: BlockWhereInput
+  AND: [BlockSubscriptionWhereInput!]
+  OR: [BlockSubscriptionWhereInput!]
+  NOT: [BlockSubscriptionWhereInput!]
+}
+
+input BlockUpdateInput {
+  name: String
+  document: DocumentUpdateOneRequiredWithoutBlocksInput
+}
+
+input BlockUpdateManyMutationInput {
+  name: String
+}
+
+input BlockUpdateManyWithoutDocumentInput {
+  create: [BlockCreateWithoutDocumentInput!]
+  delete: [BlockWhereUniqueInput!]
+  connect: [BlockWhereUniqueInput!]
+  disconnect: [BlockWhereUniqueInput!]
+  update: [BlockUpdateWithWhereUniqueWithoutDocumentInput!]
+  upsert: [BlockUpsertWithWhereUniqueWithoutDocumentInput!]
+}
+
+input BlockUpdateWithoutDocumentDataInput {
+  name: String
+}
+
+input BlockUpdateWithWhereUniqueWithoutDocumentInput {
+  where: BlockWhereUniqueInput!
+  data: BlockUpdateWithoutDocumentDataInput!
+}
+
+input BlockUpsertWithWhereUniqueWithoutDocumentInput {
+  where: BlockWhereUniqueInput!
+  update: BlockUpdateWithoutDocumentDataInput!
+  create: BlockCreateWithoutDocumentInput!
+}
+
+input BlockWhereInput {
+  id: ID
+  id_not: ID
+  id_in: [ID!]
+  id_not_in: [ID!]
+  id_lt: ID
+  id_lte: ID
+  id_gt: ID
+  id_gte: ID
+  id_contains: ID
+  id_not_contains: ID
+  id_starts_with: ID
+  id_not_starts_with: ID
+  id_ends_with: ID
+  id_not_ends_with: ID
+  name: String
+  name_not: String
+  name_in: [String!]
+  name_not_in: [String!]
+  name_lt: String
+  name_lte: String
+  name_gt: String
+  name_gte: String
+  name_contains: String
+  name_not_contains: String
+  name_starts_with: String
+  name_not_starts_with: String
+  name_ends_with: String
+  name_not_ends_with: String
+  document: DocumentWhereInput
+  createdAt: DateTime
+  createdAt_not: DateTime
+  createdAt_in: [DateTime!]
+  createdAt_not_in: [DateTime!]
+  createdAt_lt: DateTime
+  createdAt_lte: DateTime
+  createdAt_gt: DateTime
+  createdAt_gte: DateTime
+  updatedAt: DateTime
+  updatedAt_not: DateTime
+  updatedAt_in: [DateTime!]
+  updatedAt_not_in: [DateTime!]
+  updatedAt_lt: DateTime
+  updatedAt_lte: DateTime
+  updatedAt_gt: DateTime
+  updatedAt_gte: DateTime
+  AND: [BlockWhereInput!]
+  OR: [BlockWhereInput!]
+  NOT: [BlockWhereInput!]
+}
+
+input BlockWhereUniqueInput {
+  id: ID
+}
+
 scalar DateTime
 
 type Document {
@@ -25,6 +186,7 @@ type Document {
   publishDate: DateTime!
   title: String!
   author: User!
+  blocks(where: BlockWhereInput, orderBy: BlockOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Block!]
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -39,6 +201,7 @@ input DocumentCreateInput {
   publishDate: DateTime!
   title: String!
   author: UserCreateOneWithoutDocumentsInput!
+  blocks: BlockCreateManyWithoutDocumentInput
 }
 
 input DocumentCreateManyWithoutAuthorInput {
@@ -46,9 +209,21 @@ input DocumentCreateManyWithoutAuthorInput {
   connect: [DocumentWhereUniqueInput!]
 }
 
+input DocumentCreateOneWithoutBlocksInput {
+  create: DocumentCreateWithoutBlocksInput
+  connect: DocumentWhereUniqueInput
+}
+
 input DocumentCreateWithoutAuthorInput {
   publishDate: DateTime!
   title: String!
+  blocks: BlockCreateManyWithoutDocumentInput
+}
+
+input DocumentCreateWithoutBlocksInput {
+  publishDate: DateTime!
+  title: String!
+  author: UserCreateOneWithoutDocumentsInput!
 }
 
 type DocumentEdge {
@@ -99,6 +274,7 @@ input DocumentUpdateInput {
   publishDate: DateTime
   title: String
   author: UserUpdateOneRequiredWithoutDocumentsInput
+  blocks: BlockUpdateManyWithoutDocumentInput
 }
 
 input DocumentUpdateManyMutationInput {
@@ -115,14 +291,33 @@ input DocumentUpdateManyWithoutAuthorInput {
   upsert: [DocumentUpsertWithWhereUniqueWithoutAuthorInput!]
 }
 
+input DocumentUpdateOneRequiredWithoutBlocksInput {
+  create: DocumentCreateWithoutBlocksInput
+  update: DocumentUpdateWithoutBlocksDataInput
+  upsert: DocumentUpsertWithoutBlocksInput
+  connect: DocumentWhereUniqueInput
+}
+
 input DocumentUpdateWithoutAuthorDataInput {
   publishDate: DateTime
   title: String
+  blocks: BlockUpdateManyWithoutDocumentInput
+}
+
+input DocumentUpdateWithoutBlocksDataInput {
+  publishDate: DateTime
+  title: String
+  author: UserUpdateOneRequiredWithoutDocumentsInput
 }
 
 input DocumentUpdateWithWhereUniqueWithoutAuthorInput {
   where: DocumentWhereUniqueInput!
   data: DocumentUpdateWithoutAuthorDataInput!
+}
+
+input DocumentUpsertWithoutBlocksInput {
+  update: DocumentUpdateWithoutBlocksDataInput!
+  create: DocumentCreateWithoutBlocksInput!
 }
 
 input DocumentUpsertWithWhereUniqueWithoutAuthorInput {
@@ -169,6 +364,9 @@ input DocumentWhereInput {
   title_ends_with: String
   title_not_ends_with: String
   author: UserWhereInput
+  blocks_every: BlockWhereInput
+  blocks_some: BlockWhereInput
+  blocks_none: BlockWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
   createdAt_in: [DateTime!]
@@ -466,6 +664,12 @@ input FileWhereUniqueInput {
 scalar Long
 
 type Mutation {
+  createBlock(data: BlockCreateInput!): Block!
+  updateBlock(data: BlockUpdateInput!, where: BlockWhereUniqueInput!): Block
+  updateManyBlocks(data: BlockUpdateManyMutationInput!, where: BlockWhereInput): BatchPayload!
+  upsertBlock(where: BlockWhereUniqueInput!, create: BlockCreateInput!, update: BlockUpdateInput!): Block!
+  deleteBlock(where: BlockWhereUniqueInput!): Block
+  deleteManyBlocks(where: BlockWhereInput): BatchPayload!
   createDocument(data: DocumentCreateInput!): Document!
   updateDocument(data: DocumentUpdateInput!, where: DocumentWhereUniqueInput!): Document
   updateManyDocuments(data: DocumentUpdateManyMutationInput!, where: DocumentWhereInput): BatchPayload!
@@ -705,6 +909,9 @@ input ProfileWhereUniqueInput {
 }
 
 type Query {
+  block(where: BlockWhereUniqueInput!): Block
+  blocks(where: BlockWhereInput, orderBy: BlockOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Block]!
+  blocksConnection(where: BlockWhereInput, orderBy: BlockOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): BlockConnection!
   document(where: DocumentWhereUniqueInput!): Document
   documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document]!
   documentsConnection(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DocumentConnection!
@@ -729,6 +936,7 @@ enum Role {
 }
 
 type Subscription {
+  block(where: BlockSubscriptionWhereInput): BlockSubscriptionPayload
   document(where: DocumentSubscriptionWhereInput): DocumentSubscriptionPayload
   file(where: FileSubscriptionWhereInput): FileSubscriptionPayload
   profile(where: ProfileSubscriptionWhereInput): ProfileSubscriptionPayload

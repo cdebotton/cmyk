@@ -10,6 +10,7 @@ type AtLeastOne<T, U = { [K in keyof T]: Pick<T, K> }> = Partial<T> &
   U[keyof U];
 
 export interface Exists {
+  block: (where?: BlockWhereInput) => Promise<boolean>;
   document: (where?: DocumentWhereInput) => Promise<boolean>;
   file: (where?: FileWhereInput) => Promise<boolean>;
   profile: (where?: ProfileWhereInput) => Promise<boolean>;
@@ -35,6 +36,29 @@ export interface Prisma {
    * Queries
    */
 
+  block: (where: BlockWhereUniqueInput) => BlockPromise;
+  blocks: (
+    args?: {
+      where?: BlockWhereInput;
+      orderBy?: BlockOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => FragmentableArray<Block>;
+  blocksConnection: (
+    args?: {
+      where?: BlockWhereInput;
+      orderBy?: BlockOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => BlockConnectionPromise;
   document: (where: DocumentWhereUniqueInput) => DocumentPromise;
   documents: (
     args?: {
@@ -133,6 +157,22 @@ export interface Prisma {
    * Mutations
    */
 
+  createBlock: (data: BlockCreateInput) => BlockPromise;
+  updateBlock: (
+    args: { data: BlockUpdateInput; where: BlockWhereUniqueInput }
+  ) => BlockPromise;
+  updateManyBlocks: (
+    args: { data: BlockUpdateManyMutationInput; where?: BlockWhereInput }
+  ) => BatchPayloadPromise;
+  upsertBlock: (
+    args: {
+      where: BlockWhereUniqueInput;
+      create: BlockCreateInput;
+      update: BlockUpdateInput;
+    }
+  ) => BlockPromise;
+  deleteBlock: (where: BlockWhereUniqueInput) => BlockPromise;
+  deleteManyBlocks: (where?: BlockWhereInput) => BatchPayloadPromise;
   createDocument: (data: DocumentCreateInput) => DocumentPromise;
   updateDocument: (
     args: { data: DocumentUpdateInput; where: DocumentWhereUniqueInput }
@@ -206,6 +246,9 @@ export interface Prisma {
 }
 
 export interface Subscription {
+  block: (
+    where?: BlockSubscriptionWhereInput
+  ) => BlockSubscriptionPayloadSubscription;
   document: (
     where?: DocumentSubscriptionWhereInput
   ) => DocumentSubscriptionPayloadSubscription;
@@ -241,6 +284,16 @@ export type DocumentOrderByInput =
   | "updatedAt_DESC";
 
 export type Role = "ADMIN" | "EDITOR" | "USER" | "VIEWER" | "UNAUTHORIZED";
+
+export type BlockOrderByInput =
+  | "id_ASC"
+  | "id_DESC"
+  | "name_ASC"
+  | "name_DESC"
+  | "createdAt_ASC"
+  | "createdAt_DESC"
+  | "updatedAt_ASC"
+  | "updatedAt_DESC";
 
 export type FileOrderByInput =
   | "id_ASC"
@@ -296,23 +349,23 @@ export type UserOrderByInput =
 
 export type MutationType = "CREATED" | "UPDATED" | "DELETED";
 
-export interface UserUpdateOneRequiredWithoutDocumentsInput {
-  create?: UserCreateWithoutDocumentsInput;
-  update?: UserUpdateWithoutDocumentsDataInput;
-  upsert?: UserUpsertWithoutDocumentsInput;
-  connect?: UserWhereUniqueInput;
+export interface UserUpdateWithoutDocumentsDataInput {
+  email?: String;
+  password?: String;
+  lastLogin?: DateTimeInput;
+  role?: Role;
+  profile?: ProfileUpdateOneRequiredWithoutUserInput;
 }
 
-export type DocumentWhereUniqueInput = AtLeastOne<{
+export type BlockWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
 }>;
 
-export interface DocumentCreateWithoutAuthorInput {
-  publishDate: DateTimeInput;
-  title: String;
+export interface BlockUpdateWithoutDocumentDataInput {
+  name?: String;
 }
 
-export interface FileUpdateInput {
+export interface FileUpdateDataInput {
   mimetype?: String;
   encoding?: String;
   key?: String;
@@ -322,20 +375,9 @@ export interface FileUpdateInput {
   url?: String;
 }
 
-export interface DocumentCreateManyWithoutAuthorInput {
-  create?:
-    | DocumentCreateWithoutAuthorInput[]
-    | DocumentCreateWithoutAuthorInput;
-  connect?: DocumentWhereUniqueInput[] | DocumentWhereUniqueInput;
-}
-
-export interface FileUpdateOneInput {
-  create?: FileCreateInput;
-  update?: FileUpdateDataInput;
-  upsert?: FileUpsertNestedInput;
-  delete?: Boolean;
-  disconnect?: Boolean;
-  connect?: FileWhereUniqueInput;
+export interface BlockCreateInput {
+  name: String;
+  document: DocumentCreateOneWithoutBlocksInput;
 }
 
 export interface UserWhereInput {
@@ -416,6 +458,11 @@ export interface UserWhereInput {
   AND?: UserWhereInput[] | UserWhereInput;
   OR?: UserWhereInput[] | UserWhereInput;
   NOT?: UserWhereInput[] | UserWhereInput;
+}
+
+export interface DocumentCreateOneWithoutBlocksInput {
+  create?: DocumentCreateWithoutBlocksInput;
+  connect?: DocumentWhereUniqueInput;
 }
 
 export interface FileWhereInput {
@@ -546,21 +593,21 @@ export interface FileWhereInput {
   NOT?: FileWhereInput[] | FileWhereInput;
 }
 
-export interface DocumentCreateInput {
+export interface DocumentCreateWithoutBlocksInput {
   publishDate: DateTimeInput;
   title: String;
   author: UserCreateOneWithoutDocumentsInput;
 }
 
-export interface ProfileSubscriptionWhereInput {
+export interface UserSubscriptionWhereInput {
   mutation_in?: MutationType[] | MutationType;
   updatedFields_contains?: String;
   updatedFields_contains_every?: String[] | String;
   updatedFields_contains_some?: String[] | String;
-  node?: ProfileWhereInput;
-  AND?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
-  OR?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
-  NOT?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
+  node?: UserWhereInput;
+  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+  NOT?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
 }
 
 export interface UserCreateOneWithoutDocumentsInput {
@@ -568,15 +615,15 @@ export interface UserCreateOneWithoutDocumentsInput {
   connect?: UserWhereUniqueInput;
 }
 
-export interface DocumentSubscriptionWhereInput {
+export interface FileSubscriptionWhereInput {
   mutation_in?: MutationType[] | MutationType;
   updatedFields_contains?: String;
   updatedFields_contains_every?: String[] | String;
   updatedFields_contains_some?: String[] | String;
-  node?: DocumentWhereInput;
-  AND?: DocumentSubscriptionWhereInput[] | DocumentSubscriptionWhereInput;
-  OR?: DocumentSubscriptionWhereInput[] | DocumentSubscriptionWhereInput;
-  NOT?: DocumentSubscriptionWhereInput[] | DocumentSubscriptionWhereInput;
+  node?: FileWhereInput;
+  AND?: FileSubscriptionWhereInput[] | FileSubscriptionWhereInput;
+  OR?: FileSubscriptionWhereInput[] | FileSubscriptionWhereInput;
+  NOT?: FileSubscriptionWhereInput[] | FileSubscriptionWhereInput;
 }
 
 export interface UserCreateWithoutDocumentsInput {
@@ -585,6 +632,22 @@ export interface UserCreateWithoutDocumentsInput {
   lastLogin?: DateTimeInput;
   role?: Role;
   profile: ProfileCreateOneWithoutUserInput;
+}
+
+export interface BlockSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: BlockWhereInput;
+  AND?: BlockSubscriptionWhereInput[] | BlockSubscriptionWhereInput;
+  OR?: BlockSubscriptionWhereInput[] | BlockSubscriptionWhereInput;
+  NOT?: BlockSubscriptionWhereInput[] | BlockSubscriptionWhereInput;
+}
+
+export interface ProfileCreateOneWithoutUserInput {
+  create?: ProfileCreateWithoutUserInput;
+  connect?: ProfileWhereUniqueInput;
 }
 
 export interface UserUpdateInput {
@@ -596,9 +659,11 @@ export interface UserUpdateInput {
   documents?: DocumentUpdateManyWithoutAuthorInput;
 }
 
-export interface ProfileCreateOneWithoutUserInput {
-  create?: ProfileCreateWithoutUserInput;
-  connect?: ProfileWhereUniqueInput;
+export interface ProfileCreateWithoutUserInput {
+  firstName?: String;
+  lastName?: String;
+  dateOfBirth?: DateTimeInput;
+  avatar?: FileCreateOneInput;
 }
 
 export interface UserCreateInput {
@@ -610,26 +675,15 @@ export interface UserCreateInput {
   documents?: DocumentCreateManyWithoutAuthorInput;
 }
 
-export interface ProfileCreateWithoutUserInput {
-  firstName?: String;
-  lastName?: String;
-  dateOfBirth?: DateTimeInput;
-  avatar?: FileCreateOneInput;
+export interface FileCreateOneInput {
+  create?: FileCreateInput;
+  connect?: FileWhereUniqueInput;
 }
 
 export interface UserUpsertWithoutProfileInput {
   update: UserUpdateWithoutProfileDataInput;
   create: UserCreateWithoutProfileInput;
 }
-
-export interface FileCreateOneInput {
-  create?: FileCreateInput;
-  connect?: FileWhereUniqueInput;
-}
-
-export type ProfileWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
 
 export interface FileCreateInput {
   mimetype: String;
@@ -641,31 +695,37 @@ export interface FileCreateInput {
   url: String;
 }
 
+export interface DocumentUpsertWithWhereUniqueWithoutAuthorInput {
+  where: DocumentWhereUniqueInput;
+  update: DocumentUpdateWithoutAuthorDataInput;
+  create: DocumentCreateWithoutAuthorInput;
+}
+
+export interface BlockUpdateInput {
+  name?: String;
+  document?: DocumentUpdateOneRequiredWithoutBlocksInput;
+}
+
 export interface DocumentUpdateWithWhereUniqueWithoutAuthorInput {
   where: DocumentWhereUniqueInput;
   data: DocumentUpdateWithoutAuthorDataInput;
 }
 
-export interface DocumentUpdateInput {
+export interface DocumentUpdateOneRequiredWithoutBlocksInput {
+  create?: DocumentCreateWithoutBlocksInput;
+  update?: DocumentUpdateWithoutBlocksDataInput;
+  upsert?: DocumentUpsertWithoutBlocksInput;
+  connect?: DocumentWhereUniqueInput;
+}
+
+export type ProfileWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface DocumentUpdateWithoutBlocksDataInput {
   publishDate?: DateTimeInput;
   title?: String;
   author?: UserUpdateOneRequiredWithoutDocumentsInput;
-}
-
-export interface UserUpdateWithoutProfileDataInput {
-  email?: String;
-  password?: String;
-  lastLogin?: DateTimeInput;
-  role?: Role;
-  documents?: DocumentUpdateManyWithoutAuthorInput;
-}
-
-export interface UserCreateWithoutProfileInput {
-  email: String;
-  password: String;
-  lastLogin?: DateTimeInput;
-  role?: Role;
-  documents?: DocumentCreateManyWithoutAuthorInput;
 }
 
 export interface UserUpdateOneRequiredWithoutProfileInput {
@@ -675,12 +735,53 @@ export interface UserUpdateOneRequiredWithoutProfileInput {
   connect?: UserWhereUniqueInput;
 }
 
-export interface UserUpdateWithoutDocumentsDataInput {
-  email?: String;
-  password?: String;
-  lastLogin?: DateTimeInput;
-  role?: Role;
-  profile?: ProfileUpdateOneRequiredWithoutUserInput;
+export interface UserUpdateOneRequiredWithoutDocumentsInput {
+  create?: UserCreateWithoutDocumentsInput;
+  update?: UserUpdateWithoutDocumentsDataInput;
+  upsert?: UserUpsertWithoutDocumentsInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface DocumentCreateWithoutAuthorInput {
+  publishDate: DateTimeInput;
+  title: String;
+  blocks?: BlockCreateManyWithoutDocumentInput;
+}
+
+export interface FileUpdateManyMutationInput {
+  mimetype?: String;
+  encoding?: String;
+  key?: String;
+  etag?: String;
+  bucket?: String;
+  size?: Int;
+  url?: String;
+}
+
+export interface DocumentCreateManyWithoutAuthorInput {
+  create?:
+    | DocumentCreateWithoutAuthorInput[]
+    | DocumentCreateWithoutAuthorInput;
+  connect?: DocumentWhereUniqueInput[] | DocumentWhereUniqueInput;
+}
+
+export interface ProfileUpdateOneRequiredWithoutUserInput {
+  create?: ProfileCreateWithoutUserInput;
+  update?: ProfileUpdateWithoutUserDataInput;
+  upsert?: ProfileUpsertWithoutUserInput;
+  connect?: ProfileWhereUniqueInput;
+}
+
+export interface UserCreateOneWithoutProfileInput {
+  create?: UserCreateWithoutProfileInput;
+  connect?: UserWhereUniqueInput;
+}
+
+export interface ProfileUpdateWithoutUserDataInput {
+  firstName?: String;
+  lastName?: String;
+  dateOfBirth?: DateTimeInput;
+  avatar?: FileUpdateOneInput;
 }
 
 export interface DocumentWhereInput {
@@ -721,6 +822,9 @@ export interface DocumentWhereInput {
   title_ends_with?: String;
   title_not_ends_with?: String;
   author?: UserWhereInput;
+  blocks_every?: BlockWhereInput;
+  blocks_some?: BlockWhereInput;
+  blocks_none?: BlockWhereInput;
   createdAt?: DateTimeInput;
   createdAt_not?: DateTimeInput;
   createdAt_in?: DateTimeInput[] | DateTimeInput;
@@ -742,50 +846,67 @@ export interface DocumentWhereInput {
   NOT?: DocumentWhereInput[] | DocumentWhereInput;
 }
 
-export interface ProfileUpdateOneRequiredWithoutUserInput {
-  create?: ProfileCreateWithoutUserInput;
-  update?: ProfileUpdateWithoutUserDataInput;
-  upsert?: ProfileUpsertWithoutUserInput;
-  connect?: ProfileWhereUniqueInput;
+export interface FileUpdateOneInput {
+  create?: FileCreateInput;
+  update?: FileUpdateDataInput;
+  upsert?: FileUpsertNestedInput;
+  delete?: Boolean;
+  disconnect?: Boolean;
+  connect?: FileWhereUniqueInput;
 }
 
-export interface UserSubscriptionWhereInput {
-  mutation_in?: MutationType[] | MutationType;
-  updatedFields_contains?: String;
-  updatedFields_contains_every?: String[] | String;
-  updatedFields_contains_some?: String[] | String;
-  node?: UserWhereInput;
-  AND?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
-  OR?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
-  NOT?: UserSubscriptionWhereInput[] | UserSubscriptionWhereInput;
+export interface BlockWhereInput {
+  id?: ID_Input;
+  id_not?: ID_Input;
+  id_in?: ID_Input[] | ID_Input;
+  id_not_in?: ID_Input[] | ID_Input;
+  id_lt?: ID_Input;
+  id_lte?: ID_Input;
+  id_gt?: ID_Input;
+  id_gte?: ID_Input;
+  id_contains?: ID_Input;
+  id_not_contains?: ID_Input;
+  id_starts_with?: ID_Input;
+  id_not_starts_with?: ID_Input;
+  id_ends_with?: ID_Input;
+  id_not_ends_with?: ID_Input;
+  name?: String;
+  name_not?: String;
+  name_in?: String[] | String;
+  name_not_in?: String[] | String;
+  name_lt?: String;
+  name_lte?: String;
+  name_gt?: String;
+  name_gte?: String;
+  name_contains?: String;
+  name_not_contains?: String;
+  name_starts_with?: String;
+  name_not_starts_with?: String;
+  name_ends_with?: String;
+  name_not_ends_with?: String;
+  document?: DocumentWhereInput;
+  createdAt?: DateTimeInput;
+  createdAt_not?: DateTimeInput;
+  createdAt_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_not_in?: DateTimeInput[] | DateTimeInput;
+  createdAt_lt?: DateTimeInput;
+  createdAt_lte?: DateTimeInput;
+  createdAt_gt?: DateTimeInput;
+  createdAt_gte?: DateTimeInput;
+  updatedAt?: DateTimeInput;
+  updatedAt_not?: DateTimeInput;
+  updatedAt_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_not_in?: DateTimeInput[] | DateTimeInput;
+  updatedAt_lt?: DateTimeInput;
+  updatedAt_lte?: DateTimeInput;
+  updatedAt_gt?: DateTimeInput;
+  updatedAt_gte?: DateTimeInput;
+  AND?: BlockWhereInput[] | BlockWhereInput;
+  OR?: BlockWhereInput[] | BlockWhereInput;
+  NOT?: BlockWhereInput[] | BlockWhereInput;
 }
 
-export interface ProfileUpdateWithoutUserDataInput {
-  firstName?: String;
-  lastName?: String;
-  dateOfBirth?: DateTimeInput;
-  avatar?: FileUpdateOneInput;
-}
-
-export interface UserUpdateManyMutationInput {
-  email?: String;
-  password?: String;
-  lastLogin?: DateTimeInput;
-  role?: Role;
-}
-
-export interface UserCreateOneWithoutProfileInput {
-  create?: UserCreateWithoutProfileInput;
-  connect?: UserWhereUniqueInput;
-}
-
-export interface ProfileUpdateManyMutationInput {
-  firstName?: String;
-  lastName?: String;
-  dateOfBirth?: DateTimeInput;
-}
-
-export interface FileUpdateDataInput {
+export interface FileUpdateInput {
   mimetype?: String;
   encoding?: String;
   key?: String;
@@ -795,9 +916,15 @@ export interface FileUpdateDataInput {
   url?: String;
 }
 
-export interface DocumentUpdateWithoutAuthorDataInput {
-  publishDate?: DateTimeInput;
-  title?: String;
+export interface DocumentSubscriptionWhereInput {
+  mutation_in?: MutationType[] | MutationType;
+  updatedFields_contains?: String;
+  updatedFields_contains_every?: String[] | String;
+  updatedFields_contains_some?: String[] | String;
+  node?: DocumentWhereInput;
+  AND?: DocumentSubscriptionWhereInput[] | DocumentSubscriptionWhereInput;
+  OR?: DocumentSubscriptionWhereInput[] | DocumentSubscriptionWhereInput;
+  NOT?: DocumentSubscriptionWhereInput[] | DocumentSubscriptionWhereInput;
 }
 
 export interface FileUpsertNestedInput {
@@ -805,14 +932,67 @@ export interface FileUpsertNestedInput {
   create: FileCreateInput;
 }
 
-export type UserWhereUniqueInput = AtLeastOne<{
+export type DocumentWhereUniqueInput = AtLeastOne<{
   id: ID_Input;
-  email?: String;
 }>;
 
 export interface ProfileUpsertWithoutUserInput {
   update: ProfileUpdateWithoutUserDataInput;
   create: ProfileCreateWithoutUserInput;
+}
+
+export type FileWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+}>;
+
+export interface UserUpsertWithoutDocumentsInput {
+  update: UserUpdateWithoutDocumentsDataInput;
+  create: UserCreateWithoutDocumentsInput;
+}
+
+export interface DocumentUpdateManyWithoutAuthorInput {
+  create?:
+    | DocumentCreateWithoutAuthorInput[]
+    | DocumentCreateWithoutAuthorInput;
+  delete?: DocumentWhereUniqueInput[] | DocumentWhereUniqueInput;
+  connect?: DocumentWhereUniqueInput[] | DocumentWhereUniqueInput;
+  disconnect?: DocumentWhereUniqueInput[] | DocumentWhereUniqueInput;
+  update?:
+    | DocumentUpdateWithWhereUniqueWithoutAuthorInput[]
+    | DocumentUpdateWithWhereUniqueWithoutAuthorInput;
+  upsert?:
+    | DocumentUpsertWithWhereUniqueWithoutAuthorInput[]
+    | DocumentUpsertWithWhereUniqueWithoutAuthorInput;
+}
+
+export interface DocumentUpsertWithoutBlocksInput {
+  update: DocumentUpdateWithoutBlocksDataInput;
+  create: DocumentCreateWithoutBlocksInput;
+}
+
+export interface ProfileUpdateInput {
+  firstName?: String;
+  lastName?: String;
+  dateOfBirth?: DateTimeInput;
+  user?: UserUpdateOneRequiredWithoutProfileInput;
+  avatar?: FileUpdateOneInput;
+}
+
+export interface BlockUpdateManyMutationInput {
+  name?: String;
+}
+
+export interface UserCreateWithoutProfileInput {
+  email: String;
+  password: String;
+  lastLogin?: DateTimeInput;
+  role?: Role;
+  documents?: DocumentCreateManyWithoutAuthorInput;
+}
+
+export interface DocumentUpdateManyMutationInput {
+  publishDate?: DateTimeInput;
+  title?: String;
 }
 
 export interface ProfileWhereInput {
@@ -889,14 +1069,69 @@ export interface ProfileWhereInput {
   NOT?: ProfileWhereInput[] | ProfileWhereInput;
 }
 
-export interface FileUpdateManyMutationInput {
-  mimetype?: String;
-  encoding?: String;
-  key?: String;
-  etag?: String;
-  bucket?: String;
-  size?: Int;
-  url?: String;
+export interface BlockUpsertWithWhereUniqueWithoutDocumentInput {
+  where: BlockWhereUniqueInput;
+  update: BlockUpdateWithoutDocumentDataInput;
+  create: BlockCreateWithoutDocumentInput;
+}
+
+export interface UserUpdateManyMutationInput {
+  email?: String;
+  password?: String;
+  lastLogin?: DateTimeInput;
+  role?: Role;
+}
+
+export interface DocumentCreateInput {
+  publishDate: DateTimeInput;
+  title: String;
+  author: UserCreateOneWithoutDocumentsInput;
+  blocks?: BlockCreateManyWithoutDocumentInput;
+}
+
+export interface DocumentUpdateWithoutAuthorDataInput {
+  publishDate?: DateTimeInput;
+  title?: String;
+  blocks?: BlockUpdateManyWithoutDocumentInput;
+}
+
+export interface BlockCreateManyWithoutDocumentInput {
+  create?: BlockCreateWithoutDocumentInput[] | BlockCreateWithoutDocumentInput;
+  connect?: BlockWhereUniqueInput[] | BlockWhereUniqueInput;
+}
+
+export type UserWhereUniqueInput = AtLeastOne<{
+  id: ID_Input;
+  email?: String;
+}>;
+
+export interface BlockUpdateWithWhereUniqueWithoutDocumentInput {
+  where: BlockWhereUniqueInput;
+  data: BlockUpdateWithoutDocumentDataInput;
+}
+
+export interface BlockUpdateManyWithoutDocumentInput {
+  create?: BlockCreateWithoutDocumentInput[] | BlockCreateWithoutDocumentInput;
+  delete?: BlockWhereUniqueInput[] | BlockWhereUniqueInput;
+  connect?: BlockWhereUniqueInput[] | BlockWhereUniqueInput;
+  disconnect?: BlockWhereUniqueInput[] | BlockWhereUniqueInput;
+  update?:
+    | BlockUpdateWithWhereUniqueWithoutDocumentInput[]
+    | BlockUpdateWithWhereUniqueWithoutDocumentInput;
+  upsert?:
+    | BlockUpsertWithWhereUniqueWithoutDocumentInput[]
+    | BlockUpsertWithWhereUniqueWithoutDocumentInput;
+}
+
+export interface DocumentUpdateInput {
+  publishDate?: DateTimeInput;
+  title?: String;
+  author?: UserUpdateOneRequiredWithoutDocumentsInput;
+  blocks?: BlockUpdateManyWithoutDocumentInput;
+}
+
+export interface BlockCreateWithoutDocumentInput {
+  name: String;
 }
 
 export interface ProfileCreateInput {
@@ -907,59 +1142,30 @@ export interface ProfileCreateInput {
   avatar?: FileCreateOneInput;
 }
 
-export interface DocumentUpdateManyMutationInput {
-  publishDate?: DateTimeInput;
-  title?: String;
+export interface UserUpdateWithoutProfileDataInput {
+  email?: String;
+  password?: String;
+  lastLogin?: DateTimeInput;
+  role?: Role;
+  documents?: DocumentUpdateManyWithoutAuthorInput;
 }
 
-export interface UserUpsertWithoutDocumentsInput {
-  update: UserUpdateWithoutDocumentsDataInput;
-  create: UserCreateWithoutDocumentsInput;
+export interface ProfileUpdateManyMutationInput {
+  firstName?: String;
+  lastName?: String;
+  dateOfBirth?: DateTimeInput;
 }
 
-export interface FileSubscriptionWhereInput {
+export interface ProfileSubscriptionWhereInput {
   mutation_in?: MutationType[] | MutationType;
   updatedFields_contains?: String;
   updatedFields_contains_every?: String[] | String;
   updatedFields_contains_some?: String[] | String;
-  node?: FileWhereInput;
-  AND?: FileSubscriptionWhereInput[] | FileSubscriptionWhereInput;
-  OR?: FileSubscriptionWhereInput[] | FileSubscriptionWhereInput;
-  NOT?: FileSubscriptionWhereInput[] | FileSubscriptionWhereInput;
+  node?: ProfileWhereInput;
+  AND?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
+  OR?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
+  NOT?: ProfileSubscriptionWhereInput[] | ProfileSubscriptionWhereInput;
 }
-
-export interface ProfileUpdateInput {
-  firstName?: String;
-  lastName?: String;
-  dateOfBirth?: DateTimeInput;
-  user?: UserUpdateOneRequiredWithoutProfileInput;
-  avatar?: FileUpdateOneInput;
-}
-
-export interface DocumentUpdateManyWithoutAuthorInput {
-  create?:
-    | DocumentCreateWithoutAuthorInput[]
-    | DocumentCreateWithoutAuthorInput;
-  delete?: DocumentWhereUniqueInput[] | DocumentWhereUniqueInput;
-  connect?: DocumentWhereUniqueInput[] | DocumentWhereUniqueInput;
-  disconnect?: DocumentWhereUniqueInput[] | DocumentWhereUniqueInput;
-  update?:
-    | DocumentUpdateWithWhereUniqueWithoutAuthorInput[]
-    | DocumentUpdateWithWhereUniqueWithoutAuthorInput;
-  upsert?:
-    | DocumentUpsertWithWhereUniqueWithoutAuthorInput[]
-    | DocumentUpsertWithWhereUniqueWithoutAuthorInput;
-}
-
-export interface DocumentUpsertWithWhereUniqueWithoutAuthorInput {
-  where: DocumentWhereUniqueInput;
-  update: DocumentUpdateWithoutAuthorDataInput;
-  create: DocumentCreateWithoutAuthorInput;
-}
-
-export type FileWhereUniqueInput = AtLeastOne<{
-  id: ID_Input;
-}>;
 
 export interface NodeNode {
   id: ID_Output;
@@ -997,6 +1203,83 @@ export interface UserPreviousValuesSubscription
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   role: () => Promise<AsyncIterator<Role>>;
+}
+
+export interface DocumentConnection {}
+
+export interface DocumentConnectionPromise
+  extends Promise<DocumentConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfo>() => T;
+  edges: <T = FragmentableArray<DocumentEdge>>() => T;
+  aggregate: <T = AggregateDocument>() => T;
+}
+
+export interface DocumentConnectionSubscription
+  extends Promise<AsyncIterator<DocumentConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<DocumentEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateDocumentSubscription>() => T;
+}
+
+export interface File {
+  id: ID_Output;
+  mimetype: String;
+  encoding: String;
+  key: String;
+  etag: String;
+  bucket: String;
+  size: Int;
+  url: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface FilePromise extends Promise<File>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  mimetype: () => Promise<String>;
+  encoding: () => Promise<String>;
+  key: () => Promise<String>;
+  etag: () => Promise<String>;
+  bucket: () => Promise<String>;
+  size: () => Promise<Int>;
+  url: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface FileSubscription
+  extends Promise<AsyncIterator<File>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  mimetype: () => Promise<AsyncIterator<String>>;
+  encoding: () => Promise<AsyncIterator<String>>;
+  key: () => Promise<AsyncIterator<String>>;
+  etag: () => Promise<AsyncIterator<String>>;
+  bucket: () => Promise<AsyncIterator<String>>;
+  size: () => Promise<AsyncIterator<Int>>;
+  url: () => Promise<AsyncIterator<String>>;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface DocumentEdge {
+  cursor: String;
+}
+
+export interface DocumentEdgePromise
+  extends Promise<DocumentEdge>,
+    Fragmentable {
+  node: <T = Document>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface DocumentEdgeSubscription
+  extends Promise<AsyncIterator<DocumentEdge>>,
+    Fragmentable {
+  node: <T = DocumentSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
 }
 
 export interface User {
@@ -1055,83 +1338,6 @@ export interface UserSubscription
   ) => T;
 }
 
-export interface File {
-  id: ID_Output;
-  mimetype: String;
-  encoding: String;
-  key: String;
-  etag: String;
-  bucket: String;
-  size: Int;
-  url: String;
-  createdAt: DateTimeOutput;
-  updatedAt: DateTimeOutput;
-}
-
-export interface FilePromise extends Promise<File>, Fragmentable {
-  id: () => Promise<ID_Output>;
-  mimetype: () => Promise<String>;
-  encoding: () => Promise<String>;
-  key: () => Promise<String>;
-  etag: () => Promise<String>;
-  bucket: () => Promise<String>;
-  size: () => Promise<Int>;
-  url: () => Promise<String>;
-  createdAt: () => Promise<DateTimeOutput>;
-  updatedAt: () => Promise<DateTimeOutput>;
-}
-
-export interface FileSubscription
-  extends Promise<AsyncIterator<File>>,
-    Fragmentable {
-  id: () => Promise<AsyncIterator<ID_Output>>;
-  mimetype: () => Promise<AsyncIterator<String>>;
-  encoding: () => Promise<AsyncIterator<String>>;
-  key: () => Promise<AsyncIterator<String>>;
-  etag: () => Promise<AsyncIterator<String>>;
-  bucket: () => Promise<AsyncIterator<String>>;
-  size: () => Promise<AsyncIterator<Int>>;
-  url: () => Promise<AsyncIterator<String>>;
-  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
-}
-
-export interface FileConnection {}
-
-export interface FileConnectionPromise
-  extends Promise<FileConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfo>() => T;
-  edges: <T = FragmentableArray<FileEdge>>() => T;
-  aggregate: <T = AggregateFile>() => T;
-}
-
-export interface FileConnectionSubscription
-  extends Promise<AsyncIterator<FileConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<FileEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateFileSubscription>() => T;
-}
-
-export interface DocumentConnection {}
-
-export interface DocumentConnectionPromise
-  extends Promise<DocumentConnection>,
-    Fragmentable {
-  pageInfo: <T = PageInfo>() => T;
-  edges: <T = FragmentableArray<DocumentEdge>>() => T;
-  aggregate: <T = AggregateDocument>() => T;
-}
-
-export interface DocumentConnectionSubscription
-  extends Promise<AsyncIterator<DocumentConnection>>,
-    Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<DocumentEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateDocumentSubscription>() => T;
-}
-
 export interface BatchPayload {
   count: Long;
 }
@@ -1148,18 +1354,18 @@ export interface BatchPayloadSubscription
   count: () => Promise<AsyncIterator<Long>>;
 }
 
-export interface AggregateDocument {
+export interface AggregateBlock {
   count: Int;
 }
 
-export interface AggregateDocumentPromise
-  extends Promise<AggregateDocument>,
+export interface AggregateBlockPromise
+  extends Promise<AggregateBlock>,
     Fragmentable {
   count: () => Promise<Int>;
 }
 
-export interface AggregateDocumentSubscription
-  extends Promise<AsyncIterator<AggregateDocument>>,
+export interface AggregateBlockSubscription
+  extends Promise<AsyncIterator<AggregateBlock>>,
     Fragmentable {
   count: () => Promise<AsyncIterator<Int>>;
 }
@@ -1211,21 +1417,19 @@ export interface UserEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
-export interface DocumentEdge {
+export interface BlockEdge {
   cursor: String;
 }
 
-export interface DocumentEdgePromise
-  extends Promise<DocumentEdge>,
-    Fragmentable {
-  node: <T = Document>() => T;
+export interface BlockEdgePromise extends Promise<BlockEdge>, Fragmentable {
+  node: <T = Block>() => T;
   cursor: () => Promise<String>;
 }
 
-export interface DocumentEdgeSubscription
-  extends Promise<AsyncIterator<DocumentEdge>>,
+export interface BlockEdgeSubscription
+  extends Promise<AsyncIterator<BlockEdge>>,
     Fragmentable {
-  node: <T = DocumentSubscription>() => T;
+  node: <T = BlockSubscription>() => T;
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
@@ -1291,6 +1495,31 @@ export interface ProfileEdgeSubscription
   cursor: () => Promise<AsyncIterator<String>>;
 }
 
+export interface Block {
+  id: ID_Output;
+  name: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface BlockPromise extends Promise<Block>, Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  document: <T = Document>() => T;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface BlockSubscription
+  extends Promise<AsyncIterator<Block>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  name: () => Promise<AsyncIterator<String>>;
+  document: <T = DocumentSubscription>() => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
 export interface Document {
   id: ID_Output;
   publishDate: DateTimeOutput;
@@ -1304,6 +1533,17 @@ export interface DocumentPromise extends Promise<Document>, Fragmentable {
   publishDate: () => Promise<DateTimeOutput>;
   title: () => Promise<String>;
   author: <T = User>() => T;
+  blocks: <T = FragmentableArray<Block>>(
+    args?: {
+      where?: BlockWhereInput;
+      orderBy?: BlockOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
   createdAt: () => Promise<DateTimeOutput>;
   updatedAt: () => Promise<DateTimeOutput>;
 }
@@ -1315,6 +1555,81 @@ export interface DocumentSubscription
   publishDate: () => Promise<AsyncIterator<DateTimeOutput>>;
   title: () => Promise<AsyncIterator<String>>;
   author: <T = UserSubscription>() => T;
+  blocks: <T = Promise<AsyncIterator<BlockSubscription>>>(
+    args?: {
+      where?: BlockWhereInput;
+      orderBy?: BlockOrderByInput;
+      skip?: Int;
+      after?: String;
+      before?: String;
+      first?: Int;
+      last?: Int;
+    }
+  ) => T;
+  createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+  updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
+}
+
+export interface BlockSubscriptionPayload {
+  mutation: MutationType;
+  updatedFields?: String[];
+}
+
+export interface BlockSubscriptionPayloadPromise
+  extends Promise<BlockSubscriptionPayload>,
+    Fragmentable {
+  mutation: () => Promise<MutationType>;
+  node: <T = Block>() => T;
+  updatedFields: () => Promise<String[]>;
+  previousValues: <T = BlockPreviousValues>() => T;
+}
+
+export interface BlockSubscriptionPayloadSubscription
+  extends Promise<AsyncIterator<BlockSubscriptionPayload>>,
+    Fragmentable {
+  mutation: () => Promise<AsyncIterator<MutationType>>;
+  node: <T = BlockSubscription>() => T;
+  updatedFields: () => Promise<AsyncIterator<String[]>>;
+  previousValues: <T = BlockPreviousValuesSubscription>() => T;
+}
+
+export interface FileEdge {
+  cursor: String;
+}
+
+export interface FileEdgePromise extends Promise<FileEdge>, Fragmentable {
+  node: <T = File>() => T;
+  cursor: () => Promise<String>;
+}
+
+export interface FileEdgeSubscription
+  extends Promise<AsyncIterator<FileEdge>>,
+    Fragmentable {
+  node: <T = FileSubscription>() => T;
+  cursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface BlockPreviousValues {
+  id: ID_Output;
+  name: String;
+  createdAt: DateTimeOutput;
+  updatedAt: DateTimeOutput;
+}
+
+export interface BlockPreviousValuesPromise
+  extends Promise<BlockPreviousValues>,
+    Fragmentable {
+  id: () => Promise<ID_Output>;
+  name: () => Promise<String>;
+  createdAt: () => Promise<DateTimeOutput>;
+  updatedAt: () => Promise<DateTimeOutput>;
+}
+
+export interface BlockPreviousValuesSubscription
+  extends Promise<AsyncIterator<BlockPreviousValues>>,
+    Fragmentable {
+  id: () => Promise<AsyncIterator<ID_Output>>;
+  name: () => Promise<AsyncIterator<String>>;
   createdAt: () => Promise<AsyncIterator<DateTimeOutput>>;
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
@@ -1352,6 +1667,45 @@ export interface ProfileSubscription
   avatar: <T = FileSubscription>() => T;
 }
 
+export interface PageInfo {
+  hasNextPage: Boolean;
+  hasPreviousPage: Boolean;
+  startCursor?: String;
+  endCursor?: String;
+}
+
+export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
+  hasNextPage: () => Promise<Boolean>;
+  hasPreviousPage: () => Promise<Boolean>;
+  startCursor: () => Promise<String>;
+  endCursor: () => Promise<String>;
+}
+
+export interface PageInfoSubscription
+  extends Promise<AsyncIterator<PageInfo>>,
+    Fragmentable {
+  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
+  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
+  startCursor: () => Promise<AsyncIterator<String>>;
+  endCursor: () => Promise<AsyncIterator<String>>;
+}
+
+export interface AggregateUser {
+  count: Int;
+}
+
+export interface AggregateUserPromise
+  extends Promise<AggregateUser>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateUserSubscription
+  extends Promise<AsyncIterator<AggregateUser>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
 export interface DocumentSubscriptionPayload {
   mutation: MutationType;
   updatedFields?: String[];
@@ -1375,38 +1729,36 @@ export interface DocumentSubscriptionPayloadSubscription
   previousValues: <T = DocumentPreviousValuesSubscription>() => T;
 }
 
-export interface FileEdge {
-  cursor: String;
+export interface AggregateProfile {
+  count: Int;
 }
 
-export interface FileEdgePromise extends Promise<FileEdge>, Fragmentable {
-  node: <T = File>() => T;
-  cursor: () => Promise<String>;
-}
-
-export interface FileEdgeSubscription
-  extends Promise<AsyncIterator<FileEdge>>,
+export interface AggregateProfilePromise
+  extends Promise<AggregateProfile>,
     Fragmentable {
-  node: <T = FileSubscription>() => T;
-  cursor: () => Promise<AsyncIterator<String>>;
+  count: () => Promise<Int>;
 }
 
-export interface UserConnection {}
-
-export interface UserConnectionPromise
-  extends Promise<UserConnection>,
+export interface AggregateProfileSubscription
+  extends Promise<AsyncIterator<AggregateProfile>>,
     Fragmentable {
-  pageInfo: <T = PageInfo>() => T;
-  edges: <T = FragmentableArray<UserEdge>>() => T;
-  aggregate: <T = AggregateUser>() => T;
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
-export interface UserConnectionSubscription
-  extends Promise<AsyncIterator<UserConnection>>,
+export interface AggregateFile {
+  count: Int;
+}
+
+export interface AggregateFilePromise
+  extends Promise<AggregateFile>,
     Fragmentable {
-  pageInfo: <T = PageInfoSubscription>() => T;
-  edges: <T = Promise<AsyncIterator<UserEdgeSubscription>>>() => T;
-  aggregate: <T = AggregateUserSubscription>() => T;
+  count: () => Promise<Int>;
+}
+
+export interface AggregateFileSubscription
+  extends Promise<AsyncIterator<AggregateFile>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
 }
 
 export interface FilePreviousValues {
@@ -1475,27 +1827,22 @@ export interface FileSubscriptionPayloadSubscription
   previousValues: <T = FilePreviousValuesSubscription>() => T;
 }
 
-export interface PageInfo {
-  hasNextPage: Boolean;
-  hasPreviousPage: Boolean;
-  startCursor?: String;
-  endCursor?: String;
-}
+export interface BlockConnection {}
 
-export interface PageInfoPromise extends Promise<PageInfo>, Fragmentable {
-  hasNextPage: () => Promise<Boolean>;
-  hasPreviousPage: () => Promise<Boolean>;
-  startCursor: () => Promise<String>;
-  endCursor: () => Promise<String>;
-}
-
-export interface PageInfoSubscription
-  extends Promise<AsyncIterator<PageInfo>>,
+export interface BlockConnectionPromise
+  extends Promise<BlockConnection>,
     Fragmentable {
-  hasNextPage: () => Promise<AsyncIterator<Boolean>>;
-  hasPreviousPage: () => Promise<AsyncIterator<Boolean>>;
-  startCursor: () => Promise<AsyncIterator<String>>;
-  endCursor: () => Promise<AsyncIterator<String>>;
+  pageInfo: <T = PageInfo>() => T;
+  edges: <T = FragmentableArray<BlockEdge>>() => T;
+  aggregate: <T = AggregateBlock>() => T;
+}
+
+export interface BlockConnectionSubscription
+  extends Promise<AsyncIterator<BlockConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<BlockEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateBlockSubscription>() => T;
 }
 
 export interface DocumentPreviousValues {
@@ -1526,52 +1873,22 @@ export interface DocumentPreviousValuesSubscription
   updatedAt: () => Promise<AsyncIterator<DateTimeOutput>>;
 }
 
-export interface AggregateProfile {
-  count: Int;
-}
+export interface FileConnection {}
 
-export interface AggregateProfilePromise
-  extends Promise<AggregateProfile>,
+export interface FileConnectionPromise
+  extends Promise<FileConnection>,
     Fragmentable {
-  count: () => Promise<Int>;
+  pageInfo: <T = PageInfo>() => T;
+  edges: <T = FragmentableArray<FileEdge>>() => T;
+  aggregate: <T = AggregateFile>() => T;
 }
 
-export interface AggregateProfileSubscription
-  extends Promise<AsyncIterator<AggregateProfile>>,
+export interface FileConnectionSubscription
+  extends Promise<AsyncIterator<FileConnection>>,
     Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface AggregateUser {
-  count: Int;
-}
-
-export interface AggregateUserPromise
-  extends Promise<AggregateUser>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateUserSubscription
-  extends Promise<AsyncIterator<AggregateUser>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
-}
-
-export interface AggregateFile {
-  count: Int;
-}
-
-export interface AggregateFilePromise
-  extends Promise<AggregateFile>,
-    Fragmentable {
-  count: () => Promise<Int>;
-}
-
-export interface AggregateFileSubscription
-  extends Promise<AsyncIterator<AggregateFile>>,
-    Fragmentable {
-  count: () => Promise<AsyncIterator<Int>>;
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<FileEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateFileSubscription>() => T;
 }
 
 export interface ProfileConnection {}
@@ -1592,12 +1909,51 @@ export interface ProfileConnectionSubscription
   aggregate: <T = AggregateProfileSubscription>() => T;
 }
 
+export interface UserConnection {}
+
+export interface UserConnectionPromise
+  extends Promise<UserConnection>,
+    Fragmentable {
+  pageInfo: <T = PageInfo>() => T;
+  edges: <T = FragmentableArray<UserEdge>>() => T;
+  aggregate: <T = AggregateUser>() => T;
+}
+
+export interface UserConnectionSubscription
+  extends Promise<AsyncIterator<UserConnection>>,
+    Fragmentable {
+  pageInfo: <T = PageInfoSubscription>() => T;
+  edges: <T = Promise<AsyncIterator<UserEdgeSubscription>>>() => T;
+  aggregate: <T = AggregateUserSubscription>() => T;
+}
+
+export interface AggregateDocument {
+  count: Int;
+}
+
+export interface AggregateDocumentPromise
+  extends Promise<AggregateDocument>,
+    Fragmentable {
+  count: () => Promise<Int>;
+}
+
+export interface AggregateDocumentSubscription
+  extends Promise<AsyncIterator<AggregateDocument>>,
+    Fragmentable {
+  count: () => Promise<AsyncIterator<Int>>;
+}
+
 export type Long = string;
 
 /*
 The `Int` scalar type represents non-fractional signed whole numeric values. Int can represent values between -(2^31) and 2^31 - 1. 
 */
 export type Int = number;
+
+/*
+The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
+*/
+export type String = string;
 
 /*
 DateTime scalar input type, allowing Date
@@ -1608,11 +1964,6 @@ export type DateTimeInput = Date | string;
 DateTime scalar output type, which is always a string
 */
 export type DateTimeOutput = string;
-
-/*
-The `String` scalar type represents textual data, represented as UTF-8 character sequences. The String type is most often used by GraphQL to represent free-form human-readable text.
-*/
-export type String = string;
 
 /*
 The `ID` scalar type represents a unique identifier, often used to refetch an object or as key for a cache. The ID type appears in a JSON response as a String; however, it is not intended to be human-readable. When expected as an input type, any string (such as `"4"`) or integer (such as `4`) input value will be accepted as an ID.
