@@ -7,25 +7,22 @@ import { MutationResolvers } from '../generated/graphqlgen';
 const BadCredentials = new Error('Bad credentials');
 
 const Mutation: MutationResolvers.Type = {
-  createUser: async (
-    _parent,
-    { input: { avatar, email, firstName, lastName, role, password, repeatPassword } },
-    { db },
-  ) => {
-    if (password !== repeatPassword) {
+  createUser: async (_parent, { input }, { db }) => {
+    if (input.password !== input.repeatPassword) {
       throw new Error('');
     }
     const salt = await genSalt(10);
-    const hashedPassword = await hash(password, salt);
+    const hashedPassword = await hash(input.password, salt);
 
     return db.createUser({
-      email,
+      email: input.email,
+      role: input.role,
       password: hashedPassword,
       profile: {
         create: {
-          firstName,
-          lastName,
-          avatar: avatar ? { connect: { id: avatar } } : undefined,
+          firstName: input.firstName,
+          lastName: input.lastName,
+          avatar: input.avatar ? { connect: { id: input.avatar } } : undefined,
         },
       },
     });
@@ -40,14 +37,14 @@ const Mutation: MutationResolvers.Type = {
   deleteUser: async (_parent, { id }, { db }) => {
     return db.deleteUser({ id });
   },
-  login: async (_parent, { input: { email, password } }, { db }) => {
-    const user = await db.user({ email });
+  login: async (_parent, { input }, { db }) => {
+    const user = await db.user({ email: input.email });
 
     if (!user) {
       throw BadCredentials;
     }
 
-    const ok = await compare(password, user.password);
+    const ok = await compare(input.password, user.password);
 
     if (!ok) {
       throw BadCredentials;
@@ -79,7 +76,7 @@ const Mutation: MutationResolvers.Type = {
       },
     });
   },
-  uploadFile: async (_parent, { file }, { db }, info) => {
+  uploadFile: async (_parent, { file }, { db }) => {
     // @ts-ignore
     const { stream, filename, mimetype, encoding } = await file;
     const passThrough = new PassThrough();
@@ -103,10 +100,10 @@ const Mutation: MutationResolvers.Type = {
       url: `${Bucket}/${Key}`,
     });
   },
-  createDocument: (_parent, { input }, { db }) => {
+  createDocument: (_parent, { input }, { db, session }) => {
     return db.createDocument({
       title: input.title,
-      type: { connect: { id: input.type } },
+      author: { connect: { id: session.user.id } },
       publishDate: input.publishDate,
     });
   },

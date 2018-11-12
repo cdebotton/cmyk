@@ -4,7 +4,6 @@ import { GraphQLResolveInfo } from 'graphql';
 import { Session } from '../models';
 import { User } from './prisma-client';
 import { Document } from './prisma-client';
-import { DocumentType } from './prisma-client';
 import { Profile } from './prisma-client';
 import { File } from './prisma-client';
 import { Context } from '../types';
@@ -19,10 +18,6 @@ export namespace QueryResolvers {
   }
 
   export interface ArgsDocument {
-    id: string;
-  }
-
-  export interface ArgsDocumentType {
     id: string;
   }
 
@@ -68,20 +63,6 @@ export namespace QueryResolvers {
     info: GraphQLResolveInfo,
   ) => Document[] | Promise<Document[]>;
 
-  export type DocumentTypesResolver = (
-    parent: {},
-    args: {},
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) => DocumentType[] | Promise<DocumentType[]>;
-
-  export type DocumentTypeResolver = (
-    parent: {},
-    args: ArgsDocumentType,
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) => DocumentType | null | Promise<DocumentType | null>;
-
   export interface Type {
     session: (
       parent: {},
@@ -124,20 +105,6 @@ export namespace QueryResolvers {
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => Document[] | Promise<Document[]>;
-
-    documentTypes: (
-      parent: {},
-      args: {},
-      ctx: Context,
-      info: GraphQLResolveInfo,
-    ) => DocumentType[] | Promise<DocumentType[]>;
-
-    documentType: (
-      parent: {},
-      args: ArgsDocumentType,
-      ctx: Context,
-      info: GraphQLResolveInfo,
-    ) => DocumentType | null | Promise<DocumentType | null>;
   }
 }
 
@@ -186,7 +153,6 @@ export namespace UserResolvers {
     lastLogin: (parent: User) => (parent.lastLogin === undefined ? null : parent.lastLogin),
     createdAt: (parent: User) => parent.createdAt,
     updatedAt: (parent: User) => parent.updatedAt,
-    role: (parent: User) => parent.role,
   };
 
   export type CreatedAtResolver = (
@@ -357,13 +323,6 @@ export namespace DocumentResolvers {
     info: GraphQLResolveInfo,
   ) => string | Promise<string>;
 
-  export type TypeResolver = (
-    parent: Document,
-    args: {},
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) => DocumentType | Promise<DocumentType>;
-
   export type UpdatedAtResolver = (
     parent: Document,
     args: {},
@@ -407,96 +366,8 @@ export namespace DocumentResolvers {
       info: GraphQLResolveInfo,
     ) => string | Promise<string>;
 
-    type: (
-      parent: Document,
-      args: {},
-      ctx: Context,
-      info: GraphQLResolveInfo,
-    ) => DocumentType | Promise<DocumentType>;
-
     updatedAt: (
       parent: Document,
-      args: {},
-      ctx: Context,
-      info: GraphQLResolveInfo,
-    ) => string | null | Promise<string | null>;
-  }
-}
-
-export namespace DocumentTypeResolvers {
-  export const defaultResolvers = {
-    id: (parent: DocumentType) => parent.id,
-    title: (parent: DocumentType) => parent.title,
-    createdAt: (parent: DocumentType) => parent.createdAt,
-    updatedAt: (parent: DocumentType) => parent.updatedAt,
-  };
-
-  export type CreatedAtResolver = (
-    parent: DocumentType,
-    args: {},
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type DocumentsResolver = (
-    parent: DocumentType,
-    args: {},
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) => Document[] | Promise<Document[]>;
-
-  export type IdResolver = (
-    parent: DocumentType,
-    args: {},
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type TitleResolver = (
-    parent: DocumentType,
-    args: {},
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) => string | Promise<string>;
-
-  export type UpdatedAtResolver = (
-    parent: DocumentType,
-    args: {},
-    ctx: Context,
-    info: GraphQLResolveInfo,
-  ) => string | null | Promise<string | null>;
-
-  export interface Type {
-    createdAt: (
-      parent: DocumentType,
-      args: {},
-      ctx: Context,
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-
-    documents: (
-      parent: DocumentType,
-      args: {},
-      ctx: Context,
-      info: GraphQLResolveInfo,
-    ) => Document[] | Promise<Document[]>;
-
-    id: (
-      parent: DocumentType,
-      args: {},
-      ctx: Context,
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-
-    title: (
-      parent: DocumentType,
-      args: {},
-      ctx: Context,
-      info: GraphQLResolveInfo,
-    ) => string | Promise<string>;
-
-    updatedAt: (
-      parent: DocumentType,
       args: {},
       ctx: Context,
       info: GraphQLResolveInfo,
@@ -977,7 +848,6 @@ export interface Resolvers {
   Session: SessionResolvers.Type;
   User: UserResolvers.Type;
   Document: DocumentResolvers.Type;
-  DocumentType: DocumentTypeResolvers.Type;
   Profile: ProfileResolvers.Type;
   File: FileResolvers.Type;
   Mutation: MutationResolvers.Type;

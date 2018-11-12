@@ -2,7 +2,6 @@ import gql from 'graphql-tag';
 import React from 'react';
 import * as yup from 'yup';
 import { TCreateDocument, TCreateDocumentVariables } from './generated/TCreateDocument';
-import { TDocumentTypes } from './generated/TDocumentTypes';
 import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';
@@ -17,24 +16,11 @@ const CREATE_DOCUMENT = gql`
   }
 `;
 
-const DOCUMENT_TYPES = gql`
-  query TDocumentTypes {
-    documentTypes {
-      id
-      title
-    }
-  }
-`;
-
 const validationSchema = new yup.object().shape({
   title: yup.string().required(),
 });
 
 function AdminNewDocument() {
-  const {
-    data: { documentTypes },
-  } = useApolloQuery<TDocumentTypes>(DOCUMENT_TYPES);
-
   const createDocument = useApolloMutation<TCreateDocument, TCreateDocumentVariables>(
     CREATE_DOCUMENT,
   );

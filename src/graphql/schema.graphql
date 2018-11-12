@@ -16,8 +16,6 @@ type Query {
   users: [User!]!
   document(id: ID!): Document
   documents: [Document!]!
-  documentTypes: [DocumentType!]!
-  documentType(id: ID!): DocumentType
 }
 
 type Mutation {
@@ -103,15 +101,6 @@ type Document {
   createdAt: Date!
   id: ID!
   publishDate: DateTime!
-  title: String!
-  type: DocumentType!
-  updatedAt: Date
-}
-
-type DocumentType {
-  createdAt: Date!
-  documents: [Document!]!
-  id: ID!
   title: String!
   updatedAt: Date
 }

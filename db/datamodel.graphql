@@ -2,6 +2,7 @@ enum Role {
   ADMIN
   EDITOR
   USER
+  VIEWER
   UNAUTHORIZED
 }
 
@@ -28,20 +29,12 @@ type Profile {
   avatar: File @relation(name: "Avatar")
 }
 
-type DocumentType {
-  id: ID! @unique
-  title: String!
-  documents: [Document!]!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
 type Document {
   id: ID! @unique
   publishDate: DateTime!
   title: String!
-  type: DocumentType!
-  author: User @relation(name: "UserDocuments")
+  author: User! @relation(name: "UserDocuments")
+  # blocks: [Block!]! @relation(name: "DocumentBlocks", onDelete: CASCADE)
   createdAt: DateTime!
   updatedAt: DateTime!
 }

@@ -4,7 +4,6 @@ import { importSchema } from 'graphql-import';
 import jwt from 'jsonwebtoken';
 import { Prisma, prisma } from './generated/prisma-client';
 import Document from './resolvers/Document';
-import DocumentType from './resolvers/DocumentType';
 import File from './resolvers/File';
 import Mutation from './resolvers/Mutation';
 import Profile from './resolvers/Profile';
@@ -20,7 +19,6 @@ const schema = makeExecutableSchema({
   // @ts-ignore
   resolvers: {
     Document,
-    DocumentType,
     File,
     Mutation,
     Profile,

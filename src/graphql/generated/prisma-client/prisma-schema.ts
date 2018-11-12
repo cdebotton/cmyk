@@ -2,10 +2,6 @@ export const typeDefs = /* GraphQL */ `type AggregateDocument {
   count: Int!
 }
 
-type AggregateDocumentType {
-  count: Int!
-}
-
 type AggregateFile {
   count: Int!
 }
@@ -28,8 +24,7 @@ type Document {
   id: ID!
   publishDate: DateTime!
   title: String!
-  type: DocumentType!
-  author: User
+  author: User!
   createdAt: DateTime!
   updatedAt: DateTime!
 }
@@ -43,8 +38,7 @@ type DocumentConnection {
 input DocumentCreateInput {
   publishDate: DateTime!
   title: String!
-  type: DocumentTypeCreateOneWithoutDocumentsInput!
-  author: UserCreateOneWithoutDocumentsInput
+  author: UserCreateOneWithoutDocumentsInput!
 }
 
 input DocumentCreateManyWithoutAuthorInput {
@@ -52,21 +46,9 @@ input DocumentCreateManyWithoutAuthorInput {
   connect: [DocumentWhereUniqueInput!]
 }
 
-input DocumentCreateManyWithoutTypeInput {
-  create: [DocumentCreateWithoutTypeInput!]
-  connect: [DocumentWhereUniqueInput!]
-}
-
 input DocumentCreateWithoutAuthorInput {
   publishDate: DateTime!
   title: String!
-  type: DocumentTypeCreateOneWithoutDocumentsInput!
-}
-
-input DocumentCreateWithoutTypeInput {
-  publishDate: DateTime!
-  title: String!
-  author: UserCreateOneWithoutDocumentsInput
 }
 
 type DocumentEdge {
@@ -113,162 +95,10 @@ input DocumentSubscriptionWhereInput {
   NOT: [DocumentSubscriptionWhereInput!]
 }
 
-type DocumentType {
-  id: ID!
-  title: String!
-  documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document!]
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type DocumentTypeConnection {
-  pageInfo: PageInfo!
-  edges: [DocumentTypeEdge]!
-  aggregate: AggregateDocumentType!
-}
-
-input DocumentTypeCreateInput {
-  title: String!
-  documents: DocumentCreateManyWithoutTypeInput
-}
-
-input DocumentTypeCreateOneWithoutDocumentsInput {
-  create: DocumentTypeCreateWithoutDocumentsInput
-  connect: DocumentTypeWhereUniqueInput
-}
-
-input DocumentTypeCreateWithoutDocumentsInput {
-  title: String!
-}
-
-type DocumentTypeEdge {
-  node: DocumentType!
-  cursor: String!
-}
-
-enum DocumentTypeOrderByInput {
-  id_ASC
-  id_DESC
-  title_ASC
-  title_DESC
-  createdAt_ASC
-  createdAt_DESC
-  updatedAt_ASC
-  updatedAt_DESC
-}
-
-type DocumentTypePreviousValues {
-  id: ID!
-  title: String!
-  createdAt: DateTime!
-  updatedAt: DateTime!
-}
-
-type DocumentTypeSubscriptionPayload {
-  mutation: MutationType!
-  node: DocumentType
-  updatedFields: [String!]
-  previousValues: DocumentTypePreviousValues
-}
-
-input DocumentTypeSubscriptionWhereInput {
-  mutation_in: [MutationType!]
-  updatedFields_contains: String
-  updatedFields_contains_every: [String!]
-  updatedFields_contains_some: [String!]
-  node: DocumentTypeWhereInput
-  AND: [DocumentTypeSubscriptionWhereInput!]
-  OR: [DocumentTypeSubscriptionWhereInput!]
-  NOT: [DocumentTypeSubscriptionWhereInput!]
-}
-
-input DocumentTypeUpdateInput {
-  title: String
-  documents: DocumentUpdateManyWithoutTypeInput
-}
-
-input DocumentTypeUpdateManyMutationInput {
-  title: String
-}
-
-input DocumentTypeUpdateOneRequiredWithoutDocumentsInput {
-  create: DocumentTypeCreateWithoutDocumentsInput
-  update: DocumentTypeUpdateWithoutDocumentsDataInput
-  upsert: DocumentTypeUpsertWithoutDocumentsInput
-  connect: DocumentTypeWhereUniqueInput
-}
-
-input DocumentTypeUpdateWithoutDocumentsDataInput {
-  title: String
-}
-
-input DocumentTypeUpsertWithoutDocumentsInput {
-  update: DocumentTypeUpdateWithoutDocumentsDataInput!
-  create: DocumentTypeCreateWithoutDocumentsInput!
-}
-
-input DocumentTypeWhereInput {
-  id: ID
-  id_not: ID
-  id_in: [ID!]
-  id_not_in: [ID!]
-  id_lt: ID
-  id_lte: ID
-  id_gt: ID
-  id_gte: ID
-  id_contains: ID
-  id_not_contains: ID
-  id_starts_with: ID
-  id_not_starts_with: ID
-  id_ends_with: ID
-  id_not_ends_with: ID
-  title: String
-  title_not: String
-  title_in: [String!]
-  title_not_in: [String!]
-  title_lt: String
-  title_lte: String
-  title_gt: String
-  title_gte: String
-  title_contains: String
-  title_not_contains: String
-  title_starts_with: String
-  title_not_starts_with: String
-  title_ends_with: String
-  title_not_ends_with: String
-  documents_every: DocumentWhereInput
-  documents_some: DocumentWhereInput
-  documents_none: DocumentWhereInput
-  createdAt: DateTime
-  createdAt_not: DateTime
-  createdAt_in: [DateTime!]
-  createdAt_not_in: [DateTime!]
-  createdAt_lt: DateTime
-  createdAt_lte: DateTime
-  createdAt_gt: DateTime
-  createdAt_gte: DateTime
-  updatedAt: DateTime
-  updatedAt_not: DateTime
-  updatedAt_in: [DateTime!]
-  updatedAt_not_in: [DateTime!]
-  updatedAt_lt: DateTime
-  updatedAt_lte: DateTime
-  updatedAt_gt: DateTime
-  updatedAt_gte: DateTime
-  AND: [DocumentTypeWhereInput!]
-  OR: [DocumentTypeWhereInput!]
-  NOT: [DocumentTypeWhereInput!]
-}
-
-input DocumentTypeWhereUniqueInput {
-  id: ID
-}
-
 input DocumentUpdateInput {
   publishDate: DateTime
   title: String
-  type: DocumentTypeUpdateOneRequiredWithoutDocumentsInput
-  author: UserUpdateOneWithoutDocumentsInput
+  author: UserUpdateOneRequiredWithoutDocumentsInput
 }
 
 input DocumentUpdateManyMutationInput {
@@ -285,25 +115,9 @@ input DocumentUpdateManyWithoutAuthorInput {
   upsert: [DocumentUpsertWithWhereUniqueWithoutAuthorInput!]
 }
 
-input DocumentUpdateManyWithoutTypeInput {
-  create: [DocumentCreateWithoutTypeInput!]
-  delete: [DocumentWhereUniqueInput!]
-  connect: [DocumentWhereUniqueInput!]
-  disconnect: [DocumentWhereUniqueInput!]
-  update: [DocumentUpdateWithWhereUniqueWithoutTypeInput!]
-  upsert: [DocumentUpsertWithWhereUniqueWithoutTypeInput!]
-}
-
 input DocumentUpdateWithoutAuthorDataInput {
   publishDate: DateTime
   title: String
-  type: DocumentTypeUpdateOneRequiredWithoutDocumentsInput
-}
-
-input DocumentUpdateWithoutTypeDataInput {
-  publishDate: DateTime
-  title: String
-  author: UserUpdateOneWithoutDocumentsInput
 }
 
 input DocumentUpdateWithWhereUniqueWithoutAuthorInput {
@@ -311,21 +125,10 @@ input DocumentUpdateWithWhereUniqueWithoutAuthorInput {
   data: DocumentUpdateWithoutAuthorDataInput!
 }
 
-input DocumentUpdateWithWhereUniqueWithoutTypeInput {
-  where: DocumentWhereUniqueInput!
-  data: DocumentUpdateWithoutTypeDataInput!
-}
-
 input DocumentUpsertWithWhereUniqueWithoutAuthorInput {
   where: DocumentWhereUniqueInput!
   update: DocumentUpdateWithoutAuthorDataInput!
   create: DocumentCreateWithoutAuthorInput!
-}
-
-input DocumentUpsertWithWhereUniqueWithoutTypeInput {
-  where: DocumentWhereUniqueInput!
-  update: DocumentUpdateWithoutTypeDataInput!
-  create: DocumentCreateWithoutTypeInput!
 }
 
 input DocumentWhereInput {
@@ -365,7 +168,6 @@ input DocumentWhereInput {
   title_not_starts_with: String
   title_ends_with: String
   title_not_ends_with: String
-  type: DocumentTypeWhereInput
   author: UserWhereInput
   createdAt: DateTime
   createdAt_not: DateTime
@@ -670,12 +472,6 @@ type Mutation {
   upsertDocument(where: DocumentWhereUniqueInput!, create: DocumentCreateInput!, update: DocumentUpdateInput!): Document!
   deleteDocument(where: DocumentWhereUniqueInput!): Document
   deleteManyDocuments(where: DocumentWhereInput): BatchPayload!
-  createDocumentType(data: DocumentTypeCreateInput!): DocumentType!
-  updateDocumentType(data: DocumentTypeUpdateInput!, where: DocumentTypeWhereUniqueInput!): DocumentType
-  updateManyDocumentTypes(data: DocumentTypeUpdateManyMutationInput!, where: DocumentTypeWhereInput): BatchPayload!
-  upsertDocumentType(where: DocumentTypeWhereUniqueInput!, create: DocumentTypeCreateInput!, update: DocumentTypeUpdateInput!): DocumentType!
-  deleteDocumentType(where: DocumentTypeWhereUniqueInput!): DocumentType
-  deleteManyDocumentTypes(where: DocumentTypeWhereInput): BatchPayload!
   createFile(data: FileCreateInput!): File!
   updateFile(data: FileUpdateInput!, where: FileWhereUniqueInput!): File
   updateManyFiles(data: FileUpdateManyMutationInput!, where: FileWhereInput): BatchPayload!
@@ -912,9 +708,6 @@ type Query {
   document(where: DocumentWhereUniqueInput!): Document
   documents(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [Document]!
   documentsConnection(where: DocumentWhereInput, orderBy: DocumentOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DocumentConnection!
-  documentType(where: DocumentTypeWhereUniqueInput!): DocumentType
-  documentTypes(where: DocumentTypeWhereInput, orderBy: DocumentTypeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [DocumentType]!
-  documentTypesConnection(where: DocumentTypeWhereInput, orderBy: DocumentTypeOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): DocumentTypeConnection!
   file(where: FileWhereUniqueInput!): File
   files(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): [File]!
   filesConnection(where: FileWhereInput, orderBy: FileOrderByInput, skip: Int, after: String, before: String, first: Int, last: Int): FileConnection!
@@ -931,12 +724,12 @@ enum Role {
   ADMIN
   EDITOR
   USER
+  VIEWER
   UNAUTHORIZED
 }
 
 type Subscription {
   document(where: DocumentSubscriptionWhereInput): DocumentSubscriptionPayload
-  documentType(where: DocumentTypeSubscriptionWhereInput): DocumentTypeSubscriptionPayload
   file(where: FileSubscriptionWhereInput): FileSubscriptionPayload
   profile(where: ProfileSubscriptionWhereInput): ProfileSubscriptionPayload
   user(where: UserSubscriptionWhereInput): UserSubscriptionPayload
@@ -1061,19 +854,17 @@ input UserUpdateManyMutationInput {
   role: Role
 }
 
+input UserUpdateOneRequiredWithoutDocumentsInput {
+  create: UserCreateWithoutDocumentsInput
+  update: UserUpdateWithoutDocumentsDataInput
+  upsert: UserUpsertWithoutDocumentsInput
+  connect: UserWhereUniqueInput
+}
+
 input UserUpdateOneRequiredWithoutProfileInput {
   create: UserCreateWithoutProfileInput
   update: UserUpdateWithoutProfileDataInput
   upsert: UserUpsertWithoutProfileInput
-  connect: UserWhereUniqueInput
-}
-
-input UserUpdateOneWithoutDocumentsInput {
-  create: UserCreateWithoutDocumentsInput
-  update: UserUpdateWithoutDocumentsDataInput
-  upsert: UserUpsertWithoutDocumentsInput
-  delete: Boolean
-  disconnect: Boolean
   connect: UserWhereUniqueInput
 }
 

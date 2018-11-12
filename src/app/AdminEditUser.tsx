@@ -4,12 +4,8 @@ import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
 import { Role } from '../../generated/globalTypes';
-import {
-  EditUserQuery,
-  EditUserQuery_user_profile_avatar,
-  EditUserQueryVariables,
-} from './generated/EditUserQuery';
-import { UpdateUserMutation, UpdateUserMutationVariables } from './generated/UpdateUserMutation';
+import { TUser, TUser_user_profile_avatar, TUserVariables } from './generated/TUser';
+import { TUpdateUser, TUpdateUserVariables } from './generated/TUpdateUser';
 import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';
@@ -20,7 +16,7 @@ import useFileUpload from './hooks/useFileUpload';
 import { useField, useForm } from './hooks/useForm';
 
 const EDIT_USER_QUERY = gql`
-  query EditUserQuery($id: ID!) {
+  query TUser($id: ID!) {
     user(id: $id) {
       id
       email
@@ -41,7 +37,7 @@ const EDIT_USER_QUERY = gql`
 `;
 
 const USER_UPDATE_MUTATION = gql`
-  mutation UpdateUserMutation($input: UserUpdateInput!, $id: ID!) {
+  mutation TUpdateUser($input: UserUpdateInput!, $id: ID!) {
     updateUser(input: $input, id: $id) {
       id
       email
@@ -80,7 +76,7 @@ const CancelButton = styled(Button).attrs({ type: 'reset' })`
 const NotFound = lazy(() => import('./NotFound'));
 
 interface Values {
-  avatar: EditUserQuery_user_profile_avatar | null;
+  avatar: TUser_user_profile_avatar | null;
   email: string;
   firstName: string;
   lastName: string;
@@ -95,7 +91,7 @@ function AdminEditUser({ className, ...props }: Props) {
   const { match, history } = props;
   const {
     data: { user },
-  } = useApolloQuery<EditUserQuery, EditUserQueryVariables>(EDIT_USER_QUERY, {
+  } = useApolloQuery<TUser, TUserVariables>(EDIT_USER_QUERY, {
     variables: { id: match.params.userId },
   });
 
@@ -103,7 +99,7 @@ function AdminEditUser({ className, ...props }: Props) {
     return <NotFound {...props} />;
   }
 
-  const updateUserMutation = useApolloMutation<UpdateUserMutation, UpdateUserMutationVariables>(
+  const updateUserMutation = useApolloMutation<TUpdateUser, TUpdateUserVariables>(
     USER_UPDATE_MUTATION,
   );
 

@@ -4,10 +4,10 @@
 import { Role } from "./../../../generated/globalTypes";
 
 // ====================================================
-// GraphQL query operation: EditUserQuery
+// GraphQL query operation: TUser
 // ====================================================
 
-export interface EditUserQuery_user_profile_avatar {
+export interface TUser_user_profile_avatar {
   __typename: "File";
   id: string;
   key: string;
@@ -15,26 +15,26 @@ export interface EditUserQuery_user_profile_avatar {
   url: string;
 }
 
-export interface EditUserQuery_user_profile {
+export interface TUser_user_profile {
   __typename: "Profile";
   id: string;
-  avatar: EditUserQuery_user_profile_avatar | null;
+  avatar: TUser_user_profile_avatar | null;
   firstName: string;
   lastName: string;
 }
 
-export interface EditUserQuery_user {
+export interface TUser_user {
   __typename: "User";
   id: string;
   email: string;
   role: Role;
-  profile: EditUserQuery_user_profile;
+  profile: TUser_user_profile;
 }
 
-export interface EditUserQuery {
-  user: EditUserQuery_user | null;
+export interface TUser {
+  user: TUser_user | null;
 }
 
-export interface EditUserQueryVariables {
+export interface TUserVariables {
   id: string;
 }

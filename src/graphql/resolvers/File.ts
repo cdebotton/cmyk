@@ -3,9 +3,9 @@ import { FileResolvers } from '../generated/graphqlgen';
 
 const File: FileResolvers.Type = {
   ...FileResolvers.defaultResolvers,
-  url: parent => {
+  url: ({ url }) => {
     const s3 = new S3();
-    const [bucket, ...path] = parent.url.split('/');
+    const [bucket, ...path] = url.split('/');
     return s3.getSignedUrl('getObject', {
       Bucket: bucket,
       Expires: 300,
