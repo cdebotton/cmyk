@@ -1,0 +1,21 @@
+{
+  "name": "@cmyk/http",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prestart:production": "yarn build",
+    "start:production": "node build/index.js",
+    "prebuild": "rm -rf build",
+    "build": "tsc"
+  },
+  "dependencies": {
+    "koa": "^2.6.2",
+    "koa-compress": "^3.0.0",
+    "koa-static": "^5.0.0"
+  },
+  "devDependencies": {
+    "@types/koa": "^2.0.46",
+    "@types/koa-compress": "^2.0.8",
+    "@types/koa-static": "^4.0.0"
+  }
+}

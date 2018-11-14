@@ -8,7 +8,7 @@ import { Profile } from './prisma-client';
 import { File } from './prisma-client';
 import { Context } from '../types';
 
-type Role = 'ADMIN' | 'EDITOR' | 'USER' | 'UNAUTHORIZED';
+type Role = 'ADMIN' | 'EDITOR' | 'USER' | 'VIEWER' | 'UNAUTHORIZED';
 
 export namespace QueryResolvers {
   export const defaultResolvers = {};
@@ -153,6 +153,7 @@ export namespace UserResolvers {
     lastLogin: (parent: User) => (parent.lastLogin === undefined ? null : parent.lastLogin),
     createdAt: (parent: User) => parent.createdAt,
     updatedAt: (parent: User) => parent.updatedAt,
+    role: (parent: User) => parent.role,
   };
 
   export type CreatedAtResolver = (

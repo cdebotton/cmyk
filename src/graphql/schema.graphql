@@ -2,6 +2,7 @@ enum Role {
   ADMIN
   EDITOR
   USER
+  VIEWER
   UNAUTHORIZED
 }
 
