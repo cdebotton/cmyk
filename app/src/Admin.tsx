@@ -16,6 +16,7 @@ import { useApolloClient, useApolloQuery } from './hooks/Apollo';
 import PortalOutlet from './PortalOutlet';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
+import Title from './containers/Title';
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
@@ -119,6 +120,7 @@ function Admin({ className, match }: Props) {
       <ThemeProvider theme={{ mode: 'dark', size: 'medium' }}>
         <Layout className={className}>
           <GlobalStyles />
+          <Title>Admin</Title>
           <Header>
             <Link hidden={!user} to={`${match.url}/users/${user ? user.id : ''}`}>
               <Avatar size={64} src={avatar} />
