@@ -1,4 +1,4 @@
-import { Prisma } from './resolvers/types/prisma-client';
+import { Prisma } from './generated/prisma-client';
 
 export interface Context {
   db: Prisma;
