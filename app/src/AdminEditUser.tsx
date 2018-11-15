@@ -5,9 +5,9 @@ import styled from 'styled-components';
 import * as yup from 'yup';
 import {
   Role,
-  TUser,
-  TUser_user_profile_avatar,
-  TUserVariables,
+  User,
+  User_user_profile_avatar,
+  UserVariables,
   TUpdateUser,
   TUpdateUserVariables,
 } from './types';
@@ -22,7 +22,7 @@ import { useField, useForm } from './hooks/useForm';
 import Title from './containers/Title';
 
 const EDIT_USER_QUERY = gql`
-  query TUser($id: ID!) {
+  query User($id: ID!) {
     user(id: $id) {
       id
       email
@@ -82,7 +82,7 @@ const CancelButton = styled(Button).attrs({ type: 'reset' })`
 const NotFound = lazy(() => import('./NotFound'));
 
 interface Values {
-  avatar: TUser_user_profile_avatar | null;
+  avatar: User_user_profile_avatar | null;
   email: string;
   firstName: string;
   lastName: string;
@@ -97,7 +97,7 @@ function AdminEditUser({ className, ...props }: Props) {
   const { match, history } = props;
   const {
     data: { user },
-  } = useApolloQuery<TUser, TUserVariables>(EDIT_USER_QUERY, {
+  } = useApolloQuery<User, UserVariables>(EDIT_USER_QUERY, {
     variables: { id: match.params.userId },
   });
 

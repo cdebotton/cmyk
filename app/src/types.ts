@@ -54,10 +54,10 @@ export interface TDocuments {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: TUser
+// GraphQL query operation: User
 // ====================================================
 
-export interface TUser_user_profile_avatar {
+export interface User_user_profile_avatar {
   __typename: "File";
   id: string;
   key: string;
@@ -65,27 +65,27 @@ export interface TUser_user_profile_avatar {
   url: string;
 }
 
-export interface TUser_user_profile {
+export interface User_user_profile {
   __typename: "Profile";
   id: string;
-  avatar: TUser_user_profile_avatar | null;
+  avatar: User_user_profile_avatar | null;
   firstName: string;
   lastName: string;
 }
 
-export interface TUser_user {
+export interface User_user {
   __typename: "User";
   id: string;
   email: string;
   role: Role;
-  profile: TUser_user_profile;
+  profile: User_user_profile;
 }
 
-export interface TUser {
-  user: TUser_user | null;
+export interface User {
+  user: User_user | null;
 }
 
-export interface TUserVariables {
+export interface UserVariables {
   id: string;
 }
 

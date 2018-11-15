@@ -1,7 +1,5 @@
 {
   "compilerOptions": {
-    "allowJs": true,
-    "jsx": "preserve",
     "downlevelIteration": true,
     "suppressImplicitAnyIndexErrors": true,
     "strict": true,

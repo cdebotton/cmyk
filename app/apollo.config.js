@@ -1,7 +1,7 @@
 module.exports = {
   client: {
     service: {
-      localSchemaFile: '../src/graphql/schema.graphql',
+      localSchemaFile: '../api/src/schema.graphql',
     },
     includes: ['src/**/*.{ts,tsx}'],
   },
