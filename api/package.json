@@ -6,7 +6,7 @@
     "prebuild": "rm -rf build",
     "build": "NODE_ENV=production tsc",
     "predeploy": "yarn build",
-    "deploy": "NODE_ENV=production node build/index.js",
+    "deploy": "NODE_ENV=production node -r dotenv/config build/index.js",
     "start": "NODE_ENV=development nodemon src/index.ts"
   },
   "devDependencies": {
