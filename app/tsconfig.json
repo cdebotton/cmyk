@@ -3,7 +3,8 @@
   "compilerOptions": {
     "target": "esnext",
     "module": "esnext",
-    "isolatedModules": true
+    "isolatedModules": true,
+    "noEmit": true
   },
   "include": [
     "src",
