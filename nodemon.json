@@ -1,7 +1,0 @@
-{
-  "extension": [".ts", ".graphql"],
-  "watch": ["src/http", "src/graphql"],
-  "execMap": {
-    "ts": "node -r dotenv/config ./node_modules/.bin/ts-node"
-  }
-}
