@@ -1,0 +1,6 @@
+{
+  "extension": [".js"],
+  "execMap": {
+    "ts": "node -r dotenv/config ./node_modules/.bin/ts-node"
+  }
+}

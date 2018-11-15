@@ -1,8 +1,5 @@
 {
   "compilerOptions": {
-    "target": "es5",
-    "module": "commonjs",
-    "lib": ["es5", "esnext", "es2015", "dom"],
     "allowJs": true,
     "jsx": "preserve",
     "noEmit": true,
@@ -14,11 +11,6 @@
     "skipLibCheck": false,
     "allowSyntheticDefaultImports": true,
     "forceConsistentCasingInFileNames": true,
-    "resolveJsonModule": true,
-    "isolatedModules": true
-  },
-  "include": [
-    "src/graphql",
-    "apollo-types"
-  ]
+    "resolveJsonModule": true
+  }
 }

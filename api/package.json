@@ -1,0 +1,27 @@
+{
+  "name": "@cmyk/api",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "prebuild": "rm -rf build",
+    "build": "NODE_ENV=production tsc",
+    "predeploy": "yarn build",
+    "deploy": "NODE_ENV=production node build/index.js",
+    "start": "NODE_ENV=development nodemon src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.2",
+    "@types/jest": "^23.3.9",
+    "@types/jsonwebtoken": "^8.3.0",
+    "ts-node": "7.0.1"
+  },
+  "dependencies": {
+    "apollo-server": "^2.2.0",
+    "aws-sdk": "^2.353.0",
+    "bcryptjs": "^2.4.3",
+    "graphql": "^14.0.2",
+    "graphql-import": "^0.7.1",
+    "jsonwebtoken": "^8.4.0",
+    "prisma-client-lib": "1.20.1"
+  }
+}

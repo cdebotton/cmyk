@@ -1,8 +1,8 @@
 language: typescript
-schema: ./src/graphql/schema.graphql
+schema: ./api/src/schema.graphql
 models:
   files:
-    - ./src/graphql/generated/prisma-client
-    - ./src/graphql/models.ts
-output: ./src/graphql/generated/graphqlgen.ts
-context: ./src/graphql/types.ts:Context
+    - ./api/src/generated/prisma-client
+    - ./api/src/models.ts
+output: ./api/src/generated/graphqlgen.ts
+context: ./api/src/context.ts:Context

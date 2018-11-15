@@ -2,6 +2,16 @@
   "name": "@cmyk/apps",
   "version": "0.1.0",
   "private": true,
+  "scripts": {
+    "apollo": "apollo codegen:generate --addTypename --target typescript --outputFlat ./src/types.ts",
+    "apollo:watch": "yarn apollo --watch --queries '**/*.{tsx,ts}'",
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test",
+    "eject": "react-scripts eject",
+    "storybook": "start-storybook -p 6006",
+    "build-storybook": "build-storybook"
+  },
   "dependencies": {
     "@fortawesome/fontawesome-svg-core": "^1.2.8",
     "@fortawesome/free-brands-svg-icons": "^5.5.0",
@@ -27,16 +37,16 @@
     "react-router-dom": "4.4.0-beta.6",
     "react-scripts": "2.1.1",
     "react-spring": "^6.1.8",
-    "styled-components": "^4.0.3",
+    "styled-components": "^4.1.1",
     "yup": "^0.26.6"
   },
   "devDependencies": {
-    "@storybook/addon-actions": "4.0.4",
-    "@storybook/addon-info": "4.0.4",
-    "@storybook/addon-links": "4.0.4",
-    "@storybook/addon-notes": "4.0.4",
-    "@storybook/addons": "4.0.4",
-    "@storybook/react": "4.0.4",
+    "@storybook/addon-actions": "4.0.6",
+    "@storybook/addon-info": "4.0.6",
+    "@storybook/addon-links": "4.0.6",
+    "@storybook/addon-notes": "4.0.6",
+    "@storybook/addons": "4.0.6",
+    "@storybook/react": "4.0.6",
     "@types/apollo-upload-client": "^8.1.1",
     "@types/react": "16.7.3",
     "@types/react-dom": "^16.0.9",
@@ -45,20 +55,12 @@
     "@types/storybook__addon-info": "^3.4.2",
     "@types/storybook__addon-links": "^3.3.2",
     "@types/storybook__react": "^4.0.0",
-    "@types/styled-components": "^4.0.3",
-    "@types/yup": "^0.26.1",
+    "@types/styled-components": "4.0.3",
+    "@types/yup": "^0.26.2",
     "jest": "^23.6.0",
     "jest-dom": "^2.1.1",
     "jest-watch-typeahead": "^0.2.0",
     "serve": "^10.1.1"
-  },
-  "scripts": {
-    "apollo": "apollo codegen:generate --addTypename --target typescript --outputFlat ./src/types.ts",
-    "apollo:watch": "yarn apollo --watch --queries '**/*.{tsx,ts}'",
-    "start": "react-scripts start",
-    "build": "react-scripts build",
-    "test": "react-scripts test",
-    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": "react-app"

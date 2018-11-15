@@ -2,11 +2,8 @@
 
 import { GraphQLResolveInfo } from 'graphql';
 import { Session } from '../models';
-import { User } from './prisma-client';
-import { Document } from './prisma-client';
-import { Profile } from './prisma-client';
-import { File } from './prisma-client';
-import { Context } from '../types';
+import { User, Document, Profile, File } from './prisma-client';
+import { Context } from '../context';
 
 type Role = 'ADMIN' | 'EDITOR' | 'USER' | 'VIEWER' | 'UNAUTHORIZED';
 
@@ -22,42 +19,42 @@ export namespace QueryResolvers {
   }
 
   export type SessionResolver = (
-    parent: {},
+    parent: undefined,
     args: {},
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => Session | null | Promise<Session | null>;
 
   export type FilesResolver = (
-    parent: {},
+    parent: undefined,
     args: {},
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => File[] | Promise<File[]>;
 
   export type UserResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsUser,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => User | null | Promise<User | null>;
 
   export type UsersResolver = (
-    parent: {},
+    parent: undefined,
     args: {},
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => User[] | Promise<User[]>;
 
   export type DocumentResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsDocument,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => Document | null | Promise<Document | null>;
 
   export type DocumentsResolver = (
-    parent: {},
+    parent: undefined,
     args: {},
     ctx: Context,
     info: GraphQLResolveInfo,
@@ -65,42 +62,42 @@ export namespace QueryResolvers {
 
   export interface Type {
     session: (
-      parent: {},
+      parent: undefined,
       args: {},
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => Session | null | Promise<Session | null>;
 
     files: (
-      parent: {},
+      parent: undefined,
       args: {},
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => File[] | Promise<File[]>;
 
     user: (
-      parent: {},
+      parent: undefined,
       args: ArgsUser,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => User | null | Promise<User | null>;
 
     users: (
-      parent: {},
+      parent: undefined,
       args: {},
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => User[] | Promise<User[]>;
 
     document: (
-      parent: {},
+      parent: undefined,
       args: ArgsDocument,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => Document | null | Promise<Document | null>;
 
     documents: (
-      parent: {},
+      parent: undefined,
       args: {},
       ctx: Context,
       info: GraphQLResolveInfo,
@@ -730,56 +727,56 @@ export namespace MutationResolvers {
   }
 
   export type LoginResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsLogin,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => string | null | Promise<string | null>;
 
   export type UploadFileResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsUploadFile,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => File | Promise<File>;
 
   export type DeleteFileResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsDeleteFile,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => File | null | Promise<File | null>;
 
   export type CreateUserResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsCreateUser,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => User | Promise<User>;
 
   export type DeleteUserResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsDeleteUser,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => User | null | Promise<User | null>;
 
   export type UpdateUserResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsUpdateUser,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => User | null | Promise<User | null>;
 
   export type CreateDocumentResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsCreateDocument,
     ctx: Context,
     info: GraphQLResolveInfo,
   ) => Document | Promise<Document>;
 
   export type UpdateDocumentResolver = (
-    parent: {},
+    parent: undefined,
     args: ArgsUpdateDocument,
     ctx: Context,
     info: GraphQLResolveInfo,
@@ -787,56 +784,56 @@ export namespace MutationResolvers {
 
   export interface Type {
     login: (
-      parent: {},
+      parent: undefined,
       args: ArgsLogin,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => string | null | Promise<string | null>;
 
     uploadFile: (
-      parent: {},
+      parent: undefined,
       args: ArgsUploadFile,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => File | Promise<File>;
 
     deleteFile: (
-      parent: {},
+      parent: undefined,
       args: ArgsDeleteFile,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => File | null | Promise<File | null>;
 
     createUser: (
-      parent: {},
+      parent: undefined,
       args: ArgsCreateUser,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => User | Promise<User>;
 
     deleteUser: (
-      parent: {},
+      parent: undefined,
       args: ArgsDeleteUser,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => User | null | Promise<User | null>;
 
     updateUser: (
-      parent: {},
+      parent: undefined,
       args: ArgsUpdateUser,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => User | null | Promise<User | null>;
 
     createDocument: (
-      parent: {},
+      parent: undefined,
       args: ArgsCreateDocument,
       ctx: Context,
       info: GraphQLResolveInfo,
     ) => Document | Promise<Document>;
 
     updateDocument: (
-      parent: {},
+      parent: undefined,
       args: ArgsUpdateDocument,
       ctx: Context,
       info: GraphQLResolveInfo,

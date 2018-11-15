@@ -11,9 +11,9 @@ import Query from './resolvers/Query';
 import Session from './resolvers/Session';
 import User from './resolvers/User';
 
-const { PORT, ENGINE_API_NAME, ENGINE_API_KEY } = process.env;
+const { PORT = 3002, ENGINE_API_NAME, ENGINE_API_KEY } = process.env;
 
-const typeDefs = importSchema('src/graphql/schema.graphql');
+const typeDefs = importSchema('src/schema.graphql');
 
 const schema = makeExecutableSchema({
   // @ts-ignore
