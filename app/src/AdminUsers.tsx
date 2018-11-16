@@ -8,7 +8,7 @@ import ListLayout, { CreateLink, Heading } from './components/ListLayout';
 import PortalContext from './containers/PortalContext';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
 import { getFormattedDate, getTimeAgo } from './utils/date';
-import Title from './containers/Title';
+import useTitle from './hooks/useTitle';
 
 export const USERS_QUERY = gql`
   query Users {
@@ -49,6 +49,8 @@ interface Props extends RouteComponentProps<{}> {
 }
 
 function AdminUsers({ className, match }: Props) {
+  useTitle('Users | Admin');
+
   const {
     data: { users, session },
   } = useApolloQuery<Users>(USERS_QUERY);
@@ -84,7 +86,6 @@ function AdminUsers({ className, match }: Props) {
 
   return (
     <ListLayout className={className}>
-      <Title>Users | Admin</Title>
       <Heading>Users</Heading>
       <CreateLink to={`${match.url}/new`}>New user</CreateLink>
       <List hidden={users.length === 0}>

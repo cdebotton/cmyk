@@ -19,7 +19,7 @@ import Select from './components/Select';
 import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
 import useFileUpload from './hooks/useFileUpload';
 import { useField, useForm } from './hooks/useForm';
-import Title from './containers/Title';
+import useTitle from './hooks/useTitle';
 
 const EDIT_USER_QUERY = gql`
   query User($id: ID!) {
@@ -104,6 +104,8 @@ function AdminEditUser({ className, ...props }: Props) {
   if (!user) {
     return <NotFound {...props} />;
   }
+
+  useTitle(`Edit ${user.email} | Admin`);
 
   const updateUserMutation = useApolloMutation<TUpdateUser, TUpdateUserVariables>(
     USER_UPDATE_MUTATION,
@@ -194,8 +196,7 @@ function AdminEditUser({ className, ...props }: Props) {
 
   return (
     <EditorLayout className={className}>
-      <Title>Edit {user.email} | Admin</Title>
-      <Heading>Edit User {user.email}</Heading>
+      <Heading>Edit {user.email}</Heading>
       <Form onSubmit={form.handleSubmit} autoComplete="off">
         <AvatarInput
           value={avatar.input.value}

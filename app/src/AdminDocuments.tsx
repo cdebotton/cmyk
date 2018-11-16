@@ -5,7 +5,7 @@ import { TDocuments } from './types';
 import List, { Item } from './components/List';
 import ListLayout, { CreateLink, Heading } from './components/ListLayout';
 import { useApolloQuery } from './hooks/Apollo';
-import Title from './containers/Title';
+import useTitle from './hooks/useTitle';
 
 const DOCUMENTS_QUERY = gql`
   query TDocuments {
@@ -19,13 +19,14 @@ const DOCUMENTS_QUERY = gql`
 interface Props extends RouteComponentProps<{}> {}
 
 function AdminDocuments({ match: { url } }: Props) {
+  useTitle('Documents | Admin');
+
   const {
     data: { documents },
   } = useApolloQuery<TDocuments>(DOCUMENTS_QUERY);
 
   return (
     <ListLayout>
-      <Title>Documents | Admin</Title>
       <Heading>Documents</Heading>
       <CreateLink to={`${url}/new`}>New document</CreateLink>
       <List hidden={documents.length === 0}>

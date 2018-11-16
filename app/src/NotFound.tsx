@@ -2,7 +2,7 @@ import React from 'react';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import ListLayout, { Heading } from './components/ListLayout';
-import Title from './containers/Title';
+import useTitle from './hooks/useTitle';
 
 const Url = styled.code`
   background-color: #eee;
@@ -13,9 +13,10 @@ interface IProps extends RouteComponentProps<{}> {
 }
 
 function NotFound({ match, className }: IProps) {
+  useTitle('Not found');
+
   return (
     <ListLayout className={className}>
-      <Title>Not found</Title>
       <Heading>Whoops, we can't find that</Heading>
       <p>
         Nothing exists for the requested url, `<Url>{match.url}</Url>

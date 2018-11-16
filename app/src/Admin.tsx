@@ -16,7 +16,7 @@ import { useApolloClient, useApolloQuery } from './hooks/Apollo';
 import PortalOutlet from './PortalOutlet';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
-import Title from './containers/Title';
+import useTitle from './hooks/useTitle';
 
 interface Props extends RouteComponentProps<{}> {
   className?: string;
@@ -102,6 +102,8 @@ const AdminFiles = lazy(() => import('./AdminFiles'));
 const NotFound = lazy(() => import('./NotFound'));
 
 function Admin({ className, match }: Props) {
+  useTitle('Admin');
+
   const client = useApolloClient();
 
   if (!client) {
@@ -120,7 +122,6 @@ function Admin({ className, match }: Props) {
       <ThemeProvider theme={{ mode: 'dark', size: 'medium' }}>
         <Layout className={className}>
           <GlobalStyles />
-          <Title>Admin</Title>
           <Header>
             <Link hidden={!user} to={`${match.url}/users/${user ? user.id : ''}`}>
               <Avatar size={64} src={avatar} />
