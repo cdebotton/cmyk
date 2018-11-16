@@ -1,0 +1,14 @@
+{
+  "dev": {
+    "driver": "pg",
+    "user": { "ENV": "DEVELOPMENT_USERNAME" },
+    "password": { "ENV": "DEVELOPMENT_PASSWORD" },
+    "host": { "ENV": "DEVELOPMENT_HOST" }
+  },
+  "prod": {
+    "driver": "pg",
+    "user": { "ENV": "PRODUCTION_USERNAME" },
+    "password": { "ENV": "PRODUCTION_PASSWORD" },
+    "host": { "ENV": "PRODUCTION_HOST" }
+  }
+}

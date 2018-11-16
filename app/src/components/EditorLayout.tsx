@@ -22,6 +22,7 @@ const Form = styled.form`
   grid-template-columns: ${rem(64)} repeat(4, 1fr);
   align-content: start;
   ${padding(0, rem(32))};
+  align-items: center;
 `;
 
 export default EditorLayout;

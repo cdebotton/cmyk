@@ -1,9 +1,0 @@
-{
-  "projects": {
-    "prisma": {
-      "extensions": {
-        "prisma": "db/prisma.yml"
-      }
-    }
-  }
-}
