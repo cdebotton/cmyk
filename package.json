@@ -7,12 +7,10 @@
   "workspaces": [
     "app",
     "api",
+    "db",
     "http"
   ],
   "scripts": {
-    "db:build": "prisma deploy",
-    "db:watch": "yarn build:prisma --watch",
-    "preapi:start": "prisma deploy",
     "api:start": "cd api && yarn start",
     "app:start": "cd app && yarn start",
     "start": "npm-run-all --parallel 'app:start' 'api:start'",
