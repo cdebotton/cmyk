@@ -1,10 +1,8 @@
 import { padding, position, rem, size } from 'polished';
 import React, { Fragment, ReactNode, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { animated } from 'react-spring';
+import { animated, useSpring, config } from 'react-spring';
 import styled from 'styled-components';
-import useFillToLeft from '../hooks/useFillToLeft';
-import useZoomAnimation from '../hooks/useZoomAnimation';
 import AnimatedCross from './AnimatedCross';
 import Avatar from './Avatar';
 import Tooltip from './Tooltip';
@@ -25,8 +23,10 @@ const DeleteFill = styled.svg`
 `;
 
 function AnimatedDeleteBar(props: { on: boolean }) {
-  const { fill, d } = useFillToLeft(props.on, {
-    color: 'hsla(5, 50%, 50%, 0.5)',
+  const [{ fill, d }] = useSpring({
+    config: config.stiff,
+    d: props.on ? 'M100,0 M100,100, 20,100, 22,0 Z' : 'M100,0 L100,100, L100,100, L100,0 Z',
+    fill: props.on ? 'hsla(5, 50%, 50%, 0.5)' : 'hsla(212, 50%, 50%, 0)',
   });
 
   return <animated.path fill={fill} d={d} />;
@@ -93,24 +93,22 @@ interface Props extends Detail {
   onDelete?: VoidFunction;
 }
 
-function Item({
-  image,
-  to,
-  label,
-  info,
-  details,
-  onDelete,
-  deleteTooltip,
-}: Props) {
+function Item({ image, to, label, info, details, onDelete, deleteTooltip }: Props) {
   const [isHoveringList, setIsHoveringList] = useState(false);
   const [isHoveringDelete, setIsHoveringDelete] = useState(false);
-  const zoom = useZoomAnimation(isHoveringList);
+  const [zoomStyle] = useSpring({
+    backgroundColor: isHoveringList ? 'hsla(0, 0%, 100%, 0.225)' : 'hsla(0, 0%, 100%, 0.1)',
+    boxShadow: isHoveringList
+      ? '0px 0px 10px hsla(0, 0%, 0%, 0.4)'
+      : '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
+    transform: isHoveringList ? 'translate3d(0, 0, 20px)' : 'translate3d(0px, 0px, 0px)',
+  });
 
   return (
     <AnimatedLi
       onMouseEnter={() => setIsHoveringList(true)}
       onMouseLeave={() => setIsHoveringList(false)}
-      style={zoom}
+      style={zoomStyle}
     >
       <DeleteFill preserveAspectRatio="none" viewBox="0 0 100 100">
         <AnimatedDeleteBar on={isHoveringDelete} />
@@ -119,8 +117,8 @@ function Item({
         {image && (
           <Image
             style={{
-              boxShadow: zoom.boxShadow,
-              transform: zoom.transform,
+              boxShadow: zoomStyle.boxShadow,
+              transform: zoomStyle.transform,
             }}
             src={image}
             size={96}
@@ -137,25 +135,24 @@ function Item({
               </Fragment>
             ))}
         </Details>
-        {isHoveringList &&
-          onDelete && (
-            <DeleteIcon
-              onMouseEnter={() => setIsHoveringDelete(true)}
-              onMouseLeave={() => setIsHoveringDelete(false)}
-              onClick={event => {
-                event.preventDefault();
-                onDelete();
-              }}
-            >
-              {deleteTooltip ? (
-                <Tooltip content={deleteTooltip}>
-                  <AnimatedCross />
-                </Tooltip>
-              ) : (
+        {isHoveringList && onDelete && (
+          <DeleteIcon
+            onMouseEnter={() => setIsHoveringDelete(true)}
+            onMouseLeave={() => setIsHoveringDelete(false)}
+            onClick={event => {
+              event.preventDefault();
+              onDelete();
+            }}
+          >
+            {deleteTooltip ? (
+              <Tooltip content={deleteTooltip}>
                 <AnimatedCross />
-              )}
-            </DeleteIcon>
-          )}
+              </Tooltip>
+            ) : (
+              <AnimatedCross />
+            )}
+          </DeleteIcon>
+        )}
       </ItemLink>
     </AnimatedLi>
   );

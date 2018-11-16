@@ -1,11 +1,4 @@
-import {
-  ChangeEvent,
-  FormEvent,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from 'react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
 
 import { Schema, ValidationError } from 'yup';
 
@@ -27,7 +20,7 @@ type ErrorShape<T> = { readonly [K in keyof T]?: string[] | null };
 
 function getErrorShape<T>(values: T): ErrorShape<T> {
   return Object.keys(values).reduce((memo, key) => {
-    return Object.assign(memo, { [key]: null });
+    return { ...memo, [key]: null };
   }, {});
 }
 
@@ -77,24 +70,11 @@ function useForm<T>({
 }: Options<T>): Form<T> {
   const firstRun = useRef(true);
   const [values, setValues] = useState(initialValues);
-
   const [submitting, setSubmitting] = useState(false);
-
-  const [dirty, setDirty] = useState<BoolShape<T>>(
-    getBooleanShape(initialValues),
-  );
-
-  const [focused, setFocused] = useState<BoolShape<T>>(
-    getBooleanShape(initialValues),
-  );
-
-  const [touched, setTouched] = useState<BoolShape<T>>(
-    getBooleanShape(initialValues),
-  );
-
-  const [errors, setErrors] = useState<ErrorShape<T>>(
-    getErrorShape(initialValues),
-  );
+  const [dirty, setDirty] = useState(() => getBooleanShape(initialValues));
+  const [focused, setFocused] = useState(() => getBooleanShape(initialValues));
+  const [touched, setTouched] = useState(() => getBooleanShape(initialValues));
+  const [errors, setErrors] = useState(() => getErrorShape(initialValues));
 
   function validate() {
     if (validationSchema) {
@@ -114,13 +94,11 @@ function useForm<T>({
 
   function change<K extends keyof T>(name: K, value: T[K]) {
     setValues(state => {
-      return Object.assign({}, state, { [name]: value });
+      return { ...state, [name]: value };
     });
 
     setDirty(state => {
-      return Object.assign({}, state, {
-        [name]: value !== initialValues[name],
-      });
+      return Object.assign({}, state, { [name]: value !== initialValues[name] });
     });
   }
 
@@ -187,9 +165,7 @@ function useForm<T>({
     [errors],
   );
 
-  const isDirty = useMemo(() => Object.values(dirty).some(d => d === true), [
-    dirty,
-  ]);
+  const isDirty = useMemo(() => Object.values(dirty).some(d => d === true), [dirty]);
 
   return {
     handleReset,
@@ -212,18 +188,7 @@ function useForm<T>({
 
 function useField<T, K extends keyof T>(
   name: K,
-  {
-    [CONTROLLER]: {
-      values,
-      change,
-      blur,
-      focus,
-      dirty,
-      touched,
-      errors,
-      focused,
-    },
-  }: Form<T>,
+  { [CONTROLLER]: { values, change, blur, focus, dirty, touched, errors, focused } }: Form<T>,
 ) {
   const input = useMemo(
     () => {
