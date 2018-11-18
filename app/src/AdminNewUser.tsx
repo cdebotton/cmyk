@@ -20,10 +20,10 @@ const CREATE_USER_MUTATION = gql`
       createdAt
       updatedAt
       role
-      lastLogin
       profile {
         firstName
         lastName
+        lastLogin
       }
     }
   }

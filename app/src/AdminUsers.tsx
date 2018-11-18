@@ -21,12 +21,12 @@ export const USERS_QUERY = gql`
       id
       email
       role
-      lastLogin
       createdAt
       profile {
         id
         firstName
         lastName
+        lastLogin
         avatar {
           id
           url

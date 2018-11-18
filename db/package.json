@@ -1,0 +1,19 @@
+{
+  "name": "db",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "scripts": {
+    "up": "migrate up --compiler=\"ts:./ts-register\"",
+    "down": "migrate down --compiler=\"ts:./ts-register\"",
+    "create": "migrate create --template-file ./lib/template-file.ts"
+  },
+  "devDependencies": {
+    "@types/pg": "7.4.11",
+    "ts-node": "7.0.1"
+  },
+  "dependencies": {
+    "migrate": "^1.6.2",
+    "pg": "^7.6.1"
+  }
+}

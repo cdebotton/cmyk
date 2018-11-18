@@ -79,7 +79,6 @@ type User {
   documents: [Document!]!
   email: String!
   id: ID!
-  lastLogin: Date
   password: String!
   profile: Profile!
   role: Role!
@@ -93,6 +92,7 @@ type Profile {
   firstName: String!
   id: ID!
   lastName: String!
+  lastLogin: Date
   updatedAt: Date
   user: User!
 }
