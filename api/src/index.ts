@@ -27,6 +27,7 @@ class Profile {
 }
 
 const map = {
+  Root: undefined,
   User,
   Profile,
 };
@@ -37,11 +38,11 @@ function isResolveTree(x: QueryTree): x is ResolveTree {
   return x.name !== undefined;
 }
 
-const log = (x: any) => console.log(JSON.stringify(x, null, 2));
+const log = (...x: any[]) => console.log(JSON.stringify(x, null, 2));
 
-function renderQueryTree(node: QueryTree) {
+function renderQueryTree(parent: keyof typeof map, node: QueryTree) {
   if (isResolveTree(node)) {
-    log(node);
+    log(parent, node);
   }
   return 'SELECT * FROM cmyk.users';
 }
@@ -55,7 +56,7 @@ const db = {
         throw new Error('Unable to parse query info');
       }
 
-      const query = renderQueryTree(parsedResolveInfoFragment);
+      const query = renderQueryTree('Root', parsedResolveInfoFragment);
 
       const pool = new Pool();
       const result = await pool.query(query);
