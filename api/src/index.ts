@@ -72,7 +72,7 @@ const schema = makeExecutableSchema({
 
         return token;
       },
-      createUser: async (parent, { input }, { pool }, info) => {
+      createUser: async (parent, { input }, { pool, userById }, info) => {
         const { email, password, repeatPassword, firstName, lastName, role } = input;
 
         if (password !== repeatPassword) {
@@ -100,20 +100,22 @@ const schema = makeExecutableSchema({
           );
 
           await client.query('COMMIT');
+          await client.release();
+          return await userById(user.id);
         } catch (error) {
           await client.query('ROLLBACK');
+          await client.release();
           throw error;
-        } finally {
-          client.release();
         }
-
-        client.release();
-
-        return null;
       },
     },
-    User: {},
-    Profile: {},
+    User: {
+      profile: (parent, args, { profileByUserId }, info) => profileByUserId(parent.id),
+    },
+    Profile: {
+      firstName: parent => parent.first_name,
+      lastName: parent => parent.last_name,
+    },
   },
   typeDefs,
 });

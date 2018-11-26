@@ -116,7 +116,7 @@ function AdminUsers({ className, match }: Props) {
               }
               deleteTooltip={`Delete ${user.email}`}
               details={[
-                { label: 'Last login', info: getTimeAgo(user.lastLogin) },
+                { label: 'Last login', info: getTimeAgo(user.profile.lastLogin) },
                 { label: 'Created', info: getFormattedDate(user.createdAt) },
               ]}
             />

@@ -14,8 +14,8 @@ import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
 
 const loginMutation = gql`
-  mutation Login($input: LoginInput!) {
-    login(input: $input)
+  mutation Login($email: String!, $password: String!) {
+    login(email: $email, password: $password)
   }
 `;
 
@@ -71,10 +71,8 @@ function Login({ className, location }: Props) {
       }
     },
     variables: {
-      input: {
-        email: email.input.value,
-        password: password.input.value,
-      },
+      email: email.input.value,
+      password: password.input.value,
     },
   });
 

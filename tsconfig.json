@@ -3,6 +3,7 @@
     "downlevelIteration": true,
     "suppressImplicitAnyIndexErrors": true,
     "strict": true,
+    "jsx": "react",
     "moduleResolution": "node",
     "esModuleInterop": true,
     "skipLibCheck": false,

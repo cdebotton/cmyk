@@ -200,6 +200,7 @@ export interface CreateUserMutation_createUser_profile {
   __typename: "Profile";
   firstName: string;
   lastName: string;
+  lastLogin: any | null;
 }
 
 export interface CreateUserMutation_createUser {
@@ -209,7 +210,6 @@ export interface CreateUserMutation_createUser {
   createdAt: any;
   updatedAt: any | null;
   role: Role;
-  lastLogin: any | null;
   profile: CreateUserMutation_createUser_profile;
 }
 
@@ -249,6 +249,7 @@ export interface Users_users_profile {
   id: string;
   firstName: string;
   lastName: string;
+  lastLogin: any | null;
   avatar: Users_users_profile_avatar | null;
 }
 
@@ -257,7 +258,6 @@ export interface Users_users {
   id: string;
   email: string;
   role: Role;
-  lastLogin: any | null;
   createdAt: any;
   profile: Users_users_profile;
 }
@@ -344,7 +344,8 @@ export interface Login {
 }
 
 export interface LoginVariables {
-  input: LoginInput;
+  email: string;
+  password: string;
 }
 
 /* tslint:disable */
@@ -383,11 +384,6 @@ export interface DocumentCreateInput {
   publishDate: any;
   type: string;
   author: string;
-}
-
-export interface LoginInput {
-  email: string;
-  password: string;
 }
 
 export interface UserCreateInput {

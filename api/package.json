@@ -17,8 +17,8 @@
     "ts-node": "7.0.1"
   },
   "dependencies": {
-    "apollo-server": "^2.2.0",
-    "aws-sdk": "^2.357.0",
+    "apollo-server": "^2.2.3",
+    "aws-sdk": "^2.362.0",
     "bcryptjs": "^2.4.3",
     "dataloader": "1.4.0",
     "graphql": "^14.0.2",
@@ -26,6 +26,6 @@
     "graphql-parse-resolve-info": "4.0.0",
     "jsonwebtoken": "^8.4.0",
     "pg": "7.6.1",
-    "prisma-client-lib": "1.20.7"
+    "prisma-client-lib": "1.21.1"
   }
 }
