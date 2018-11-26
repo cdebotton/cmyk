@@ -4,9 +4,9 @@
   "main": "index.js",
   "license": "MIT",
   "scripts": {
-    "up": "migrate up --compiler=\"ts:./ts-register\"",
-    "down": "migrate down --compiler=\"ts:./ts-register\"",
-    "create": "migrate create --template-file ./lib/template-file.ts"
+    "up": "node -r dotenv/config ./node_modules/.bin/migrate up --compiler=\"ts:./ts-register\"",
+    "down": "node -r dotenv/config ./node_modules/.bin/migrate down --compiler=\"ts:./ts-register\"",
+    "create": "node -r dotenv/config ./node_modules/.bin/migrate create --template-file ./lib/template-file.ts"
   },
   "devDependencies": {
     "@types/pg": "7.4.11",

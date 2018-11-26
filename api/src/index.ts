@@ -1,98 +1,117 @@
 import { ApolloServer, makeExecutableSchema } from 'apollo-server';
-import { Context } from 'apollo-server-core';
 import { importSchema } from 'graphql-import';
-import { Pool } from 'pg';
 import jwt from 'jsonwebtoken';
-import { parse, simplify, ResolveTree, FieldsByTypeName } from 'graphql-parse-resolve-info';
-import { GraphQLResolveInfo } from 'graphql';
+import { compare, hash, genSalt } from 'bcryptjs';
+import Context from './Context';
 
 const { PORT = 3002, ENGINE_API_NAME, ENGINE_API_KEY } = process.env;
 
 const typeDefs = importSchema('src/schema.graphql');
 
-class User {
-  alias = 'user';
-  table = 'cmyk.user';
-  profile() {
-    return 'LEFT JOIN cmyk.user_profile as profile WHERE user.id = profile.user_id';
-  }
-}
-
-class Profile {
-  alias = 'profile';
-  table = 'cmyk.user_profile';
-  user() {
-    return 'LEFT JOIN cmyk.user as user WHERE user.id = profile.user_id';
-  }
-}
-
-const map = {
-  Root: undefined,
-  User,
-  Profile,
-};
-
-type QueryTree = ResolveTree | FieldsByTypeName;
-
-function isResolveTree(x: QueryTree): x is ResolveTree {
-  return x.name !== undefined;
-}
-
-const log = (...x: any[]) => console.log(JSON.stringify(x, null, 2));
-
-function renderQueryTree(parent: keyof typeof map, node: QueryTree) {
-  if (isResolveTree(node)) {
-    log(parent, node);
-  }
-  return 'SELECT * FROM cmyk.users';
-}
-
-const db = {
-  users: {
-    async findAll(args: any, info: GraphQLResolveInfo) {
-      const parsedResolveInfoFragment = parse(info);
-
-      if (!parsedResolveInfoFragment) {
-        throw new Error('Unable to parse query info');
-      }
-
-      const query = renderQueryTree('Root', parsedResolveInfoFragment);
-
-      const pool = new Pool();
-      const result = await pool.query(query);
-
-      pool.end();
-
-      return result;
-    },
-    async findById(args: { id: number }) {
-      const pool = new Pool();
-      const { rows } = await pool.query(
-        `
-        SELECT * FROM cmyk.user
-        WHERE id = $1
-        LIMIT 1
-      `,
-        [{ id: args.id }],
-      );
-      const [user] = rows;
-      await pool.end;
-      return user;
-    },
-  },
-};
-
 const schema = makeExecutableSchema({
   resolvers: {
     Query: {
-      users: (paent, args, { db }, info) => {
-        return db.users.findAll(args, info);
-      },
-      user: (parent, args, { db }, info) => {
-        return db.users.findById(args, info);
+      session: async (parent, args, { userId, pool }, info) => {
+        if (!userId) {
+          return null;
+        }
+
+        const client = await pool.connect();
+
+        const {
+          rows: [user],
+        } = await client.query(
+          `
+          SELECT u.id, u.email, p.first_name, p.last_name
+          FROM User u
+          LEFT JOIN cmyk.user_profile p
+          ON p.user_id = u.id
+          WHERE t.id=$1
+        `,
+          [userId],
+        );
+
+        pool.end();
+
+        return user;
       },
     },
-    Mutation: {},
+    Mutation: {
+      login: async (parent, { email, password }, { pool }, info) => {
+        const client = await pool.connect();
+
+        const {
+          rows: [user],
+        } = await client.query(
+          `
+          SELECT u.id, u.hashed_password
+          FROM cmyk.user u
+          WHERE u.email=$1
+        `,
+          [email],
+        );
+
+        client.release();
+
+        if (!user) {
+          throw new Error('Invalid credentials');
+        }
+
+        const match = await compare(password, user.hashed_password);
+
+        if (!match) {
+          throw new Error('Invalid credentials');
+        }
+
+        const token = jwt.sign(
+          {
+            userId: user.id,
+          },
+          'shh',
+        );
+
+        return token;
+      },
+      createUser: async (parent, { input }, { pool }, info) => {
+        const { email, password, repeatPassword, firstName, lastName, role } = input;
+
+        if (password !== repeatPassword) {
+          throw new Error('Password mismatch');
+        }
+
+        const salt = await genSalt(10);
+        const hashedPassword = await hash(password, salt);
+
+        const client = await pool.connect();
+
+        try {
+          await client.query('BEGIN');
+
+          const {
+            rows: [user],
+          } = await client.query(
+            'INSERT INTO cmyk.user(email, hashed_password, role) VALUES($1, $2, $3) RETURNING id',
+            [email, hashedPassword, role],
+          );
+
+          await client.query(
+            'INSERT INTO cmyk.user_profile(user_id, first_name, last_name) VALUES($1, $2, $3)',
+            [user.id, firstName, lastName],
+          );
+
+          await client.query('COMMIT');
+        } catch (error) {
+          await client.query('ROLLBACK');
+          throw error;
+        } finally {
+          client.release();
+        }
+
+        pool.end();
+
+        return null;
+      },
+    },
     User: {},
     Profile: {},
   },
@@ -104,39 +123,35 @@ interface IToken {
   userId: string;
 }
 
-// async function getSession(db: Prisma, authorization?: string) {
-//   if (!authorization) {
-//     return null;
-//   }
+function getToken(authorization?: string): IToken | null {
+  if (!authorization) {
+    return null;
+  }
 
-//   const token = authorization.split(' ')[1];
-//   let decoded = jwt.verify(token, 'shh');
+  const token = authorization.split(' ')[1];
+  let decoded = jwt.verify(token, 'shh');
 
-//   if (!decoded) {
-//     return null;
-//   }
+  if (!decoded) {
+    return null;
+  }
 
-//   if (typeof decoded === 'string') {
-//     decoded = JSON.parse(decoded);
-//   }
+  if (typeof decoded === 'string') {
+    try {
+      return JSON.parse(decoded) as IToken;
+    } catch {
+      return null;
+    }
+  }
 
-//   const t = decoded as IToken;
-
-//   const user = await db.user({ id: t.userId });
-
-//   return {
-//     user,
-//     iat: t.iat,
-//   };
-// }
+  return null;
+}
 
 const server = new ApolloServer({
   schema,
-  context: (ctx: Context) => {
-    return {
-      ...ctx,
-      db,
-    };
+  context: (ctx: any) => {
+    const token = getToken(ctx.req.headers.authorization);
+
+    return new Context(token);
   },
   engine: {
     apiKey: `service:${ENGINE_API_NAME}:${ENGINE_API_KEY}`,

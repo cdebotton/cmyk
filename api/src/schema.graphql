@@ -20,7 +20,7 @@ type Query {
 }
 
 type Mutation {
-  login(input: LoginInput!): String
+  login(email: String!, password: String!): String
   uploadFile(file: Upload!): File!
   deleteFile(id: ID!): File
   createUser(input: UserCreateInput!): User!
@@ -28,11 +28,6 @@ type Mutation {
   updateUser(input: UserUpdateInput!, id: ID!): User
   createDocument(input: DocumentCreateInput!): Document!
   updateDocument(input: DocumentUpdateInput!, id: String!): Document
-}
-
-input LoginInput {
-  email: String!
-  password: String!
 }
 
 input UserCreateInput {

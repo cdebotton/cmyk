@@ -3,19 +3,19 @@
   "migrations": [
     {
       "title": "1542515374894-add-schemas.ts",
-      "timestamp": 1542519332737
+      "timestamp": 1543271814140
     },
     {
       "title": "1542515456885-set-updated-at.ts",
-      "timestamp": 1542519332755
+      "timestamp": 1543271814151
     },
     {
       "title": "1542515601245-add-user.ts",
-      "timestamp": 1542519332782
+      "timestamp": 1543271814168
     },
     {
       "title": "1542519109140-add-user-profile.ts",
-      "timestamp": 1542519332809
+      "timestamp": 1543271814183
     }
   ]
 }

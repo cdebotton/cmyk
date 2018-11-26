@@ -20,6 +20,7 @@
     "apollo-server": "^2.2.0",
     "aws-sdk": "^2.357.0",
     "bcryptjs": "^2.4.3",
+    "dataloader": "1.4.0",
     "graphql": "^14.0.2",
     "graphql-import": "^0.7.1",
     "graphql-parse-resolve-info": "4.0.0",

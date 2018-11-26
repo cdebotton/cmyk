@@ -4,8 +4,11 @@ export async function up() {
   const pool = new Pool();
 
   await pool.query(`
+    CREATE TYPE role_t as enum('ADMIN', 'EDITOR', 'VIEWER', 'DEMO', 'UNAUTHORIZED');
+
     CREATE TABLE cmyk.user (
       id                SERIAL PRIMARY KEY,
+      role              role_t NOT NULL DEFAULT 'UNAUTHORIZED',
       email             TEXT UNIQUE NOT NULL,
       hashed_password   TEXT NOT NULL,
       created_at        TIMESTAMP DEFAULT now(),
@@ -27,6 +30,7 @@ export async function down() {
   await pool.query(`
     DROP TRIGGER user_updated_at ON cmyk.user;
     DROP TABLE cmyk.user;
+    DROP TYPE role_t;
   `);
 
   await pool.end();
