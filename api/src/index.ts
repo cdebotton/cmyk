@@ -31,7 +31,7 @@ const schema = makeExecutableSchema({
           [userId],
         );
 
-        pool.end();
+        client.release();
 
         return user;
       },
@@ -107,7 +107,7 @@ const schema = makeExecutableSchema({
           client.release();
         }
 
-        pool.end();
+        client.release();
 
         return null;
       },
