@@ -23,7 +23,6 @@ export const USERS_QUERY = gql`
       role
       createdAt
       profile {
-        id
         firstName
         lastName
         lastLogin

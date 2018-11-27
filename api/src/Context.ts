@@ -7,27 +7,29 @@ interface Token {
 }
 
 class Context {
-  userId: string | null;
+  token: Token | null;
   pool: Pool;
 
-  constructor(token: Token | null) {
-    this.pool = new Pool();
-    this.userId = token ? token.userId : null;
+  constructor(token: Token | null, pool: Pool) {
+    this.pool = pool;
+    this.token = token;
   }
 
   userById = new DataLoader(async keys => {
     const client = await this.pool.connect();
-    const params = keys.map((_, i) => `$${i + 1}`);
-    const query = `SELECT * FROM cmyk.user u WHERE u.id IN ${params}`;
+    const params = keys.map((_, i) => `$${i + 1}`).join(',');
+    const query = `SELECT * FROM cmyk.user u WHERE u.id IN (${params})`;
     const { rows } = await client.query(query, keys);
+    client.release();
     return rows;
   });
 
   profileByUserId = new DataLoader(async keys => {
     const client = await this.pool.connect();
-    const params = keys.map((_, i) => `$${i + 1}`);
-    const query = `SELECT * FROM cmyk.user_profile p WHERE p.user_id IN ${params}`;
+    const params = keys.map((_, i) => `$${i + 1}`).join(',');
+    const query = `SELECT * FROM cmyk.user_profile p WHERE p.user_id IN (${params})`;
     const { rows } = await client.query(query, keys);
+    client.release();
     return rows;
   });
 }

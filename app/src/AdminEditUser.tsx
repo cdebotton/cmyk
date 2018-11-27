@@ -28,7 +28,6 @@ const EDIT_USER_QUERY = gql`
       email
       role
       profile {
-        id
         avatar {
           id
           key
@@ -49,7 +48,6 @@ const USER_UPDATE_MUTATION = gql`
       email
       role
       profile {
-        id
         avatar {
           id
           bucket

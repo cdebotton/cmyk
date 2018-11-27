@@ -28,7 +28,6 @@ const CURRENT_USER_QUERY = gql`
       user {
         id
         profile {
-          id
           firstName
           avatar {
             id

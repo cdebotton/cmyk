@@ -1,4 +1,4 @@
-import { ThemedOuterStyledProps } from 'styled-components';
+import { ThemedStyledProps } from 'styled-components';
 import * as colors from './colors';
 
 export interface Theme {
@@ -6,9 +6,7 @@ export interface Theme {
   size: 'small' | 'medium' | 'large';
 }
 
-export const ThemeError = new Error(
-  'Component not wrapped in a theme provider',
-);
+export const ThemeError = new Error('Component not wrapped in a theme provider');
 
 export type Format = 'positive' | 'negative' | 'neutral';
 
@@ -23,9 +21,7 @@ export function gradient(
   },
 ) {
   const { offset = 0, steps = 5 } = options;
-  return function generate<P extends Formattable>(
-    props: ThemedOuterStyledProps<P, Theme>,
-  ) {
+  return function generate<P extends Formattable>(props: ThemedStyledProps<P, Theme>) {
     const { theme, format } = props;
 
     if (!theme) {
@@ -45,9 +41,7 @@ export function foreground(
   },
 ) {
   const { shade = 1 } = options;
-  return function generate<P extends Formattable>(
-    props: ThemedOuterStyledProps<P, Theme>,
-  ) {
+  return function generate<P extends Formattable>(props: ThemedStyledProps<P, Theme>) {
     const { theme, format } = props;
 
     if (!theme) {
@@ -68,7 +62,7 @@ export function color(
     shade: 1,
   },
 ) {
-  return function<P>(_props: ThemedOuterStyledProps<P, Theme>) {
+  return function<P>(_props: ThemedStyledProps<P, Theme>) {
     const { color: clr, shade = 1 } = options;
     return colors[clr][shade];
   };

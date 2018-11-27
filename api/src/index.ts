@@ -3,6 +3,7 @@ import { importSchema } from 'graphql-import';
 import jwt from 'jsonwebtoken';
 import { compare, hash, genSalt } from 'bcryptjs';
 import Context from './Context';
+import { Pool } from 'pg';
 
 const { PORT = 3002, ENGINE_API_NAME, ENGINE_API_KEY } = process.env;
 
@@ -11,29 +12,30 @@ const typeDefs = importSchema('src/schema.graphql');
 const schema = makeExecutableSchema({
   resolvers: {
     Query: {
-      session: async (parent, args, { userId, pool }, info) => {
-        if (!userId) {
+      session: async (parent, args, { token, pool, userById }, info) => {
+        if (!token) {
           return null;
         }
 
         const client = await pool.connect();
 
-        const {
-          rows: [user],
-        } = await client.query(
+        const { rows } = await client.query(
           `
-          SELECT u.id, u.email, p.first_name, p.last_name
-          FROM User u
-          LEFT JOIN cmyk.user_profile p
-          ON p.user_id = u.id
-          WHERE t.id=$1
+          SELECT u.id
+          FROM cmyk.user u
+          WHERE u.id=$1
         `,
-          [userId],
+          [token.userId],
         );
+
+        const user = await userById.load(rows[0].id);
 
         client.release();
 
-        return user;
+        return {
+          ...token,
+          user,
+        };
       },
     },
     Mutation: {
@@ -101,7 +103,7 @@ const schema = makeExecutableSchema({
 
           await client.query('COMMIT');
           await client.release();
-          return await userById(user.id);
+          return await userById.load(user.id);
         } catch (error) {
           await client.query('ROLLBACK');
           await client.release();
@@ -110,7 +112,7 @@ const schema = makeExecutableSchema({
       },
     },
     User: {
-      profile: (parent, args, { profileByUserId }, info) => profileByUserId(parent.id),
+      profile: (parent, args, { profileByUserId }, info) => profileByUserId.load(parent.id),
     },
     Profile: {
       firstName: parent => parent.first_name,
@@ -145,15 +147,17 @@ function getToken(authorization?: string): IToken | null {
     }
   }
 
-  return null;
+  return decoded as IToken;
 }
+
+const pool = new Pool();
 
 const server = new ApolloServer({
   schema,
   context: (ctx: any) => {
     const token = getToken(ctx.req.headers.authorization);
 
-    return new Context(token);
+    return new Context(token, pool);
   },
   engine: {
     apiKey: `service:${ENGINE_API_NAME}:${ENGINE_API_KEY}`,
