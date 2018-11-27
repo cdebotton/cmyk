@@ -37,6 +37,13 @@ const schema = makeExecutableSchema({
           user,
         };
       },
+      users: async (parent, args, { pool }, info) => {
+        const client = await pool.connect();
+        const { rows } = await client.query('SELECT * FROM cmyk.user');
+        // console.log(rows);
+        return rows;
+      },
+      user: async (parent, { id }, { userById }, info) => userById.load(id),
     },
     Mutation: {
       login: async (parent, { email, password }, { pool }, info) => {
@@ -113,6 +120,8 @@ const schema = makeExecutableSchema({
     },
     User: {
       profile: (parent, args, { profileByUserId }, info) => profileByUserId.load(parent.id),
+      createdAt: parent => parent.created_at,
+      updatedAt: parent => parent.updatedAt,
     },
     Profile: {
       firstName: parent => parent.first_name,
