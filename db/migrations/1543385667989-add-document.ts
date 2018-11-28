@@ -10,11 +10,11 @@ export async function up() {
       published_at  TIMESTAMP DEFAULT now(),
       created_at    TIMESTAMP DEFAULT now(),
       updated_at    TIMESTAMP DEFAULT now(),
-      author_id     UUID REFERENCES cmyk.user(id) ON DELETE SET NULL,
+      author_id     UUID REFERENCES cmyk.user(id) ON DELETE SET NULL
     );
 
-    CREATE TRIGGER file_updated_at BEFORE UPDATE
-    ON cmyk.file
+    CREATE TRIGGER document_updated_at BEFORE UPDATE
+    ON cmyk.document
     FOR EACH ROW
     EXECUTE PROCEDURE cmyk_private.set_updated_at();
   `);
@@ -26,7 +26,7 @@ export async function down() {
   const pool = new Pool();
 
   await pool.query(`
-    DROP TRIGGER file_updated_at ON cmyk.file;
+    DROP TRIGGER document_updated_at ON cmyk.document;
     DROP TABLE cmyk.document;
   `);
 
