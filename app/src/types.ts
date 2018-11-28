@@ -190,6 +190,46 @@ export interface TCreateDocumentVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
+// GraphQL mutation operation: CreateUserMutation
+// ====================================================
+
+export interface CreateUserMutation_createUser_profile_avatar {
+  __typename: "File";
+  id: string;
+  bucket: string;
+  key: string;
+}
+
+export interface CreateUserMutation_createUser_profile {
+  __typename: "Profile";
+  avatar: CreateUserMutation_createUser_profile_avatar | null;
+  firstName: string;
+  lastName: string;
+  lastLogin: any | null;
+}
+
+export interface CreateUserMutation_createUser {
+  __typename: "User";
+  id: string;
+  email: string;
+  createdAt: any;
+  updatedAt: any | null;
+  role: Role;
+  profile: CreateUserMutation_createUser_profile;
+}
+
+export interface CreateUserMutation {
+  createUser: CreateUserMutation_createUser;
+}
+
+export interface CreateUserMutationVariables {
+  input: UserCreateInput;
+}
+
+/* tslint:disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
 // GraphQL query operation: Users
 // ====================================================
 
@@ -326,38 +366,6 @@ export interface Session_session {
 
 export interface Session {
   session: Session_session | null;
-}
-
-/* tslint:disable */
-// This file was automatically generated and should not be edited.
-
-// ====================================================
-// GraphQL mutation operation: CreateUserMutation
-// ====================================================
-
-export interface CreateUserMutation_createUser_profile {
-  __typename: "Profile";
-  firstName: string;
-  lastName: string;
-  lastLogin: any | null;
-}
-
-export interface CreateUserMutation_createUser {
-  __typename: "User";
-  id: string;
-  email: string;
-  createdAt: any;
-  updatedAt: any | null;
-  role: Role;
-  profile: CreateUserMutation_createUser_profile;
-}
-
-export interface CreateUserMutation {
-  createUser: CreateUserMutation_createUser;
-}
-
-export interface CreateUserMutationVariables {
-  input: UserCreateInput;
 }
 
 /* tslint:disable */

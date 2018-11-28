@@ -124,6 +124,7 @@ function Item({ image, to, label, info, details, onDelete, deleteTooltip }: Prop
             size={96}
           />
         )}
+        {!image && <span />}
         <Details>
           <Title>{label}</Title>
           {info && <Description>{info}</Description>}

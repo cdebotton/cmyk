@@ -5,7 +5,7 @@ export async function up() {
 
   await pool.query(`
     ALTER TABLE cmyk.user_profile
-    ADD COLUMN avatar_id INTEGER REFERENCES cmyk.file(id) ON DELETE SET NULL
+    ADD COLUMN avatar_id UUID REFERENCES cmyk.file(id) ON DELETE SET NULL
   `);
 
   await pool.end();

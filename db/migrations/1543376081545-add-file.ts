@@ -5,7 +5,7 @@ export async function up() {
 
   await pool.query(`
     CREATE TABLE cmyk.file (
-      id          SERIAL PRIMARY KEY,
+      id          UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       bucket      TEXT NOT NULL,
       encoding    TEXT NOT NULL,
       etag        TEXT NOT NULL,

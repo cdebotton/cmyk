@@ -5,7 +5,7 @@ export async function up() {
 
   await pool.query(`
     CREATE TABLE cmyk.user_profile (
-      user_id       INTEGER PRIMARY KEY REFERENCES cmyk.user(id) ON DELETE CASCADE,
+      user_id       UUID PRIMARY KEY REFERENCES cmyk.user(id) ON DELETE CASCADE,
       first_name    TEXT NOT NULL,
       last_name     TEXT NOT NULL,
       last_login    TIMESTAMP,

@@ -7,7 +7,7 @@ export async function up() {
     CREATE TYPE role_t as enum('ADMIN', 'EDITOR', 'VIEWER', 'DEMO', 'UNAUTHORIZED');
 
     CREATE TABLE cmyk.user (
-      id                SERIAL PRIMARY KEY,
+      id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),
       role              role_t NOT NULL DEFAULT 'UNAUTHORIZED',
       email             TEXT UNIQUE NOT NULL,
       hashed_password   TEXT NOT NULL,
