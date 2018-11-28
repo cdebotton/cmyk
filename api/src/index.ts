@@ -26,7 +26,13 @@ const schema = makeExecutableSchema({
           user,
         };
       },
-      documents: () => [],
+      documents: async (parent, args, { pool }) => {
+        const client = await pool.connect();
+        const query = 'SELECT * FROM cmyk.document';
+        const { rows } = await client.query(query);
+        client.release();
+        return rows;
+      },
       files: async (parent, args, { pool }) => {
         const client = await pool.connect();
 
@@ -138,6 +144,38 @@ const schema = makeExecutableSchema({
           await client.query('ROLLBACK');
         }
         client.release();
+      },
+      createDocument: async (parent, { input }, { pool }) => {
+        const client = await pool.connect();
+
+        const query = `
+          INSERT INTO cmyk.document(title, author_id)
+          VALUES($1, $2)
+        `;
+
+        const params = [input.title, input.authorId];
+
+        const {
+          rows: [document],
+        } = await client.query(query, params);
+
+        client.release();
+
+        return document;
+      },
+      deleteDocument: async (parent, { id }, { pool }) => {
+        const client = pool.connect();
+
+        const query = 'DELETE FROM cmyk.document WHERE id = $1 RETURNING *';
+        const params = [id];
+
+        const {
+          rows: [document],
+        } = client.query(query, params);
+
+        client.release();
+
+        return document;
       },
       deleteFile: async (parent, { id }, { pool }) => {
         const s3 = new S3();
