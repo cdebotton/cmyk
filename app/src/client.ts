@@ -32,7 +32,7 @@ const authLink = setContext((request, previousContext) => {
 
 const client = new ApolloClient({
   cache,
-  link: split(isFile, from([authLink]), from([authLink, httpLink])),
+  link: split(isFile, from([authLink, uploadLink]), from([authLink, httpLink])),
 });
 
 export default client;

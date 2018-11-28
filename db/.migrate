@@ -1,21 +1,29 @@
 {
-  "lastRun": "1542519109140-add-user-profile.ts",
+  "lastRun": "1543378265862-add-avatar_id-to-user_profile.ts",
   "migrations": [
     {
       "title": "1542515374894-add-schemas.ts",
-      "timestamp": 1543274346326
+      "timestamp": 1543380271770
     },
     {
       "title": "1542515456885-set-updated-at.ts",
-      "timestamp": 1543274346339
+      "timestamp": 1543380271786
     },
     {
       "title": "1542515601245-add-user.ts",
-      "timestamp": 1543274346357
+      "timestamp": 1543380271806
     },
     {
       "title": "1542519109140-add-user-profile.ts",
-      "timestamp": 1543274346373
+      "timestamp": 1543380271820
+    },
+    {
+      "title": "1543376081545-add-file.ts",
+      "timestamp": 1543380271833
+    },
+    {
+      "title": "1543378265862-add-avatar_id-to-user_profile.ts",
+      "timestamp": 1543380271844
     }
   ]
 }

@@ -99,6 +99,34 @@ type Document {
   publishDate: DateTime!
   title: String!
   updatedAt: Date
+  publishedAt: Date
+  content: [Content!]!
+}
+
+interface Content {
+  id: ID!
+  createdAt: Date!
+  updatedAt: Date
+  document: Document!
+  name: String!
+}
+
+type TextContent implements Content {
+  id: ID!
+  createdAt: Date!
+  updatedAt: Date
+  document: Document!
+  name: String!
+  text: String!
+}
+
+type FileContent implements Content {
+  id: ID!
+  createdAt: Date!
+  updatedAt: Date
+  document: Document!
+  name: String!
+  files: [File!]!
 }
 
 type File {

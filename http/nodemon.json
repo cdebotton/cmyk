@@ -1,6 +1,6 @@
 {
-  "extension": [".js"],
+  "extension": [".ts"],
   "execMap": {
-    "ts": "node -r dotenv/config ./node_modules/.bin/ts-node"
+    "ts": "node -r dotenv/config ../node_modules/.bin/babel-node --extensions \".ts\""
   }
 }

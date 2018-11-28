@@ -4,6 +4,8 @@ import jwt from 'jsonwebtoken';
 import { compare, hash, genSalt } from 'bcryptjs';
 import Context from './Context';
 import { Pool } from 'pg';
+import { S3 } from 'aws-sdk';
+import { PassThrough } from 'stream';
 
 const { PORT = 3002, ENGINE_API_NAME, ENGINE_API_KEY } = process.env;
 
@@ -36,6 +38,17 @@ const schema = makeExecutableSchema({
           ...token,
           user,
         };
+      },
+      documents: () => [],
+      files: async (parent, args, { pool }, info) => {
+        const client = await pool.connect();
+
+        const query = 'SELECT * FROM cmyk.file';
+        const { rows } = await client.query(query);
+
+        client.release();
+
+        return rows;
       },
       users: async (parent, args, { pool }, info) => {
         const client = await pool.connect();
@@ -117,15 +130,90 @@ const schema = makeExecutableSchema({
           throw error;
         }
       },
+      updateUser: async (parent, { id, input }, { pool }) => {
+        const client = await pool.connect();
+        try {
+          await client.query('BEGIN');
+
+          await client.query('UPDATE cmyk.user SET email = $1, role = $2 WHERE id = $3', [
+            input.email,
+            input.role,
+            id,
+          ]);
+
+          await client.query(
+            'UPDATE cmyk.user_profile SET first_name = $1, last_name = $2, avatar_id = $3 WHERE user_id = $4',
+            [input.firstName, input.lastName, input.avatar, id],
+          );
+
+          await client.query('COMMIT');
+        } catch {
+          await client.query('ROLLBACK');
+        }
+        client.release();
+      },
+      deleteFile: async (parent, { id }, { pool }, info) => {
+        const s3 = new S3();
+        const client = await pool.connect();
+
+        const query = 'DELETE FROM cmyk.file WHERE id = $1 RETURNING *';
+        const params = [id];
+        const { rows } = await client.query(query, params);
+        const [file] = rows;
+
+        await s3.deleteObject({ Key: file.key, Bucket: file.bucket }).promise();
+
+        client.release();
+
+        return file;
+      },
+      uploadFile: async (parent, { file }, { pool }) => {
+        const { stream, filename, mimetype, encoding } = await file;
+        const passThrough = new PassThrough();
+        const s3 = new S3();
+        const s3Params = {
+          Body: passThrough,
+          Bucket: 'debotton.io',
+          Key: filename,
+        };
+
+        stream.pipe(passThrough);
+
+        const { ETag, Key, Bucket } = await s3.upload(s3Params).promise();
+
+        const client = await pool.connect();
+        const query = `INSERT INTO cmyk.file(encoding, mimetype, bucket, etag, key, size) VALUES($1, $2, $3, $4, $5, $6) RETURNING *`;
+        const params = [encoding, mimetype, Bucket, ETag, Key, 0];
+
+        const { rows } = await client.query(query, params);
+        client.release();
+
+        return rows[0];
+      },
     },
     User: {
-      profile: (parent, args, { profileByUserId }, info) => profileByUserId.load(parent.id),
+      profile: (parent, args, { profileByUserId }) => profileByUserId.load(parent.id),
       createdAt: parent => parent.created_at,
-      updatedAt: parent => parent.updatedAt,
+      updatedAt: parent => parent.updated_at,
     },
     Profile: {
+      avatar: (parent, args, { fileById }) =>
+        parent.avatar_id ? fileById.load(parent.avatar_id) : null,
       firstName: parent => parent.first_name,
       lastName: parent => parent.last_name,
+      lastLogin: parent => parent.last_login,
+    },
+    File: {
+      createdAt: parent => parent.created_at,
+      updatedAt: parent => parent.updated_at,
+      url: parent => {
+        const s3 = new S3();
+        return s3.getSignedUrl('getObject', {
+          Bucket: parent.bucket,
+          Expires: 300,
+          Key: parent.key,
+        });
+      },
     },
   },
   typeDefs,
