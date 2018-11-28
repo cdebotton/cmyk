@@ -96,10 +96,9 @@ type Document {
   author: User!
   createdAt: Date!
   id: ID!
-  publishDate: DateTime!
+  publishedAt: Date!
   title: String!
   updatedAt: Date
-  publishedAt: Date
   content: [Content!]!
 }
 
