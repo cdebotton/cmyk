@@ -52,6 +52,7 @@ function ImageSelector({ className, name, value, onChange, uploading }: Props) {
   return (
     <ImageSelectorContainer className={className} disabled={uploading}>
       {url && <Image src={url} />}
+      {!url && <EmptyImage />}
       {!uploading && <FileInput id={id} onChange={handleChange} />}
       <Label htmlFor={id} />
     </ImageSelectorContainer>
@@ -63,6 +64,13 @@ const Image = styled.img`
   height: 100%;
   border-radius: 50%;
   object-fit: cover;
+`;
+
+const EmptyImage = styled.div`
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #ccc;
 `;
 
 const FileInput = styled.input.attrs({ type: 'file' })`

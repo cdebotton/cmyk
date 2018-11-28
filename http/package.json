@@ -6,7 +6,7 @@
     "predeploy": "yarn build",
     "deploy": "NODE_ENV=production node build/index.js",
     "prebuild": "rm -rf build",
-    "build": "NODE_ENV=production tsc"
+    "build": "NODE_ENV=production babel --out-dir build --extensions \".ts\" src"
   },
   "dependencies": {
     "koa": "^2.6.2",
@@ -17,7 +17,7 @@
     "@types/koa": "^2.0.47",
     "@types/koa-compress": "^2.0.8",
     "@types/koa-static": "^4.0.0",
-    "nodemon": "1.18.6",
+    "nodemon": "1.18.7",
     "ts-node": "7.0.1"
   }
 }

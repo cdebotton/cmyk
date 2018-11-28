@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 import React, { FormEvent, lazy, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import * as yup from 'yup';
 import {
   Role,

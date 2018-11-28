@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prebuild": "rm -rf build",
-    "build": "NODE_ENV=production tsc",
+    "build": "NODE_ENV=production babel --out-dir build --extensions \".ts\" src",
     "predeploy": "yarn build",
     "deploy": "NODE_ENV=production node -r dotenv/config build/index.js",
     "start": "NODE_ENV=development nodemon src/index.ts"
@@ -18,7 +18,7 @@
   },
   "dependencies": {
     "apollo-server": "^2.2.3",
-    "aws-sdk": "^2.362.0",
+    "aws-sdk": "^2.364.0",
     "bcryptjs": "^2.4.3",
     "dataloader": "1.4.0",
     "graphql": "^14.0.2",

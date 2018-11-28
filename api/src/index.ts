@@ -14,25 +14,12 @@ const typeDefs = importSchema('src/schema.graphql');
 const schema = makeExecutableSchema({
   resolvers: {
     Query: {
-      session: async (parent, args, { token, pool, userById }, info) => {
+      session: async (parent, args, { token, pool, userById }) => {
         if (!token) {
           return null;
         }
 
-        const client = await pool.connect();
-
-        const { rows } = await client.query(
-          `
-          SELECT u.id
-          FROM cmyk.user u
-          WHERE u.id=$1
-        `,
-          [token.userId],
-        );
-
-        const user = await userById.load(rows[0].id);
-
-        client.release();
+        const user = await userById.load(token.userId);
 
         return {
           ...token,
@@ -40,7 +27,7 @@ const schema = makeExecutableSchema({
         };
       },
       documents: () => [],
-      files: async (parent, args, { pool }, info) => {
+      files: async (parent, args, { pool }) => {
         const client = await pool.connect();
 
         const query = 'SELECT * FROM cmyk.file';
@@ -50,16 +37,16 @@ const schema = makeExecutableSchema({
 
         return rows;
       },
-      users: async (parent, args, { pool }, info) => {
+      users: async (parent, args, { pool }) => {
         const client = await pool.connect();
         const { rows } = await client.query('SELECT * FROM cmyk.user');
         // console.log(rows);
         return rows;
       },
-      user: async (parent, { id }, { userById }, info) => userById.load(id),
+      user: async (parent, { id }, { userById }) => userById.load(id),
     },
     Mutation: {
-      login: async (parent, { email, password }, { pool }, info) => {
+      login: async (parent, { email, password }, { pool }) => {
         const client = await pool.connect();
 
         const {
@@ -94,8 +81,8 @@ const schema = makeExecutableSchema({
 
         return token;
       },
-      createUser: async (parent, { input }, { pool, userById }, info) => {
-        const { email, password, repeatPassword, firstName, lastName, role } = input;
+      createUser: async (parent, { input }, { pool, userById }) => {
+        const { email, password, repeatPassword, firstName, lastName, role, avatar } = input;
 
         if (password !== repeatPassword) {
           throw new Error('Password mismatch');
@@ -117,8 +104,8 @@ const schema = makeExecutableSchema({
           );
 
           await client.query(
-            'INSERT INTO cmyk.user_profile(user_id, first_name, last_name) VALUES($1, $2, $3)',
-            [user.id, firstName, lastName],
+            'INSERT INTO cmyk.user_profile(user_id, first_name, last_name, avatar_id) VALUES($1, $2, $3, $4)',
+            [user.id, firstName, lastName, avatar],
           );
 
           await client.query('COMMIT');
@@ -152,7 +139,7 @@ const schema = makeExecutableSchema({
         }
         client.release();
       },
-      deleteFile: async (parent, { id }, { pool }, info) => {
+      deleteFile: async (parent, { id }, { pool }) => {
         const s3 = new S3();
         const client = await pool.connect();
 

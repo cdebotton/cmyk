@@ -10,6 +10,7 @@
   },
   "devDependencies": {
     "@types/pg": "7.4.11",
+    "apollo": "^2.1.6",
     "ts-node": "7.0.1"
   },
   "dependencies": {

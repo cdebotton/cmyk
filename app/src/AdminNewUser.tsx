@@ -1,5 +1,5 @@
 import gql from 'graphql-tag';
-import React from 'react';
+import React, { FormEvent, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
 import styled from 'styled-components';
 import * as yup from 'yup';
@@ -7,10 +7,13 @@ import { Role, Users, CreateUserMutation, CreateUserMutationVariables } from './
 import { USERS_QUERY } from './AdminUsers';
 import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
+import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
 import Select from './components/Select';
 import { useApolloMutation } from './hooks/Apollo';
 import { useField, useForm } from './hooks/useForm';
+import useFileUpload from './hooks/useFileUpload';
+import useTitle from './hooks/useTitle';
 
 const CREATE_USER_MUTATION = gql`
   mutation CreateUserMutation($input: UserCreateInput!) {
@@ -21,6 +24,11 @@ const CREATE_USER_MUTATION = gql`
       updatedAt
       role
       profile {
+        avatar {
+          id
+          bucket
+          key
+        }
         firstName
         lastName
         lastLogin
@@ -29,8 +37,13 @@ const CREATE_USER_MUTATION = gql`
   }
 `;
 
+const AvatarInput = styled(ImageSelector)`
+  grid-column: span 1;
+  grid-row: span 2;
+`;
+
 const EmailField = styled(Input)`
-  grid-column: 1 / span 2;
+  grid-column: 2 / span 2;
 `;
 
 const validationSchema = yup.object().shape({
@@ -58,13 +71,24 @@ const validationSchema = yup.object().shape({
 interface Props extends RouteComponentProps<{}> {}
 
 function AdminNewUser({ history }: Props) {
+  useTitle('New user | Admin');
+
   const mutate = useApolloMutation<CreateUserMutation, CreateUserMutationVariables>(
     CREATE_USER_MUTATION,
   );
 
-  const form = useForm({
+  const form = useForm<{
+    avatar: { key: string; bucket: string; url: string; id: string } | null;
+    email: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+    repeatPassword: string;
+    role: Role;
+  }>({
     validationSchema,
     initialValues: {
+      avatar: null,
       email: '',
       firstName: '',
       lastName: '',
@@ -96,6 +120,7 @@ function AdminNewUser({ history }: Props) {
             firstName: values.firstName,
             lastName: values.lastName,
             role: values.role,
+            avatar: values.avatar ? values.avatar.id : null,
           },
         },
       });
@@ -104,17 +129,45 @@ function AdminNewUser({ history }: Props) {
   });
 
   const email = useField('email', form);
+  const avatar = useField('avatar', form);
   const firstName = useField('firstName', form);
   const lastName = useField('lastName', form);
   const password = useField('password', form);
   const repeatPassword = useField('repeatPassword', form);
   const role = useField('role', form);
 
+  const [upload, { data, error, uploading }] = useFileUpload();
+
+  async function handleFileChange(event: FormEvent<HTMLInputElement>) {
+    if (!event.currentTarget.files) {
+      return;
+    }
+
+    const file = event.currentTarget.files[0];
+
+    upload(file);
+  }
+
+  useEffect(
+    () => {
+      if (data) {
+        avatar.handlers.setValue(data);
+      }
+    },
+    [data],
+  );
+
   return (
     <EditorLayout>
       <Heading>New user</Heading>
-
       <Form onSubmit={form.handleSubmit}>
+        <AvatarInput
+          value={avatar.input.value}
+          name="avatar"
+          onChange={handleFileChange}
+          error={error}
+          uploading={uploading}
+        />
         <EmailField name="email" label="Email" {...email.input} {...email.meta} />
         <Input name="firstName" label="First name" {...firstName.input} {...firstName.meta} />
         <Input name="lastName" label="Last name" {...lastName.input} {...lastName.meta} />

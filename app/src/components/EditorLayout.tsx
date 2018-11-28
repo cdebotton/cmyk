@@ -19,7 +19,7 @@ const Form = styled.form`
   grid-column: 2 / span 1;
   grid-gap: ${rem(16)};
   display: grid;
-  grid-template-columns: ${rem(64)} repeat(4, 1fr);
+  grid-template-columns: ${rem(128)} repeat(4, 1fr);
   align-content: start;
   ${padding(0, rem(32))};
   align-items: center;

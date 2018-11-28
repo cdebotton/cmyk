@@ -13,7 +13,6 @@ export interface TCurrentUser_session_user_profile_avatar {
 
 export interface TCurrentUser_session_user_profile {
   __typename: "Profile";
-  id: string;
   firstName: string;
   avatar: TCurrentUser_session_user_profile_avatar | null;
 }
@@ -67,7 +66,6 @@ export interface User_user_profile_avatar {
 
 export interface User_user_profile {
   __typename: "Profile";
-  id: string;
   avatar: User_user_profile_avatar | null;
   firstName: string;
   lastName: string;
@@ -105,7 +103,6 @@ export interface TUpdateUser_updateUser_profile_avatar {
 
 export interface TUpdateUser_updateUser_profile {
   __typename: "Profile";
-  id: string;
   avatar: TUpdateUser_updateUser_profile_avatar | null;
   firstName: string;
   lastName: string;
@@ -193,38 +190,6 @@ export interface TCreateDocumentVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: CreateUserMutation
-// ====================================================
-
-export interface CreateUserMutation_createUser_profile {
-  __typename: "Profile";
-  firstName: string;
-  lastName: string;
-  lastLogin: any | null;
-}
-
-export interface CreateUserMutation_createUser {
-  __typename: "User";
-  id: string;
-  email: string;
-  createdAt: any;
-  updatedAt: any | null;
-  role: Role;
-  profile: CreateUserMutation_createUser_profile;
-}
-
-export interface CreateUserMutation {
-  createUser: CreateUserMutation_createUser;
-}
-
-export interface CreateUserMutationVariables {
-  input: UserCreateInput;
-}
-
-/* tslint:disable */
-// This file was automatically generated and should not be edited.
-
-// ====================================================
 // GraphQL query operation: Users
 // ====================================================
 
@@ -246,7 +211,6 @@ export interface Users_users_profile_avatar {
 
 export interface Users_users_profile {
   __typename: "Profile";
-  id: string;
   firstName: string;
   lastName: string;
   lastLogin: any | null;
@@ -362,6 +326,38 @@ export interface Session_session {
 
 export interface Session {
   session: Session_session | null;
+}
+
+/* tslint:disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: CreateUserMutation
+// ====================================================
+
+export interface CreateUserMutation_createUser_profile {
+  __typename: "Profile";
+  firstName: string;
+  lastName: string;
+  lastLogin: any | null;
+}
+
+export interface CreateUserMutation_createUser {
+  __typename: "User";
+  id: string;
+  email: string;
+  createdAt: any;
+  updatedAt: any | null;
+  role: Role;
+  profile: CreateUserMutation_createUser_profile;
+}
+
+export interface CreateUserMutation {
+  createUser: CreateUserMutation_createUser;
+}
+
+export interface CreateUserMutationVariables {
+  input: UserCreateInput;
 }
 
 /* tslint:disable */

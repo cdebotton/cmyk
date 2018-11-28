@@ -10,6 +10,9 @@ const Label = styled(animated.label)<{ blockEvents: boolean }>`
   position: absolute;
   top: 0;
   pointer-events: ${props => (props.blockEvents ? 'none' : 'inherit')};
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 `;
 
 const LabelBacker = styled(animated.span)`
