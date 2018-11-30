@@ -15,9 +15,24 @@ const Query: IResolverObject<QuerySource, Context> = {
       user,
     };
   },
-  documents: async (_parent, _args, { db }) => db.documents(),
-  files: async (_parent, _args, { db }) => db.files(),
-  users: (_parent, _args, { db }) => db.users(),
+  documents: async (_parent, _args, { db }) =>
+    db
+      .withSchema('cmyk')
+      .table('document')
+      .orderBy('created_at', 'desc')
+      .select(),
+  files: async (_parent, _args, { db }) =>
+    db
+      .withSchema('cmyk')
+      .table('file')
+      .orderBy('created_at', 'desc')
+      .select(),
+  users: (_parent, _args, { db }) =>
+    db
+      .withSchema('cmyk')
+      .table('user')
+      .orderBy('created_at', 'desc')
+      .select(),
   user: async (_parent, { id }, { loaders }) => loaders.userById.load(id),
 };
 

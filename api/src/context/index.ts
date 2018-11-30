@@ -1,6 +1,5 @@
-import { Pool } from 'pg';
 import { loaders } from './loaders';
-import { db } from './db';
+import knex from 'knex';
 
 interface Token {
   userId: string;
@@ -11,12 +10,12 @@ class Context {
   token: Token | null;
 
   loaders: ReturnType<typeof loaders>;
-  db: ReturnType<typeof db>;
+  db: knex;
 
-  constructor(token: Token | null, pool: Pool) {
+  constructor(token: Token | null, db: knex) {
     this.token = token;
-    this.loaders = loaders(pool);
-    this.db = db(pool);
+    this.loaders = loaders(db);
+    this.db = db;
   }
 }
 

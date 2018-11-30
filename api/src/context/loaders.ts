@@ -1,35 +1,41 @@
 import DataLoader from 'dataloader';
-import { Pool } from 'pg';
+import knex from 'knex';
 import { mapTo } from '../utils';
+import { UserSource, ProfileSource, FileSource } from '../models';
 
-function loaders(pool: Pool) {
+function loaders(db: knex) {
   return {
-    userById: new DataLoader<string, any>(async keys => {
-      const client = await pool.connect();
-      const params = keys.map((_, i) => `$${i + 1}`).join(',');
-      const query = `SELECT * FROM cmyk.user u WHERE u.id IN (${params})`;
-      const { rows } = await client.query(query, keys);
-      client.release();
-      return mapTo(keys, x => x.id)(rows);
+    userById: new DataLoader<string, UserSource>(async keys => {
+      const user = await db
+        .withSchema('cmyk')
+        .table('user')
+        .whereIn('id', keys)
+        .select()
+        .then(mapTo(keys, x => x.id));
+
+      return user;
     }),
 
-    profileByUserId: new DataLoader<string, any>(async keys => {
-      const client = await pool.connect();
-      const params = keys.map((_, i) => `$${i + 1}`).join(',');
-      const query = `SELECT * FROM cmyk.user_profile p WHERE p.user_id IN (${params})`;
-      const { rows } = await client.query(query, keys);
-      client.release();
+    profileByUserId: new DataLoader<string, ProfileSource>(async keys => {
+      const profile = await db
+        .withSchema('cmyk')
+        .table('user_profile')
+        .whereIn('user_id', keys)
+        .select()
+        .then(mapTo(keys, x => x.user_id));
 
-      return mapTo(keys, x => x.user_id)(rows);
+      return profile;
     }),
 
-    fileById: new DataLoader<string, any>(async keys => {
-      const client = await pool.connect();
-      const params = keys.map((_, i) => `$${i + 1}`).join(',');
-      const query = `SELECT * FROM cmyk.file f WHERE f.id IN (${params})`;
-      const { rows } = await client.query(query, keys);
-      client.release();
-      return mapTo(keys, x => x.id)(rows);
+    fileById: new DataLoader<string, FileSource>(async keys => {
+      const file = await db
+        .withSchema('cmyk')
+        .table('file')
+        .whereIn('id', keys)
+        .select()
+        .then(mapTo(keys, x => x.id));
+
+      return file;
     }),
   };
 }

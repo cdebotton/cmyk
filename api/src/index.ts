@@ -1,7 +1,7 @@
 import { ApolloServer, makeExecutableSchema } from 'apollo-server';
 import { importSchema } from 'graphql-import';
-import { Context } from './Context';
-import { Pool } from 'pg';
+import { db } from './db';
+import { Context } from './context';
 import { Query } from './resolvers/Query';
 import { Mutation } from './resolvers/Mutation';
 import { User } from './resolvers/User';
@@ -24,14 +24,12 @@ const schema = makeExecutableSchema({
   typeDefs,
 });
 
-const pool = new Pool();
-
 const server = new ApolloServer({
   schema,
   context: (ctx: any) => {
     const token = getToken(ctx.req.headers.authorization);
 
-    return new Context(token, pool);
+    return new Context(token, db);
   },
   engine: {
     apiKey: `service:${ENGINE_API_NAME}:${ENGINE_API_KEY}`,
