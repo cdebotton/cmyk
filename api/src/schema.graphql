@@ -75,7 +75,6 @@ type User {
   documents: [Document!]!
   email: String!
   id: ID!
-  password: String!
   profile: Profile!
   role: Role!
   updatedAt: Date

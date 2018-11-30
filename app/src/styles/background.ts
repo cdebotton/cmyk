@@ -36,6 +36,6 @@ export default css`
     hsl(172, 50%, 50%),
     hsl(162, 50%, 50%)
   );
-  animation: ${ScrollAnimation} 120s linear infinite alternate;
+  /* animation: ${ScrollAnimation} 120s linear infinite alternate; */
   transform: translate3d(0, 0, 0);
 `;
