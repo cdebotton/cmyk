@@ -42,40 +42,43 @@ const Mutation: IResolverObject<MutationSource, Context> = {
 
     const salt = await genSalt(10);
     const hashedPassword = await hash(password, salt);
-    const userId = await db.transaction(async trx => {
+    const user = await db.transaction(async trx => {
       try {
-        const userId = await db
+        const [user] = await db
           .withSchema('cmyk')
           .table('user')
+          .transacting(trx)
           .insert(
             {
               email,
               role,
               hashed_password: hashedPassword,
             },
-            'id',
+            '*',
           );
 
-        await db
+        const profile = await db
           .withSchema('cmyk')
           .table('user_profile')
+          .transacting(trx)
           .insert({
             firstName,
             lastName,
             avatar_id: avatar,
-            user_id: userId,
+            user_id: user.id,
             hashed_password: hashedPassword,
           });
 
+        console.log(profile);
         trx.commit();
-        return userId;
+        return user;
       } catch (err) {
         trx.rollback();
         throw err;
       }
     });
 
-    return userId;
+    return user;
   },
   updateUser: async (_parent, { id, input }, { db }) => {
     const { email, password, repeatPassword, firstName, lastName, role, avatar } = input;
