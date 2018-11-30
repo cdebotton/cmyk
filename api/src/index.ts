@@ -1,6 +1,6 @@
 import { ApolloServer, makeExecutableSchema } from 'apollo-server';
 import { importSchema } from 'graphql-import';
-import Context from './Context';
+import { Context } from './Context';
 import { Pool } from 'pg';
 import { Query } from './resolvers/Query';
 import { Mutation } from './resolvers/Mutation';

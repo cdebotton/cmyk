@@ -1,7 +1,7 @@
 import { IResolverObject } from 'graphql-tools';
 import { S3 } from 'aws-sdk';
 import { FileSource } from '../models';
-import Context from '../Context';
+import { Context } from '../context';
 
 const File: IResolverObject<FileSource, Context> = {
   createdAt: ({ created_at }) => created_at,
