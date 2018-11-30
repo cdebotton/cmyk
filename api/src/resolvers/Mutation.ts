@@ -147,7 +147,7 @@ const Mutation: IResolverObject<MutationSource, Context> = {
 
     return file;
   },
-  uploadFile: async (parent, { file }, { pool }) => {
+  uploadFile: async (_parent, { file }, { pool }) => {
     const { stream, filename, mimetype, encoding } = await file;
     const passThrough = new PassThrough();
     const s3 = new S3();

@@ -3,11 +3,10 @@ import { ProfileSource } from '../models';
 import Context from '../Context';
 
 const Profile: IResolverObject<ProfileSource, Context> = {
-  avatar: (parent, args, { fileById }) =>
-    parent.avatar_id ? fileById.load(parent.avatar_id) : null,
-  firstName: parent => parent.first_name,
-  lastName: parent => parent.last_name,
-  lastLogin: parent => parent.last_login,
+  avatar: ({ avatar_id }, _args, { fileById }) => (avatar_id ? fileById.load(avatar_id) : null),
+  firstName: ({ first_name }) => first_name,
+  lastName: ({ last_name }) => last_name,
+  lastLogin: ({ last_login }) => last_login,
 };
 
 export { Profile };

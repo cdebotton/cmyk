@@ -4,14 +4,14 @@ import { FileSource } from '../models';
 import Context from '../Context';
 
 const File: IResolverObject<FileSource, Context> = {
-  createdAt: parent => parent.created_at,
-  updatedAt: parent => parent.updated_at,
-  url: parent => {
+  createdAt: ({ created_at }) => created_at,
+  updatedAt: ({ updated_at }) => updated_at,
+  url: ({ bucket, key }) => {
     const s3 = new S3();
     return s3.getSignedUrl('getObject', {
-      Bucket: parent.bucket,
+      Bucket: bucket,
       Expires: 300,
-      Key: parent.key,
+      Key: key,
     });
   },
 };

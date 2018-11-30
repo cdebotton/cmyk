@@ -3,9 +3,9 @@ import { UserSource } from '../models';
 import Context from '../Context';
 
 const User: IResolverObject<UserSource, Context> = {
-  profile: (parent, args, { profileByUserId }) => profileByUserId.load(parent.id),
-  createdAt: parent => parent.created_at,
-  updatedAt: parent => parent.updated_at,
+  profile: ({ id }, _args, { profileByUserId }) => profileByUserId.load(id),
+  createdAt: ({ created_at }) => created_at,
+  updatedAt: ({ updated_at }) => updated_at,
 };
 
 export { User };

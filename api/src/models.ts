@@ -24,6 +24,7 @@ export interface ProfileSource {
   first_name: string;
   last_name: string;
   id: string;
+  user_id: string;
   last_login: Date | null;
   updated_at: Date;
 }
@@ -37,5 +38,14 @@ export interface FileSource {
   key: string;
   mimetype: string;
   size: number;
+  updated_at: Date;
+}
+
+export interface DocumentSource {
+  author_id: string;
+  created_at: Date;
+  id: string;
+  published_at: Date;
+  title: string;
   updated_at: Date;
 }
