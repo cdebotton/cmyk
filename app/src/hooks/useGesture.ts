@@ -119,7 +119,7 @@ function createHandlers(set: Setter, { onAction }: Options) {
   };
 }
 
-function useGesture(options: Options = {}): [any, State] {
+function useGesture(options: Options = {}): [ReturnType<typeof createHandlers>, State] {
   const [state, setState] = useState(initialState);
   const transientState = useRef(initialState);
   const handlers = useMemo(
