@@ -130,7 +130,7 @@ function useGesture(options: Options = {}): [ReturnType<typeof createHandlers>, 
 
       return createHandlers(setState, options);
     },
-    [options.transient, transientState.current],
+    [options.transient],
   );
 
   return [handlers, state];

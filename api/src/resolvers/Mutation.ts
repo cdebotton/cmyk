@@ -42,43 +42,36 @@ const Mutation: IResolverObject<MutationSource, Context> = {
 
     const salt = await genSalt(10);
     const hashedPassword = await hash(password, salt);
-    const user = await db.transaction(async trx => {
-      try {
-        const [user] = await db
-          .withSchema('cmyk')
-          .table('user')
-          .transacting(trx)
-          .insert(
-            {
-              email,
-              role,
-              hashed_password: hashedPassword,
-            },
-            '*',
-          );
+    const createUser = await db.transaction(async trx => {
+      const [user] = await trx
+        .withSchema('cmyk')
+        .insert(
+          {
+            email,
+            role,
+            hashed_password: hashedPassword,
+          },
+          '*',
+        )
+        .into('user');
 
-        const profile = await db
-          .withSchema('cmyk')
-          .table('user_profile')
-          .transacting(trx)
-          .insert({
-            firstName,
-            lastName,
+      await trx
+        .withSchema('cmyk')
+        .insert(
+          {
+            first_name: firstName,
+            last_name: lastName,
             avatar_id: avatar,
             user_id: user.id,
-            hashed_password: hashedPassword,
-          });
+          },
+          '*',
+        )
+        .into('user_profile');
 
-        console.log(profile);
-        trx.commit();
-        return user;
-      } catch (err) {
-        trx.rollback();
-        throw err;
-      }
+      return user;
     });
 
-    return user;
+    return createUser;
   },
   updateUser: async (_parent, { id, input }, { db }) => {
     const { email, password, repeatPassword, firstName, lastName, role, avatar } = input;
@@ -89,42 +82,32 @@ const Mutation: IResolverObject<MutationSource, Context> = {
 
     const salt = await genSalt(10);
     const hashedPassword = await hash(password, salt);
-    const user = await db.transaction(async trx => {
-      try {
-        const user = db
-          .withSchema('cmyk')
-          .table('user')
-          .where('id', id)
-          .update(
-            {
-              email,
-              role,
-            },
-            '*',
-          );
-
-        const profile = db
-          .withSchema('cmyk')
-          .table('user_profile')
-          .where('user_id', id)
-          .update({
+    const updateUser = await db.transaction(async trx => {
+      await trx
+        .withSchema('cmyk')
+        .table('user')
+        .where('id', id)
+        .update(
+          {
             email,
             role,
-            user_id: id,
-            hashed_password: hashedPassword,
-          });
+          },
+          '*',
+        );
 
-        await Promise.all([user, profile]);
-
-        trx.commit();
-        return user;
-      } catch (err) {
-        trx.rollback();
-        throw err;
-      }
+      await trx
+        .withSchema('cmyk')
+        .table('user_profile')
+        .where('user_id', id)
+        .update({
+          first_name: firstName,
+          last_name: lastName,
+          avatar_id: avatar,
+          user_id: id,
+        });
     });
 
-    return user;
+    return updateUser;
   },
   createDocument: async (_parent, { input }, { db }) => {
     const createDocument = await db
@@ -159,7 +142,16 @@ const Mutation: IResolverObject<MutationSource, Context> = {
 
     await s3.deleteObject({ Key: deleteFile.key, Bucket: deleteFile.bucket }).promise();
 
-    return deleteFile;
+    return deleteFile[0];
+  },
+  deleteUser: async (_parent, { id }, { db }) => {
+    const deleteUser = await db
+      .withSchema('cmyk')
+      .table('user')
+      .where('id', id)
+      .delete('*');
+
+    return deleteUser[0];
   },
   uploadFile: async (_parent, { file }, { db }) => {
     const { stream, filename, mimetype, encoding } = await file;
