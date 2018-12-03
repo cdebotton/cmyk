@@ -45,28 +45,24 @@ const Mutation: IResolverObject<MutationSource, Context> = {
     const createUser = await db.transaction(async trx => {
       const [user] = await trx
         .withSchema('cmyk')
-        .insert(
-          {
-            email,
-            role,
-            hashed_password: hashedPassword,
-          },
-          '*',
-        )
-        .into('user');
+        .insert({
+          email,
+          role,
+          hashed_password: hashedPassword,
+        })
+        .into('user')
+        .returning('*');
 
       await trx
         .withSchema('cmyk')
-        .insert(
-          {
-            first_name: firstName,
-            last_name: lastName,
-            avatar_id: avatar,
-            user_id: user.id,
-          },
-          '*',
-        )
-        .into('user_profile');
+        .insert({
+          first_name: firstName,
+          last_name: lastName,
+          avatar_id: avatar,
+          user_id: user.id,
+        })
+        .into('user_profile')
+        .returning('*');
 
       return user;
     });
@@ -77,7 +73,6 @@ const Mutation: IResolverObject<MutationSource, Context> = {
     const { email, password, repeatPassword, firstName, lastName, role, avatar } = input;
 
     const userUpdates: Record<string, string> = { email, role };
-
 
     if (password) {
       if (password !== repeatPassword) {
@@ -90,13 +85,13 @@ const Mutation: IResolverObject<MutationSource, Context> = {
       userUpdates.hashed_password = hashedPassword;
     }
 
-
     const updateUser = await db.transaction(async trx => {
       const [user] = await trx
         .withSchema('cmyk')
         .table('user')
         .where('id', id)
-        .update(userUpdates, '*');
+        .update(userUpdates)
+        .returning('*');
 
       await trx
         .withSchema('cmyk')
@@ -109,7 +104,7 @@ const Mutation: IResolverObject<MutationSource, Context> = {
           user_id: id,
         });
 
-        return user;
+      return user;
     });
 
     return updateUser;
@@ -118,13 +113,11 @@ const Mutation: IResolverObject<MutationSource, Context> = {
     const [createDocument] = await db
       .withSchema('cmyk')
       .table('document')
-      .insert(
-        {
-          title: input.title,
-          author_id: input.authorId,
-        },
-        '*',
-      );
+      .insert({
+        title: input.title,
+        author_id: input.authorId,
+      })
+      .returning('*');
 
     return createDocument;
   },
@@ -176,17 +169,15 @@ const Mutation: IResolverObject<MutationSource, Context> = {
     const [uploadFile] = await db
       .withSchema('cmyk')
       .table('file')
-      .insert(
-        {
-          encoding,
-          mimetype,
-          bucket: Bucket,
-          etag: ETag,
-          key: Key,
-          size: 0,
-        },
-        '*',
-      );
+      .insert({
+        encoding,
+        mimetype,
+        bucket: Bucket,
+        etag: ETag,
+        key: Key,
+        size: 0,
+      })
+      .returning('*');
 
     return uploadFile;
   },
