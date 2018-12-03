@@ -4,7 +4,7 @@ export async function up() {
   const pool = new Pool();
 
   await pool.query(`
-    CREATE TYPE role_t as enum('ADMIN', 'EDITOR', 'VIEWER', 'DEMO', 'UNAUTHORIZED');
+    CREATE TYPE role_t as enum('ADMIN', 'EDITOR', 'VIEWER', 'USER', 'DEMO', 'UNAUTHORIZED');
 
     CREATE TABLE cmyk.user (
       id                UUID PRIMARY KEY DEFAULT gen_random_uuid(),

@@ -76,24 +76,27 @@ const Mutation: IResolverObject<MutationSource, Context> = {
   updateUser: async (_parent, { id, input }, { db }) => {
     const { email, password, repeatPassword, firstName, lastName, role, avatar } = input;
 
-    if (password !== repeatPassword) {
-      throw new Error('Password mismatch');
+    const userUpdates: Record<string, string> = { email, role };
+
+
+    if (password) {
+      if (password !== repeatPassword) {
+        throw new Error('Password mismatch');
+      }
+
+      const salt = await genSalt(10);
+      const hashedPassword = await hash(password, salt);
+
+      userUpdates.hashed_password = hashedPassword;
     }
 
-    const salt = await genSalt(10);
-    const hashedPassword = await hash(password, salt);
+
     const updateUser = await db.transaction(async trx => {
-      await trx
+      const [user] = await trx
         .withSchema('cmyk')
         .table('user')
         .where('id', id)
-        .update(
-          {
-            email,
-            role,
-          },
-          '*',
-        );
+        .update(userUpdates, '*');
 
       await trx
         .withSchema('cmyk')
@@ -105,12 +108,14 @@ const Mutation: IResolverObject<MutationSource, Context> = {
           avatar_id: avatar,
           user_id: id,
         });
+
+        return user;
     });
 
     return updateUser;
   },
   createDocument: async (_parent, { input }, { db }) => {
-    const createDocument = await db
+    const [createDocument] = await db
       .withSchema('cmyk')
       .table('document')
       .insert(
@@ -120,10 +125,11 @@ const Mutation: IResolverObject<MutationSource, Context> = {
         },
         '*',
       );
+
     return createDocument;
   },
   deleteDocument: async (_parent, { id }, { db }) => {
-    const deleteDocument = await db
+    const [deleteDocument] = await db
       .withSchema('cmyk')
       .table('document')
       .where('id', id)
@@ -134,7 +140,7 @@ const Mutation: IResolverObject<MutationSource, Context> = {
   deleteFile: async (_parent, { id }, { db }) => {
     const s3 = new S3();
 
-    const deleteFile = await db
+    const [deleteFile] = await db
       .withSchema('cmyk')
       .table('file')
       .where('id', id)
@@ -142,16 +148,16 @@ const Mutation: IResolverObject<MutationSource, Context> = {
 
     await s3.deleteObject({ Key: deleteFile.key, Bucket: deleteFile.bucket }).promise();
 
-    return deleteFile[0];
+    return deleteFile;
   },
   deleteUser: async (_parent, { id }, { db }) => {
-    const deleteUser = await db
+    const [deleteUser] = await db
       .withSchema('cmyk')
       .table('user')
       .where('id', id)
       .delete('*');
 
-    return deleteUser[0];
+    return deleteUser;
   },
   uploadFile: async (_parent, { file }, { db }) => {
     const { stream, filename, mimetype, encoding } = await file;
@@ -167,7 +173,7 @@ const Mutation: IResolverObject<MutationSource, Context> = {
 
     const { ETag, Key, Bucket } = await s3.upload(s3Params).promise();
 
-    const uploadFile = await db
+    const [uploadFile] = await db
       .withSchema('cmyk')
       .table('file')
       .insert(
