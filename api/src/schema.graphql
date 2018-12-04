@@ -6,6 +6,17 @@ enum Role {
   UNAUTHORIZED
 }
 
+enum Position {
+  TOP
+  TOP_RIGHT
+  RIGHT
+  BOTTOM_RIGHT
+  BOTTOM
+  BOTTOM_LEFT
+  LEFT
+  TOP_LEFT
+}
+
 scalar DateTime
 scalar Upload
 scalar Date
@@ -93,39 +104,175 @@ type Profile {
 }
 
 type Document {
-  author: User!
-  createdAt: Date!
   id: ID!
-  publishedAt: Date!
   title: String!
-  updatedAt: Date
-  content: [Content!]!
-}
-
-interface Content {
-  id: ID!
+  fields: [Field!]!
+  author: User!
+  tags: [Tag!]!
+  category: Category
+  publishedAt: Date!
   createdAt: Date!
   updatedAt: Date
-  document: Document!
-  name: String!
 }
 
-type TextContent implements Content {
+interface Field {
   id: ID!
-  createdAt: Date!
-  updatedAt: Date
   document: Document!
   name: String!
-  text: String!
+  handle: String!
+  required: Boolean!
 }
 
-type FileContent implements Content {
+type AssetField implements Field {
   id: ID!
-  createdAt: Date!
-  updatedAt: Date
   document: Document!
   name: String!
-  files: [File!]!
+  handle: String!
+  required: Boolean!
+  value: File
+}
+
+type CheckboxOption {
+  id: ID!
+  name: String!
+  value: String!
+  checkbox: CheckboxField
+}
+
+type CheckboxField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  options: [CheckboxOption!]
+  value: CheckboxOption
+}
+
+type ColorField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  value: String
+}
+
+type DateTimeField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  value: DateTime
+}
+
+type DropdownOption {
+  id: ID!
+  name: String!
+  value: String!
+  dropdown: DropdownField
+}
+
+type DropdownField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  options: [DropdownOption!]!
+  value: DropdownOption
+}
+
+type DocumentField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  min: Int!
+  max: Int!
+  category: Category
+  tags: [Tag!]
+  value: [Document!]
+}
+
+type MatrixField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+}
+
+type MultiSelectField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+}
+
+type NumberField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  value: Float!
+}
+
+type PlainTextField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  value: String!
+}
+
+type MarkdownField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  value: String!
+}
+
+type RadioField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+}
+
+type PositionField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  value: Position
+}
+
+type CategoryField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  value: [Category!]
+}
+
+type TagField implements Field {
+  id: ID!
+  document: Document!
+  name: String!
+  handle: String!
+  required: Boolean!
+  value: [Tag!]
 }
 
 type File {
@@ -139,4 +286,20 @@ type File {
   size: Int!
   updatedAt: Date
   url: String!
+}
+
+type Category {
+  id: ID!
+  title: String!
+  documents: [Document!]!
+  createdAt: Date!
+  updatedAt: Date!
+}
+
+type Tag {
+  id: ID!
+  title: String!
+  documents: [Document!]
+  createdAt: Date!
+  updatedAt: Date!
 }

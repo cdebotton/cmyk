@@ -1,8 +1,10 @@
 import { padding, rem, size } from 'polished';
-import React, { ReactNode, useEffect, useMemo, useState } from 'react';
+import React, { ReactNode, useEffect, useMemo, useState, useRef } from 'react';
 import { animated, config, useSpring } from 'react-spring';
 import styled, { css } from 'styled-components';
 import InputLabel from './InputLabel';
+import useViewport from '../hooks/useViewport';
+import useBoundingBox from '../hooks/useBoundingBox';
 
 interface Option<T> {
   value: T;
@@ -106,6 +108,11 @@ const Option = styled(animated.li)<{ disabled: boolean }>`
   }
 `;
 
+enum OpenDir {
+  up,
+  down,
+}
+
 function Select<T extends string>({
   className,
   options,
@@ -114,6 +121,7 @@ function Select<T extends string>({
   setValue,
   ...props
 }: Props<T>) {
+  const [openDir, setOpenDir] = useState<OpenDir>(OpenDir.down);
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
   const [spring, setSpring] = useSpring({
@@ -122,6 +130,21 @@ function Select<T extends string>({
     hover: 0,
     open: 0,
   });
+
+  const optionsRef = useRef<HTMLUListElement | null>(null);
+  const viewport = useViewport();
+  const rect = useBoundingBox(optionsRef);
+
+  useEffect(
+    () => {
+      if (rect.top >= viewport.top && rect.top + rect.height < viewport.bottom) {
+        setOpenDir(OpenDir.down);
+      } else {
+        setOpenDir(OpenDir.up);
+      }
+    },
+    [viewport],
+  );
 
   useEffect(() => {
     setSpring({
@@ -206,12 +229,14 @@ function Select<T extends string>({
           }}
         />
         <OptionList
+          ref={optionsRef}
           style={{
             opacity: spring.open,
             pointerEvents: open ? 'inherit' : 'none',
             transform: spring.open
               .interpolate({
-                output: [rem(-20), rem(0)],
+                output:
+                  openDir === OpenDir.down ? [rem(-20), rem(0)] : [rem(20), rem(-20 - rect.height)],
                 range: [0, 1],
               })
               .interpolate(y => `translate3d(0, ${y}, 0)`),

@@ -170,26 +170,6 @@ export interface DeleteFileVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL mutation operation: TCreateDocument
-// ====================================================
-
-export interface TCreateDocument_createDocument {
-  __typename: "Document";
-  id: string;
-}
-
-export interface TCreateDocument {
-  createDocument: TCreateDocument_createDocument;
-}
-
-export interface TCreateDocumentVariables {
-  input: DocumentCreateInput;
-}
-
-/* tslint:disable */
-// This file was automatically generated and should not be edited.
-
-// ====================================================
 // GraphQL mutation operation: CreateUserMutation
 // ====================================================
 
@@ -366,6 +346,26 @@ export interface Session_session {
 
 export interface Session {
   session: Session_session | null;
+}
+
+/* tslint:disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL mutation operation: TCreateDocument
+// ====================================================
+
+export interface TCreateDocument_createDocument {
+  __typename: "Document";
+  id: string;
+}
+
+export interface TCreateDocument {
+  createDocument: TCreateDocument_createDocument;
+}
+
+export interface TCreateDocumentVariables {
+  input: DocumentCreateInput;
 }
 
 /* tslint:disable */
