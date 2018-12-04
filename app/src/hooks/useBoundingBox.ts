@@ -12,13 +12,16 @@ function useBoundingBox<T extends HTMLElement>(ref: MutableRefObject<T | null>) 
     };
   });
 
-  useEffect(() => {
-    if (!ref.current) {
-      return;
-    }
+  useEffect(
+    () => {
+      if (!ref.current) {
+        return;
+      }
 
-    setRect(ref.current.getBoundingClientRect());
-  });
+      setRect(ref.current.getBoundingClientRect());
+    },
+    [ref.current],
+  );
 
   return rect;
 }

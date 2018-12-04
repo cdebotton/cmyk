@@ -231,4 +231,74 @@ function useField<T, K extends keyof T>(
   return { input, meta, handlers };
 }
 
-export { useForm, useField };
+function useArrayField<T, K extends keyof T>(
+  name: K,
+  index: number,
+  { [CONTROLLER]: { values, change, blur, focus, dirty, touched, errors, focused } }: Form<T>,
+) {
+  if (!Array.isArray(values[name])) {
+    throw new Error(`Expected ${name} to be an array but got ${typeof values[name]}`);
+  }
+
+  const value = values[name][index];
+  const [fieldTouched, setFieldTouched] = useState(false);
+  const [fieldFocused, setFieldFocused] = useState(false);
+  const [fieldDirty, setFieldDirty] = useState(false);
+
+  function fieldChange<K extends keyof T>(name: K, value: T[K]) {
+    change(name, value);
+    setFieldDirty(true);
+  }
+
+  function fieldBlur<K extends keyof T>(name: K) {
+    blur(name);
+    setFieldTouched(true);
+    setFieldFocused(false);
+  }
+
+  function fieldFocus<K extends keyof T>(name: K) {
+    setFieldFocused(true);
+  }
+
+  const input = useMemo(
+    () => {
+      return {
+        onBlur: (_event: FormEvent) => {
+          fieldBlur(name);
+        },
+        onChange: (event: ChangeEvent<{ value: T[K] }>) => {
+          fieldChange(name, event.currentTarget.value);
+        },
+        onFocus: (_event: FormEvent) => {
+          fieldFocus(name);
+        },
+        value: value,
+      };
+    },
+    [values[name]],
+  );
+
+  const meta = useMemo(
+    () => {
+      return {
+        dirty: fieldDirty,
+        errors: errors[name],
+        focused: fieldFocused,
+        touched: fieldTouched,
+      };
+    },
+    [fieldDirty, fieldTouched, errors[name], fieldFocused],
+  );
+
+  const handlers = useMemo(() => {
+    return {
+      setValue: (value: T[K]) => {
+        change(name, value);
+      },
+    };
+  }, []);
+
+  return { input, meta, handlers };
+}
+
+export { useForm, useField, useArrayField };

@@ -6,22 +6,18 @@ import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';
 import { useApolloMutation } from './hooks/Apollo';
-import { useField, useForm } from './hooks/useForm';
+import { useField, useForm, useArrayField } from './hooks/useForm';
 import Select from './components/Select';
 import styled from 'styled-components';
 import { rem, padding } from 'polished';
 
-const NewFieldPalette = styled.div`
-  display: grid;
-  grid-template-columns: auto max-content;
-  position: fixed;
-  bottom: ${rem(16)};
-  right: ${rem(16)};
-  background-color: hsla(0, 0%, 100%, 0.4);
-  border-radius: 4px;
-  grid-gap: ${rem(16)};
-  width: ${rem(320)};
-  ${padding(rem(16))};
+const DocumentForm = styled(Form)`
+  grid-template-columns: [form-start] 1fr 1fr max-content max-content [form-end];
+`;
+
+const FieldSet = styled.div`
+  grid-column: form-start / form-end;
+  grid-row: 2;
 `;
 
 const CREATE_DOCUMENT = gql`
@@ -39,13 +35,29 @@ const validationSchema = new yup.object().shape({
 
 type FieldType = 'plain_text' | 'asset';
 
-type Field =
-  | { type: 'plain_text'; order: number; required: boolean; handle: string; value: string }
-  | { type: 'asset'; order: number; handle: string; required: boolean };
+interface PlainTextField {
+  type: 'plain_text';
+  order: number;
+  required: boolean;
+  handle: string;
+  value: string;
+}
+
+type Field = PlainTextField | { type: 'asset'; order: number; handle: string; required: boolean };
 
 interface Form {
   title: string;
-  fields: Array<{ type: FieldType }>;
+  fields: Array<Field>;
+}
+
+function PlainTextFieldInput(props: PlainTextField) {
+  return (
+    <>
+      <input />
+      <input type="checkbox" />
+      <input />
+    </>
+  );
 }
 
 function AdminNewDocument() {
@@ -74,6 +86,7 @@ function AdminNewDocument() {
       order: fields.input.value.length + 1,
       handle: '',
       required: false,
+      ...useArrayField('fields', fields.input.value.length, form),
     };
 
     switch (fieldType) {
@@ -96,21 +109,11 @@ function AdminNewDocument() {
   return (
     <EditorLayout>
       <Heading>New document</Heading>
-      <Form onSubmit={form.handleSubmit}>
+      <DocumentForm onSubmit={form.handleSubmit}>
         <Input name="title" label="Title" {...title.input} {...title.meta} />
-        <div>
-          {fields.input.value.map(field => {
-            return <div>{JSON.stringify(field)}</div>;
-          })}
-        </div>
-        <Button type="submit" disabled={!form.valid}>
-          Create document
-        </Button>
-      </Form>
-      <NewFieldPalette>
         <Select
           name="fieldType"
-          label="New field"
+          label="Add field"
           options={[
             { label: 'Plain text', value: 'plain_text' },
             { label: 'Asset', value: 'asset' },
@@ -121,7 +124,22 @@ function AdminNewDocument() {
         <Button type="button" onClick={addField}>
           Add field
         </Button>
-      </NewFieldPalette>
+        <Button type="submit" disabled={!form.valid}>
+          Create document
+        </Button>
+        <FieldSet>
+          {fields.input.value.map(field => {
+            switch (field.type) {
+              case 'plain_text':
+                return <PlainTextFieldInput {...field} />;
+              case 'asset':
+                return <pre>{JSON.stringify(field, null, 2)}</pre>;
+              default:
+                return null;
+            }
+          })}
+        </FieldSet>
+      </DocumentForm>
     </EditorLayout>
   );
 }

@@ -143,7 +143,7 @@ function Select<T extends string>({
         setOpenDir(OpenDir.up);
       }
     },
-    [viewport],
+    [rect, viewport],
   );
 
   useEffect(() => {
@@ -236,7 +236,7 @@ function Select<T extends string>({
             transform: spring.open
               .interpolate({
                 output:
-                  openDir === OpenDir.down ? [rem(-20), rem(0)] : [rem(20), rem(-20 - rect.height)],
+                  openDir === OpenDir.down ? [rem(-20), rem(0)] : [rem(20), rem(-32 - rect.height)],
                 range: [0, 1],
               })
               .interpolate(y => `translate3d(0, ${y}, 0)`),
