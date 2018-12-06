@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState } from 'react';
+import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState, useCallback } from 'react';
 
 import { Schema, ValidationError } from 'yup';
 
@@ -8,7 +8,11 @@ function isValidationError(x: any): x is ValidationError {
   return x instanceof ValidationError;
 }
 
-type BoolShape<T> = { readonly [K in keyof T]?: boolean };
+type BoolShape<T> = {
+  readonly [K in keyof T]?: T[K] extends Array<unknown>
+    ? boolean[]
+    : (T[K] extends object ? BoolShape<T[K]> : boolean)
+};
 
 function getBooleanShape<T>(values: T): BoolShape<T> {
   return Object.keys(values).reduce((memo, key) => {
@@ -16,7 +20,11 @@ function getBooleanShape<T>(values: T): BoolShape<T> {
   }, {});
 }
 
-type ErrorShape<T> = { readonly [K in keyof T]?: string[] | null };
+type ErrorShape<T> = {
+  readonly [K in keyof T]?: T[K] extends Array<unknown>
+    ? string[][]
+    : (T[K] extends object ? ErrorShape<T[K]> : string[])
+};
 
 function getErrorShape<T>(values: T): ErrorShape<T> {
   return Object.keys(values).reduce((memo, key) => {
@@ -231,74 +239,4 @@ function useField<T, K extends keyof T>(
   return { input, meta, handlers };
 }
 
-function useArrayField<T, K extends keyof T>(
-  name: K,
-  index: number,
-  { [CONTROLLER]: { values, change, blur, focus, dirty, touched, errors, focused } }: Form<T>,
-) {
-  if (!Array.isArray(values[name])) {
-    throw new Error(`Expected ${name} to be an array but got ${typeof values[name]}`);
-  }
-
-  const value = values[name][index];
-  const [fieldTouched, setFieldTouched] = useState(false);
-  const [fieldFocused, setFieldFocused] = useState(false);
-  const [fieldDirty, setFieldDirty] = useState(false);
-
-  function fieldChange<K extends keyof T>(name: K, value: T[K]) {
-    change(name, value);
-    setFieldDirty(true);
-  }
-
-  function fieldBlur<K extends keyof T>(name: K) {
-    blur(name);
-    setFieldTouched(true);
-    setFieldFocused(false);
-  }
-
-  function fieldFocus<K extends keyof T>(name: K) {
-    setFieldFocused(true);
-  }
-
-  const input = useMemo(
-    () => {
-      return {
-        onBlur: (_event: FormEvent) => {
-          fieldBlur(name);
-        },
-        onChange: (event: ChangeEvent<{ value: T[K] }>) => {
-          fieldChange(name, event.currentTarget.value);
-        },
-        onFocus: (_event: FormEvent) => {
-          fieldFocus(name);
-        },
-        value: value,
-      };
-    },
-    [values[name]],
-  );
-
-  const meta = useMemo(
-    () => {
-      return {
-        dirty: fieldDirty,
-        errors: errors[name],
-        focused: fieldFocused,
-        touched: fieldTouched,
-      };
-    },
-    [fieldDirty, fieldTouched, errors[name], fieldFocused],
-  );
-
-  const handlers = useMemo(() => {
-    return {
-      setValue: (value: T[K]) => {
-        change(name, value);
-      },
-    };
-  }, []);
-
-  return { input, meta, handlers };
-}
-
-export { useForm, useField, useArrayField };
+export { useForm, useField };

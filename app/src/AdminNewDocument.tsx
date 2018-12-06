@@ -6,7 +6,7 @@ import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';
 import { useApolloMutation } from './hooks/Apollo';
-import { useField, useForm, useArrayField } from './hooks/useForm';
+import { useField, useForm } from './hooks/useForm';
 import Select from './components/Select';
 import styled from 'styled-components';
 import { rem, padding } from 'polished';
@@ -28,32 +28,48 @@ const CREATE_DOCUMENT = gql`
   }
 `;
 
-const validationSchema = new yup.object().shape({
+const fieldSchema = yup.lazy((field: any) => {
+  switch (field.type) {
+    case 'plain_text':
+      return yup.object().shape({
+        handle: yup.string().required(),
+        required: yup.boolean().required(),
+      });
+    case 'asset':
+      return yup.object().shape({});
+    default:
+      throw new Error('Unhandled field validation type');
+  }
+});
+
+const validationSchema = yup.object().shape({
   title: yup.string().required(),
-  fields: yup.array().min(1),
+  fields: yup
+    .array()
+    .of(fieldSchema)
+    .min(1),
 });
 
 type FieldType = 'plain_text' | 'asset';
 
-interface PlainTextField {
-  type: 'plain_text';
-  order: number;
-  required: boolean;
-  handle: string;
-  value: string;
-}
-
-type Field = PlainTextField | { type: 'asset'; order: number; handle: string; required: boolean };
-
 interface Form {
   title: string;
-  fields: Array<Field>;
+  fields: any[];
 }
 
-function PlainTextFieldInput(props: PlainTextField) {
+function createField(fieldType: FieldType) {
+  return {
+    type: fieldType,
+    handle: '',
+    required: false,
+    value: '',
+  };
+}
+
+function PlainTextFieldInput(props: any) {
   return (
     <>
-      <input />
+      <input {...props.input} />
       <input type="checkbox" />
       <input />
     </>
@@ -65,7 +81,7 @@ function AdminNewDocument() {
   //   CREATE_DOCUMENT,
   // );
 
-  const [nextField, setNextField] = useState<FieldType>('plain_text');
+  const [nextFieldType, setNextFieldType] = useState<FieldType>('plain_text');
 
   const form = useForm<Form>({
     validationSchema,
@@ -81,29 +97,13 @@ function AdminNewDocument() {
   const title = useField('title', form);
   const fields = useField('fields', form);
 
-  function createField(fieldType: FieldType): Field {
-    const fieldBase = {
-      order: fields.input.value.length + 1,
-      handle: '',
-      required: false,
-      ...useArrayField('fields', fields.input.value.length, form),
-    };
-
-    switch (fieldType) {
-      case 'plain_text':
-        return { type: 'plain_text', value: '', ...fieldBase };
-      case 'asset':
-        return { type: 'asset', ...fieldBase };
-      default:
-        throw new Error(`Unhandled field type ${fieldType}.`);
-    }
-  }
+  console.log(fields.input.value);
 
   const addField = useCallback(
     () => {
-      fields.handlers.setValue([...fields.input.value, createField(nextField)]);
+      fields.handlers.setValue([...fields.input.value, createField(nextFieldType)]);
     },
-    [fields],
+    [fields.input.value, nextFieldType],
   );
 
   return (
@@ -118,8 +118,8 @@ function AdminNewDocument() {
             { label: 'Plain text', value: 'plain_text' },
             { label: 'Asset', value: 'asset' },
           ]}
-          value={nextField}
-          setValue={setNextField}
+          value={nextFieldType}
+          setValue={setNextFieldType}
         />
         <Button type="button" onClick={addField}>
           Add field
