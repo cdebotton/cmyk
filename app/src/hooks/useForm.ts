@@ -239,4 +239,45 @@ function useField<T, K extends keyof T>(
   return { input, meta, handlers };
 }
 
-export { useForm, useField };
+function useFieldArray<T, K extends keyof T>(name: K, form: Form<T>): [any, any] {
+  const value = form[CONTROLLER].values[name];
+
+  if (!Array.isArray(value)) {
+    throw new TypeError(`Expected field ${name} to be of type Array, but recieved ${typeof value}`);
+  }
+
+  const {
+    handlers: { setValue },
+  } = useField(name, form);
+
+  const push = useCallback(newItem => {
+    const nextValue = [...value, newItem];
+    setValue(nextValue as any);
+  }, []);
+
+  const fields = useMemo(
+    () => {
+      return value.map((v, i) => {
+        return {
+          input: {
+            value: v,
+          },
+        };
+      });
+    },
+    [value],
+  );
+
+  const controller = useMemo(
+    () => {
+      return {
+        push,
+      };
+    },
+    [name, form],
+  );
+
+  return [fields, controller];
+}
+
+export { useForm, useField, useFieldArray };
