@@ -165,11 +165,11 @@ function AdminEditUser({ className, ...props }: Props) {
     },
   });
 
-  const email = useField('email', form);
-  const firstName = useField('firstName', form);
-  const lastName = useField('lastName', form);
-  const avatar = useField('avatar', form);
-  const role = useField('role', form);
+  const email = useField(form, 'email');
+  const firstName = useField(form, 'firstName');
+  const lastName = useField(form, 'lastName');
+  const avatar = useField(form, 'avatar');
+  const role = useField(form, 'role');
 
   const [upload, { data, error, uploading }] = useFileUpload();
 

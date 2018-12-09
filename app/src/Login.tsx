@@ -52,8 +52,8 @@ function Login({ className, location }: Props) {
 
   const { handleSubmit, valid } = form;
 
-  const email = useField('email', form);
-  const password = useField('password', form);
+  const email = useField(form, 'email');
+  const password = useField(form, 'password');
 
   if (!client) {
     throw new Error("Can't find Apollo client, please wrap application in <ApolloProvider />");

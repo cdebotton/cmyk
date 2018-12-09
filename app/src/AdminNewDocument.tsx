@@ -6,7 +6,7 @@ import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';
 import { useApolloMutation } from './hooks/Apollo';
-import { useField, useForm, useFieldArray } from './hooks/useForm';
+import { useField, useForm, arrayHelpers } from './hooks/useForm';
 import Select from './components/Select';
 import styled from 'styled-components';
 import { rem, padding } from 'polished';
@@ -94,16 +94,15 @@ function AdminNewDocument() {
     },
   });
 
-  const title = useField('title', form);
-  const [fields, { push }] = useFieldArray('fields', form);
-
-  console.log(fields);
+  const title = useField(form, 'title');
+  const fields = useField(form, 'fields');
 
   const addField = useCallback(
     () => {
-      push(createField(nextFieldType));
+      const newField = createField(nextFieldType);
+      arrayHelpers.push(fields, newField);
     },
-    [push, nextFieldType],
+    [nextFieldType, fields],
   );
 
   return (
@@ -127,18 +126,6 @@ function AdminNewDocument() {
         <Button type="submit" disabled={!form.valid}>
           Create document
         </Button>
-        <FieldSet>
-          {fields.map((field: any) => {
-            switch (field.type) {
-              case 'plain_text':
-                return <PlainTextFieldInput {...field} />;
-              case 'asset':
-                return <pre>{JSON.stringify(field, null, 2)}</pre>;
-              default:
-                return null;
-            }
-          })}
-        </FieldSet>
       </DocumentForm>
     </EditorLayout>
   );

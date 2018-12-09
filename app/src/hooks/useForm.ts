@@ -1,4 +1,14 @@
-import { ChangeEvent, FormEvent, useEffect, useMemo, useRef, useState, useCallback } from 'react';
+import {
+  ChangeEvent,
+  FormEvent,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useCallback,
+  FormEventHandler,
+  ChangeEventHandler,
+} from 'react';
 
 import { Schema, ValidationError } from 'yup';
 
@@ -8,11 +18,7 @@ function isValidationError(x: any): x is ValidationError {
   return x instanceof ValidationError;
 }
 
-type BoolShape<T> = {
-  readonly [K in keyof T]?: T[K] extends Array<unknown>
-    ? boolean[]
-    : (T[K] extends object ? BoolShape<T[K]> : boolean)
-};
+type BoolShape<T> = { readonly [K in keyof T]?: boolean };
 
 function getBooleanShape<T>(values: T): BoolShape<T> {
   return Object.keys(values).reduce((memo, key) => {
@@ -20,11 +26,7 @@ function getBooleanShape<T>(values: T): BoolShape<T> {
   }, {});
 }
 
-type ErrorShape<T> = {
-  readonly [K in keyof T]?: T[K] extends Array<unknown>
-    ? string[][]
-    : (T[K] extends object ? ErrorShape<T[K]> : string[])
-};
+type ErrorShape<T> = { readonly [K in keyof T]?: string[] };
 
 function getErrorShape<T>(values: T): ErrorShape<T> {
   return Object.keys(values).reduce((memo, key) => {
@@ -194,10 +196,30 @@ function useForm<T>({
   };
 }
 
+interface Field<T> {
+  input: {
+    onBlur: FormEventHandler;
+    onChange: ChangeEventHandler<{ value: T }>;
+    onFocus: FormEventHandler;
+    value: T;
+  };
+
+  meta: {
+    dirty?: boolean;
+    errors?: string[] | null;
+    focused?: boolean;
+    touched?: boolean;
+  };
+
+  handlers: {
+    setValue: (value: T) => void;
+  };
+}
+
 function useField<T, K extends keyof T>(
-  name: K,
   { [CONTROLLER]: { values, change, blur, focus, dirty, touched, errors, focused } }: Form<T>,
-) {
+  name: K,
+): Field<T[K]> {
   const input = useMemo(
     () => {
       return {
@@ -239,45 +261,43 @@ function useField<T, K extends keyof T>(
   return { input, meta, handlers };
 }
 
-function useFieldArray<T, K extends keyof T>(name: K, form: Form<T>): [any, any] {
-  const value = form[CONTROLLER].values[name];
+const arrayHelpers = {
+  push: <T>(field: Field<T[]>, value: T) => {
+    field.handlers.setValue([...field.input.value, value]);
+  },
+  remove: <T>(field: Field<T[]>, index: number): T => {
+    const shallowCopy = [...field.input.value];
+    const [deletedItem] = shallowCopy.splice(index);
+    field.handlers.setValue(shallowCopy);
+    return deletedItem;
+  },
+};
+
+type UnwrapArray<T> = T extends Array<infer P> ? P : never;
+
+function useFieldArray<T, K extends keyof T>({ [CONTROLLER]: { values } }: Form<T>, name: K) {
+  const value = values[name];
 
   if (!Array.isArray(value)) {
-    throw new TypeError(`Expected field ${name} to be of type Array, but recieved ${typeof value}`);
+    throw new TypeError(`Expected ${name} to be an array but received ${typeof value}`);
   }
 
-  const {
-    handlers: { setValue },
-  } = useField(name, form);
-
-  const push = useCallback(newItem => {
-    const nextValue = [...value, newItem];
-    setValue(nextValue as any);
-  }, []);
-
-  const fields = useMemo(
-    () => {
-      return value.map((v, i) => {
-        return {
-          input: {
-            value: v,
-          },
-        };
-      });
-    },
-    [value],
-  );
-
-  const controller = useMemo(
-    () => {
-      return {
-        push,
-      };
-    },
-    [name, form],
-  );
-
-  return [fields, controller];
+  value.map((_: UnwrapArray<T[K]>) => {
+    return {
+      input: {
+        //   onBlur: (_event: FormEvent) => {
+        //     blur(name);
+        //   },
+        //   onChange: (event: ChangeEvent<{ value: T[K] }>) => {
+        //     change(name, event.currentTarget.value);
+        //   },
+        //   onFocus: (_event: FormEvent) => {
+        //     focus(name);
+        //   },
+        //   value: values[name],
+      },
+    };
+  });
 }
 
-export { useForm, useField, useFieldArray };
+export { useForm, useField, useFieldArray, arrayHelpers };
