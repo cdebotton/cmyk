@@ -28,6 +28,7 @@ type Query {
   users: [User!]!
   document(id: ID!): Document
   documents: [Document!]!
+  layouts: [Layout!]!
 }
 
 type Mutation {
@@ -105,8 +106,8 @@ type Profile {
 
 type Document {
   id: ID!
+  layout: Layout!
   title: String!
-  fields: [Field!]!
   author: User!
   tags: [Tag!]!
   category: Category
@@ -115,165 +116,186 @@ type Document {
   updatedAt: Date
 }
 
-interface Field {
+type Layout {
   id: ID!
-  document: Document!
-  name: String!
+  title: String!
+  createdAt: Date!
+  updatedAt: Date
+}
+
+enum FieldConfigType {
+  PLAIN_TEXT
+  ASSETS
+}
+
+interface FieldConfig {
+  id: ID!
+  type: FieldConfigType
+  layout: Layout
   handle: String!
   required: Boolean!
+  instructions: String
+  createdAt: Date!
+  updatedAt: Date
 }
 
-type AssetField implements Field {
+type FieldConfigPlainText implements FieldConfig {
   id: ID!
-  document: Document!
-  name: String!
+  type: FieldConfigType
+  layout: Layout
   handle: String!
   required: Boolean!
-  value: File
+  instructions: String
+  createdAt: Date!
+  updatedAt: Date
 }
 
-type CheckboxOption {
+type FieldConfigAssets implements FieldConfig {
   id: ID!
-  name: String!
-  value: String!
-  checkbox: CheckboxField
-}
-
-type CheckboxField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
+  type: FieldConfigType
+  layout: Layout
   handle: String!
   required: Boolean!
-  options: [CheckboxOption!]
-  value: CheckboxOption
+  instructions: String
+  minimum: Int!
+  maximum: Int
+  createdAt: Date!
+  updatedAt: Date
 }
 
-type ColorField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  value: String
-}
+# type CheckboxOption {
+#   id: ID!
+#   name: String!
+#   value: String!
+#   checkbox: CheckboxField
+# }
 
-type DateTimeField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  value: DateTime
-}
+# type CheckboxField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   options: [CheckboxOption!]
+#   value: CheckboxOption
+# }
 
-type DropdownOption {
-  id: ID!
-  name: String!
-  value: String!
-  dropdown: DropdownField
-}
+# type ColorField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   value: String
+# }
 
-type DropdownField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  options: [DropdownOption!]!
-  value: DropdownOption
-}
+# type DateTimeField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   value: DateTime
+# }
 
-type DocumentField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  min: Int!
-  max: Int!
-  category: Category
-  tags: [Tag!]
-  value: [Document!]
-}
+# type DropdownOption {
+#   id: ID!
+#   name: String!
+#   value: String!
+#   dropdown: DropdownField
+# }
 
-type MatrixField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-}
+# type DropdownField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   options: [DropdownOption!]!
+#   value: DropdownOption
+# }
 
-type MultiSelectField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-}
+# type DocumentField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   min: Int!
+#   max: Int!
+#   category: Category
+#   tags: [Tag!]
+#   value: [Document!]
+# }
 
-type NumberField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  value: Float!
-}
+# type MatrixField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+# }
 
-type PlainTextField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  value: String!
-}
+# type MultiSelectField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+# }
 
-type MarkdownField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  value: String!
-}
+# type NumberField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   value: Float!
+# }
 
-type RadioField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-}
+# type MarkdownField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   value: String!
+# }
 
-type PositionField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  value: Position
-}
+# type RadioField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+# }
 
-type CategoryField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  value: [Category!]
-}
+# type PositionField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   value: Position
+# }
 
-type TagField implements Field {
-  id: ID!
-  document: Document!
-  name: String!
-  handle: String!
-  required: Boolean!
-  value: [Tag!]
-}
+# type CategoryField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   value: [Category!]
+# }
+
+# type TagField implements Field {
+#   id: ID!
+#   document: Document!
+#   name: String!
+#   handle: String!
+#   required: Boolean!
+#   value: [Tag!]
+# }
 
 type File {
   bucket: String!

@@ -1,4 +1,4 @@
-import { MutableRefObject, useState, useEffect } from 'react';
+import { MutableRefObject, useState, useLayoutEffect, useCallback, useEffect } from 'react';
 
 function useBoundingBox<T extends HTMLElement>(ref: MutableRefObject<T | null>) {
   const [rect, setRect] = useState(() => {
@@ -12,7 +12,7 @@ function useBoundingBox<T extends HTMLElement>(ref: MutableRefObject<T | null>) 
     };
   });
 
-  useEffect(
+  const updateRect = useCallback(
     () => {
       if (!ref.current) {
         return;
@@ -22,6 +22,18 @@ function useBoundingBox<T extends HTMLElement>(ref: MutableRefObject<T | null>) 
     },
     [ref.current],
   );
+
+  useEffect(() => {
+    window.addEventListener('resize', updateRect);
+    window.addEventListener('scroll', updateRect);
+
+    return () => {
+      window.removeEventListener('resize', updateRect);
+      window.removeEventListener('scroll', updateRect);
+    };
+  });
+
+  useLayoutEffect(updateRect, [ref.current]);
 
   return rect;
 }

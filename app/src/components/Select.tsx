@@ -1,5 +1,14 @@
 import { padding, rem, size } from 'polished';
-import React, { ReactNode, useEffect, useMemo, useState, useRef } from 'react';
+import React, {
+  ReactNode,
+  useEffect,
+  useMemo,
+  useState,
+  useRef,
+  forwardRef,
+  Ref,
+  MouseEventHandler,
+} from 'react';
 import { animated, config, useSpring } from 'react-spring';
 import styled, { css } from 'styled-components';
 import InputLabel from './InputLabel';
@@ -21,7 +30,8 @@ interface Props<T> {
   touched?: boolean;
   dirty?: boolean;
   error?: string;
-  setValue: (value: T) => void;
+  change: (value: T) => void;
+  onClick?: MouseEventHandler;
 }
 
 const SelectContainer = styled.div`
@@ -113,14 +123,10 @@ enum OpenDir {
   down,
 }
 
-function Select<T extends string>({
-  className,
-  options,
-  value,
-  tabIndex = 0,
-  setValue,
-  ...props
-}: Props<T>) {
+function Select<T extends string>(
+  { className, options, value, tabIndex = 0, change, onClick, ...props }: Props<T>,
+  ref: Ref<HTMLDivElement>,
+) {
   const [openDir, setOpenDir] = useState<OpenDir>(OpenDir.down);
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
@@ -173,6 +179,8 @@ function Select<T extends string>({
       role="menu"
       onFocus={() => setOpen(true)}
       onBlur={() => setOpen(false)}
+      onClick={onClick}
+      ref={ref}
     >
       <SelectWrapper>
         <SelectLabel
@@ -249,7 +257,7 @@ function Select<T extends string>({
               key={`OPTION_${name}_${option.value}`}
               disabled={option.value === value}
               onClick={_event => {
-                setValue(option.value);
+                change(option.value);
                 setOpen(false);
               }}
             >
@@ -262,4 +270,4 @@ function Select<T extends string>({
   );
 }
 
-export default Select;
+export default forwardRef<HTMLDivElement, Props<any>>(Select);

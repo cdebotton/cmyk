@@ -186,7 +186,7 @@ function AdminEditUser({ className, ...props }: Props) {
   useEffect(
     () => {
       if (data) {
-        avatar.handlers.setValue(data);
+        avatar.change(data);
       }
     },
     [data],

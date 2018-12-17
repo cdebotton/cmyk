@@ -10,7 +10,7 @@ import {
   ChangeEventHandler,
 } from 'react';
 
-import { Schema, ValidationError } from 'yup';
+import { Schema, ValidationError, number } from 'yup';
 
 export const CONTROLLER = Symbol();
 
@@ -210,10 +210,17 @@ interface Field<T> {
     focused?: boolean;
     touched?: boolean;
   };
-
   handlers: {
-    setValue: (value: T) => void;
+    value: T;
+    change: (value: T) => void;
+    blur: VoidFunction;
+    focus: VoidFunction;
   };
+
+  value: T;
+  change: (value: T) => void;
+  blur: VoidFunction;
+  focus: VoidFunction;
 }
 
 function useField<T, K extends keyof T>(
@@ -250,54 +257,52 @@ function useField<T, K extends keyof T>(
     [dirty[name], touched[name], errors[name], focused[name]],
   );
 
-  const handlers = useMemo(() => {
-    return {
-      setValue: (value: T[K]) => {
+  const handlers = {
+    value: values[name],
+    change: useCallback(
+      (value: T[K]) => {
         change(name, value);
       },
-    };
-  }, []);
+      [name, change],
+    ),
+    blur: useCallback(
+      () => {
+        blur(name);
+      },
+      [name, blur],
+    ),
+    focus: useCallback(
+      () => {
+        focus(name);
+      },
+      [name, focus],
+    ),
+  };
 
-  return { input, meta, handlers };
+  return { ...handlers, handlers, input, meta };
 }
 
 const arrayHelpers = {
   push: <T>(field: Field<T[]>, value: T) => {
-    field.handlers.setValue([...field.input.value, value]);
+    field.change([...field.input.value, value]);
   },
   remove: <T>(field: Field<T[]>, index: number): T => {
     const shallowCopy = [...field.input.value];
     const [deletedItem] = shallowCopy.splice(index);
-    field.handlers.setValue(shallowCopy);
+    field.change(shallowCopy);
     return deletedItem;
+  },
+  update: <T>(field: Field<T[]>, index: number, value: T) => {
+    field.change(
+      field.value.map((item, i) => {
+        if (i !== index) {
+          return item;
+        }
+
+        return { ...item, ...value };
+      }),
+    );
   },
 };
 
-type UnwrapArray<T> = T extends Array<infer P> ? P : never;
-
-function useFieldArray<T, K extends keyof T>({ [CONTROLLER]: { values } }: Form<T>, name: K) {
-  const value = values[name];
-
-  if (!Array.isArray(value)) {
-    throw new TypeError(`Expected ${name} to be an array but received ${typeof value}`);
-  }
-
-  value.map((_: UnwrapArray<T[K]>) => {
-    return {
-      input: {
-        //   onBlur: (_event: FormEvent) => {
-        //     blur(name);
-        //   },
-        //   onChange: (event: ChangeEvent<{ value: T[K] }>) => {
-        //     change(name, event.currentTarget.value);
-        //   },
-        //   onFocus: (_event: FormEvent) => {
-        //     focus(name);
-        //   },
-        //   value: values[name],
-      },
-    };
-  });
-}
-
-export { useForm, useField, useFieldArray, arrayHelpers };
+export { useForm, useField, arrayHelpers };

@@ -21,6 +21,12 @@ const Query: IResolverObject<QuerySource, Context> = {
       .table('document')
       .orderBy('created_at', 'desc')
       .select(),
+  layouts: async (_parent, _args, { db }) =>
+    db
+      .withSchema('cmyk')
+      .table('layout')
+      .orderBy('created_at', 'desc')
+      .select(),
   files: async (_parent, _args, { db }) =>
     db
       .withSchema('cmyk')
