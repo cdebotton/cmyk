@@ -8,7 +8,7 @@ import { Login as LoginMutation, LoginVariables, Session } from './types';
 import Button from './components/Button';
 import Heading from './components/Heading';
 import Input from './components/Input';
-import { useApolloClient, useApolloMutation, useApolloQuery } from './hooks/Apollo';
+import { useApolloClient, useMutation, useQuery } from './hooks/useApollo';
 import { useField, useForm } from './hooks/useForm';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
@@ -61,9 +61,9 @@ function Login({ className, location }: Props) {
 
   const {
     data: { session },
-  } = useApolloQuery<Session>(sessionQuery);
+  } = useQuery<Session>(sessionQuery);
 
-  const mutate = useApolloMutation<LoginMutation, LoginVariables>(loginMutation, {
+  const mutate = useMutation<LoginMutation, LoginVariables>(loginMutation, {
     update: (proxy, { data: result }) => {
       if (result && result.login) {
         localStorage.setItem('jwt', result.login);

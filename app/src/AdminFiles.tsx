@@ -9,7 +9,7 @@ import Layout from './components/Layout';
 import List, { Item } from './components/List';
 import PageHeading from './components/PageHeading';
 import PortalContext from './containers/PortalContext';
-import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
+import { useMutation, useQuery } from './hooks/useApollo';
 import { getTimeAgo } from './utils/date';
 
 const FILES_QUERY = gql`
@@ -38,11 +38,11 @@ interface Props extends RouteComponentProps<{}> {}
 function AdminFiles({ match }: Props) {
   const {
     data: { files },
-  } = useApolloQuery<Files>(FILES_QUERY);
+  } = useQuery<Files>(FILES_QUERY);
 
   const { setPortalNode } = useContext(PortalContext);
 
-  const mutate = useApolloMutation<DeleteFile, DeleteFileVariables>(DELETE_FILE_MUTATION);
+  const mutate = useMutation<DeleteFile, DeleteFileVariables>(DELETE_FILE_MUTATION);
 
   function deleteFile(id: string) {
     return mutate({

@@ -1,6 +1,7 @@
 import { padding, rem } from 'polished';
 import React, { ReactNode, useMemo, useRef } from 'react';
-import { animated, config, useSpring } from 'react-spring';
+// @ts-ignore
+import { animated, useSpring } from 'react-spring/hooks';
 import styled, { css } from 'styled-components';
 import useBoundingClientRect from '../hooks/useBoundingClientRect';
 
@@ -59,15 +60,13 @@ function Tooltip({ children, content }: Props) {
 
   const targetRect = useBoundingClientRect(target);
   const popupRect = useBoundingClientRect(popup);
-  const position = useMemo(() => getPosition(targetRect, popupRect), [
-    targetRect,
-    popupRect,
-  ]);
+  const position = useMemo(() => getPosition(targetRect, popupRect), [targetRect, popupRect]);
 
-  const [styles, setStyles] = useSpring({
-    config: config.stiff,
-    opacity: 0,
-    transform: getOrigin(position),
+  const [styles, setStyles] = useSpring(() => {
+    return {
+      opacity: 0,
+      transform: getOrigin(position),
+    };
   });
 
   function showTooltip() {
@@ -85,11 +84,7 @@ function Tooltip({ children, content }: Props) {
   }
 
   return (
-    <Target
-      ref={target}
-      onMouseMoveCapture={showTooltip}
-      onMouseLeave={hideTooltip}
-    >
+    <Target ref={target} onMouseMoveCapture={showTooltip} onMouseLeave={hideTooltip}>
       {children}
       <Popup position={position} ref={popup} style={styles}>
         {content}

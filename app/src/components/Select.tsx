@@ -9,7 +9,8 @@ import React, {
   Ref,
   MouseEventHandler,
 } from 'react';
-import { animated, config, useSpring } from 'react-spring';
+// @ts-ignore
+import { animated, useSpring } from 'react-spring/hooks';
 import styled, { css } from 'styled-components';
 import InputLabel from './InputLabel';
 import useViewport from '../hooks/useViewport';
@@ -130,11 +131,12 @@ function Select<T extends string>(
   const [openDir, setOpenDir] = useState<OpenDir>(OpenDir.down);
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
-  const [spring, setSpring] = useSpring({
-    config: config.default,
-    empty: 0,
-    hover: 0,
-    open: 0,
+  const [spring, setSpring] = useSpring(() => {
+    return {
+      empty: 0,
+      hover: 0,
+      open: 0,
+    };
   });
 
   const optionsRef = useRef<HTMLUListElement | null>(null);
@@ -185,16 +187,20 @@ function Select<T extends string>(
       <SelectWrapper>
         <SelectLabel
           style={{
+            // @ts-ignore
             backgroundColor: spring.open.interpolate({
               output: ['#fff', 'hsla(0, 0%, 20%, 0.2)'],
               range: [0, 1],
             }),
             borderRadius: spring.open
+              // @ts-ignore
               .interpolate({
                 output: ['3px', '0px'],
                 range: [0, 1],
               })
+              // @ts-ignore
               .interpolate(x => `3px 3px ${x} ${x}`),
+            // @ts-ignore
             color: spring.open.interpolate({
               output: ['#000', '#fff'],
               range: [0, 1],
@@ -207,13 +213,16 @@ function Select<T extends string>(
               d="M0,0 L10,0 L5,5 L0,0 Z"
               style={{
                 transform: spring.open
+                  // @ts-ignore
                   .interpolate({
                     output: ['0deg', '180deg'],
                     range: [0, 1],
                   })
+                  // @ts-ignore
                   .interpolate(r => `rotateZ(${r})`),
                 transformOrigin: 'center center',
               }}
+              // @ts-ignore
               fill={spring.open.interpolate({
                 output: ['#000', '#fff'],
                 range: [0, 1],
@@ -227,12 +236,14 @@ function Select<T extends string>(
         <Border
           format="hover"
           style={{
+            // @ts-ignore
             transform: spring.hover.interpolate(x => `scaleX(${x})`),
           }}
         />
         <Border
           format="focus"
           style={{
+            // @ts-ignore
             transform: spring.open.interpolate(x => `scaleX(${x})`),
           }}
         />
@@ -242,11 +253,13 @@ function Select<T extends string>(
             opacity: spring.open,
             pointerEvents: open ? 'inherit' : 'none',
             transform: spring.open
+              // @ts-ignore
               .interpolate({
                 output:
                   openDir === OpenDir.down ? [rem(-20), rem(0)] : [rem(20), rem(-32 - rect.height)],
                 range: [0, 1],
               })
+              // @ts-ignore
               .interpolate(y => `translate3d(0, ${y}, 0)`),
           }}
         >
@@ -256,7 +269,7 @@ function Select<T extends string>(
               tabIndex={option.value === value ? -1 : tabIndex}
               key={`OPTION_${name}_${option.value}`}
               disabled={option.value === value}
-              onClick={_event => {
+              onClick={() => {
                 change(option.value);
                 setOpen(false);
               }}

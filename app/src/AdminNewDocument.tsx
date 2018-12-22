@@ -6,7 +6,7 @@ import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';
 import { useField, useForm } from './hooks/useForm';
 import styled from 'styled-components';
-import { useApolloQuery } from './hooks/Apollo';
+import { useQuery } from './hooks/useApollo';
 import { NewDocument } from './types';
 import Select from './components/Select';
 import Popover from './components/Popover';
@@ -32,7 +32,7 @@ const validationSchema = yup.object().shape({
 const NEW_LAYOUT = 'NEW_LAYOUT';
 
 function AdminNewDocument() {
-  const { data } = useApolloQuery<NewDocument>(NEW_DOCUMENT_QUERY);
+  const { data } = useQuery<NewDocument>(NEW_DOCUMENT_QUERY);
 
   const form = useForm({
     validationSchema,

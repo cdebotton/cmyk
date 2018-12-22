@@ -1,7 +1,8 @@
 import { padding, position, rem, size } from 'polished';
-import React, { Fragment, ReactNode, useState } from 'react';
+import React, { Fragment, ReactNode, useState, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
-import { animated, useSpring, config } from 'react-spring';
+// @ts-ignore
+import { animated, config, useSpring } from 'react-spring/hooks';
 import styled from 'styled-components';
 import AnimatedCross from './AnimatedCross';
 import Avatar from './Avatar';
@@ -23,7 +24,7 @@ const DeleteFill = styled.svg`
 `;
 
 function AnimatedDeleteBar(props: { on: boolean }) {
-  const [{ fill, d }] = useSpring({
+  const { fill, d } = useSpring({
     config: config.stiff,
     d: props.on ? 'M100,0 M100,100, 20,100, 22,0 Z' : 'M100,0 L100,100, L100,100, L100,0 Z',
     fill: props.on ? 'hsla(5, 50%, 50%, 0.5)' : 'hsla(212, 50%, 50%, 0)',
@@ -96,7 +97,7 @@ interface Props extends Detail {
 function Item({ image, to, label, info, details, onDelete, deleteTooltip }: Props) {
   const [isHoveringList, setIsHoveringList] = useState(false);
   const [isHoveringDelete, setIsHoveringDelete] = useState(false);
-  const [zoomStyle] = useSpring({
+  const zoomStyle = useSpring({
     backgroundColor: isHoveringList ? 'hsla(0, 0%, 100%, 0.225)' : 'hsla(0, 0%, 100%, 0.1)',
     boxShadow: isHoveringList
       ? '0px 0px 10px hsla(0, 0%, 0%, 0.4)'
@@ -140,7 +141,7 @@ function Item({ image, to, label, info, details, onDelete, deleteTooltip }: Prop
           <DeleteIcon
             onMouseEnter={() => setIsHoveringDelete(true)}
             onMouseLeave={() => setIsHoveringDelete(false)}
-            onClick={event => {
+            onClick={(event: MouseEvent) => {
               event.preventDefault();
               onDelete();
             }}

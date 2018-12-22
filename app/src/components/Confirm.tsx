@@ -1,6 +1,7 @@
 import { padding, position, rem, size } from 'polished';
-import React, { MouseEventHandler, ReactNode, useEffect } from 'react';
-import { animated, config, useSpring } from 'react-spring';
+import React, { MouseEventHandler, ReactNode, useEffect, MouseEvent } from 'react';
+// @ts-ignore
+import { animated, config, interpolate, useSpring } from 'react-spring/hooks';
 import styled from 'styled-components';
 import Button from './Button';
 
@@ -59,18 +60,25 @@ interface Props {
   onCancel: MouseEventHandler<HTMLElement>;
 }
 
+const interpolateTransform = (x: number) => {
+  const clamped = Math.max(Math.min(x, 0), -500);
+  return `translate3d(0, 0, ${clamped})`;
+};
+
 function Confirm({ title, message, onConfirm, onCancel }: Props) {
-  const [{ x }, setSpring] = useSpring({
-    config: config.default,
-    x: 0,
+  const [{ x }, setSpring] = useSpring(() => {
+    return {
+      config: config.default,
+      x: 0,
+    };
   });
 
   useOnMount(() => {
-    setSpring({ x: 1 });
+    setSpring({ x: 1, config: config.default });
   });
 
   useOnUnmount(() => {
-    setSpring({ x: 0 });
+    setSpring({ x: 0, config: config.default });
   });
 
   return (
@@ -83,14 +91,9 @@ function Confirm({ title, message, onConfirm, onCancel }: Props) {
       <Alert
         style={{
           opacity: x,
-          transform: x
-            .interpolate({
-              output: [rem(-500), rem(0)],
-              range: [0, 1],
-            })
-            .interpolate(y => `translate3d(0, 0, ${y})`),
+          transform: interpolate([x], interpolateTransform),
         }}
-        onClick={event => {
+        onClick={(event: MouseEvent) => {
           event.stopPropagation();
         }}
       >

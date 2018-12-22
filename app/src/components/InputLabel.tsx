@@ -1,6 +1,7 @@
 import { modularScale, rem } from 'polished';
 import React, { ReactNode, useMemo } from 'react';
-import { animated, config, useSpring } from 'react-spring';
+// @ts-ignore
+import { animated, config, useSpring } from 'react-spring/hooks';
 import styled from 'styled-components';
 
 const Label = styled(animated.label)<{ blockEvents: boolean }>`
@@ -45,7 +46,7 @@ function InputLabel({ children, focused, empty, htmlFor }: Props) {
     [focused, empty],
   );
 
-  const [labelSpring] = useSpring({
+  const labelSpring = useSpring({
     color: colorSpring,
     config: config.stiff,
     fontSize: empty ? modularScale(0) : modularScale(-1),
@@ -53,7 +54,7 @@ function InputLabel({ children, focused, empty, htmlFor }: Props) {
     transform: empty ? `translate3d(0, ${rem(5)}, 0)` : `translate3d(0, ${rem(-20)}, 0)`,
   });
 
-  const [backerSpring] = useSpring({
+  const backerSpring = useSpring({
     opacity: focused ? 1 : 0,
     transform: focused ? 'scaleX(1)' : 'scaleX(0)',
   });

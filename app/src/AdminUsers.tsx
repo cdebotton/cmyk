@@ -6,7 +6,7 @@ import Confirm from './components/Confirm';
 import List, { Item } from './components/List';
 import ListLayout, { CreateLink, Heading } from './components/ListLayout';
 import PortalContext from './containers/PortalContext';
-import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
+import { useMutation, useQuery } from './hooks/useApollo';
 import { getFormattedDate, getTimeAgo } from './utils/date';
 import useTitle from './hooks/useTitle';
 
@@ -52,13 +52,11 @@ function AdminUsers({ className, match }: Props) {
 
   const {
     data: { users, session },
-  } = useApolloQuery<Users>(USERS_QUERY);
+  } = useQuery<Users>(USERS_QUERY);
 
   const { setPortalNode } = useContext(PortalContext);
 
-  const mutate = useApolloMutation<DeleteUserMutation, DeleteUserMutationVariables>(
-    DELETE_USER_MUTATION,
-  );
+  const mutate = useMutation<DeleteUserMutation, DeleteUserMutationVariables>(DELETE_USER_MUTATION);
 
   const deleteUser = (userId: string) => {
     mutate({

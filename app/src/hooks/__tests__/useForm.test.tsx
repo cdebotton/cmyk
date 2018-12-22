@@ -128,18 +128,13 @@ describe('useForm', () => {
 
   it('should provide validation', () => {
     let form: Form<{ fieldA: string; fieldB: string }> | undefined;
-    const validationSchema = yup
-      .object<{ fieldA: string; fieldB: string }>()
-      .shape({
-        fieldA: yup.string().required('req'),
-        fieldB: yup.string(),
-      });
+    const validationSchema = yup.object<{ fieldA: string; fieldB: string }>().shape({
+      fieldA: yup.string().required('req'),
+      fieldB: yup.string(),
+    });
 
     const ui = (
-      <Assert
-        initialValues={{ fieldA: '', fieldB: '' }}
-        validationSchema={validationSchema}
-      >
+      <Assert initialValues={{ fieldA: '', fieldB: '' }} validationSchema={validationSchema}>
         {assertForm => {
           form = assertForm;
           return null;
@@ -174,7 +169,7 @@ describe('useInput', () => {
         initialValues: { field: '' },
         onSubmit: () => undefined,
       });
-      const field = useField('field', hook);
+      const field = useField(hook, 'field');
 
       return (
         <>

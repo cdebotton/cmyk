@@ -2,7 +2,7 @@ import { ApolloError } from 'apollo-client';
 import gql from 'graphql-tag';
 import { useState } from 'react';
 import { TUploadFile, TUploadFile_uploadFile, TUploadFileVariables } from '../types';
-import { useApolloMutation } from './Apollo';
+import { useMutation } from './useApollo';
 
 const UPLOAD_FILE_MUTATION = gql`
   mutation TUploadFile($file: Upload!) {
@@ -28,9 +28,7 @@ function useFileUpload(): [Uploader, Context] {
   const [error, setError] = useState<ApolloError | null>(null);
   const [data, setData] = useState<TUploadFile_uploadFile | null>(null);
 
-  const uploadFileMutation = useApolloMutation<TUploadFile, TUploadFileVariables>(
-    UPLOAD_FILE_MUTATION,
-  );
+  const uploadFileMutation = useMutation<TUploadFile, TUploadFileVariables>(UPLOAD_FILE_MUTATION);
 
   async function upload(file: File) {
     setUploading(true);

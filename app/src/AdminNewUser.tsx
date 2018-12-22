@@ -10,7 +10,7 @@ import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
 import Select from './components/Select';
-import { useApolloMutation } from './hooks/Apollo';
+import { useMutation } from './hooks/useApollo';
 import { useField, useForm } from './hooks/useForm';
 import useFileUpload from './hooks/useFileUpload';
 import useTitle from './hooks/useTitle';
@@ -73,9 +73,7 @@ interface Props extends RouteComponentProps<{}> {}
 function AdminNewUser({ history }: Props) {
   useTitle('New user | Admin');
 
-  const mutate = useApolloMutation<CreateUserMutation, CreateUserMutationVariables>(
-    CREATE_USER_MUTATION,
-  );
+  const mutate = useMutation<CreateUserMutation, CreateUserMutationVariables>(CREATE_USER_MUTATION);
 
   const form = useForm<{
     avatar: { key: string; bucket: string; url: string; id: string } | null;

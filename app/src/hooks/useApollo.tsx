@@ -3,14 +3,16 @@ import ApolloClient, {
   ApolloQueryResult,
   FetchMoreOptions,
   FetchMoreQueryOptions,
+  MutationOptions,
   ObservableQuery,
+  MutationUpdaterFn,
   OperationVariables,
   QueryOptions,
 } from 'apollo-client';
 import { DocumentNode } from 'graphql';
 import React, { createContext, ReactNode, useContext, useEffect, useRef, useState } from 'react';
-import { MutationFn, MutationOptions } from 'react-apollo';
 import isEqual from 'react-fast-compare';
+import { FetchResult } from 'apollo-link';
 
 const ApolloContext = createContext<ApolloClient<NormalizedCacheObject> | null>(null);
 
@@ -27,7 +29,7 @@ export function useApolloClient() {
   return useContext(ApolloContext);
 }
 
-export function useApolloQuery<TData, TVariables = OperationVariables>(
+export function useQuery<TData, TVariables = OperationVariables>(
   query: any,
   {
     variables,
@@ -99,9 +101,22 @@ export function useApolloQuery<TData, TVariables = OperationVariables>(
   return { ...helpers, ...result };
 }
 
-export function useApolloMutation<TData, TVariables = OperationVariables>(
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
+
+type MutationHookOptions<T, TVariables> = Omit<
+  MutationOptions<T, TVariables>,
+  'mutation' | 'update'
+> & {
+  update?: MutationUpdaterFn<T>;
+};
+
+type MutationFn<TData, TVariables> = (
+  localOptions?: MutationHookOptions<TData, TVariables>,
+) => Promise<FetchResult<TData>>;
+
+export function useMutation<TData, TVariables = OperationVariables>(
   mutation: DocumentNode,
-  baseOptions: Partial<MutationOptions<TData, Partial<TVariables>>> = {},
+  baseOptions: MutationHookOptions<TData, TVariables> = {},
 ): MutationFn<TData, TVariables> {
   const client = useApolloClient();
 

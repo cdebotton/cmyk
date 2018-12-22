@@ -170,23 +170,6 @@ export interface DeleteFileVariables {
 // This file was automatically generated and should not be edited.
 
 // ====================================================
-// GraphQL query operation: NewDocument
-// ====================================================
-
-export interface NewDocument_layouts {
-  __typename: "Layout";
-  id: string;
-  title: string;
-}
-
-export interface NewDocument {
-  layouts: NewDocument_layouts[];
-}
-
-/* tslint:disable */
-// This file was automatically generated and should not be edited.
-
-// ====================================================
 // GraphQL mutation operation: CreateUserMutation
 // ====================================================
 
@@ -363,6 +346,23 @@ export interface Session_session {
 
 export interface Session {
   session: Session_session | null;
+}
+
+/* tslint:disable */
+// This file was automatically generated and should not be edited.
+
+// ====================================================
+// GraphQL query operation: NewDocument
+// ====================================================
+
+export interface NewDocument_layouts {
+  __typename: "Layout";
+  id: string;
+  title: string;
+}
+
+export interface NewDocument {
+  layouts: NewDocument_layouts[];
 }
 
 /* tslint:disable */

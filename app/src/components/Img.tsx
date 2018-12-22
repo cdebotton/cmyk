@@ -1,6 +1,7 @@
 import React, { CSSProperties } from 'react';
 import { createResource } from 'react-cache';
-import { animated } from 'react-spring';
+// @ts-ignore
+import { animated } from 'react-spring/hooks';
 import styled from 'styled-components';
 
 const ImageResource = createResource(

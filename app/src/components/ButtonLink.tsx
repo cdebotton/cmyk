@@ -1,7 +1,8 @@
 import { padding, rem } from 'polished';
 import React, { MouseEvent } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
-import { animated, config, useSpring } from 'react-spring';
+// @ts-ignore
+import { useSpring, animated, config, interpolate } from 'react-spring/hooks';
 import styled from 'styled-components';
 import { Format } from '../styles/helpers';
 
@@ -31,20 +32,22 @@ const Backer = styled(animated.span)`
   height: 100%;
   left: 0;
   position: absolute;
-  top: 0;
   transformorigin: 0 0;
+  top: 0;
   width: 100%;
 `;
 
 function ButtonLink({ children, ...props }: Props) {
-  const [spring, setSpring] = useSpring({ x: 0, config: config.stiff });
+  const [spring, setSpring] = useSpring(() => {
+    return { x: 0, config: config.stiff };
+  });
 
   function onMouseEnter(event: MouseEvent<any>) {
     if (props.onMouseEnter) {
       props.onMouseEnter(event);
     }
 
-    setSpring({ x: 1 });
+    setSpring({ x: 1, config: config.stiff });
   }
 
   function onMouseLeave(event: MouseEvent<any>) {
@@ -52,7 +55,7 @@ function ButtonLink({ children, ...props }: Props) {
       props.onMouseLeave(event);
     }
 
-    setSpring({ x: 0 });
+    setSpring({ x: 0, config: config.stiff });
   }
 
   return (
@@ -60,16 +63,17 @@ function ButtonLink({ children, ...props }: Props) {
       <Backer
         style={{
           backgroundColor: 'hsla(0, 0%, 20%, 0.2)',
-          transform: spring.x.interpolate(
-            x => `scaleX(${x}) translate3d(0, 0, ${rem(x * 20)})`,
-          ),
+          // @ts-ignore
+          transform: interpolate([spring.x], x => `scaleX(${x}) translate3d(0, 0, ${rem(x * 20)})`),
           transformOrigin: '0 0',
         }}
       />
       <Backer
         style={{
           backgroundColor: `hsla(0, 0%, 100%, 0.2)`,
-          transform: spring.x.interpolate(
+          transform: interpolate(
+            [spring.x],
+            // @ts-ignore
             x => `scaleX(${1 - x}) translate3d(0, 0, ${rem((1 - x) * 20)})`,
           ),
           transformOrigin: '100% 0',

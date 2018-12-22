@@ -11,12 +11,12 @@
   "devDependencies": {
     "@types/knex": "0.15.1",
     "@types/pg": "7.4.11",
-    "apollo": "^2.1.6",
+    "apollo": "^2.1.8",
     "ts-node": "7.0.1"
   },
   "dependencies": {
     "knex": "0.15.2",
     "migrate": "^1.6.2",
-    "pg": "^7.6.1"
+    "pg": "^7.7.1"
   }
 }

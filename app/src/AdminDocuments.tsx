@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router';
 import { TDocuments } from './types';
 import List, { Item } from './components/List';
 import ListLayout, { CreateLink, Heading } from './components/ListLayout';
-import { useApolloQuery } from './hooks/Apollo';
+import { useQuery } from './hooks/useApollo';
 import useTitle from './hooks/useTitle';
 
 const DOCUMENTS_QUERY = gql`
@@ -23,7 +23,7 @@ function AdminDocuments({ match: { url } }: Props) {
 
   const {
     data: { documents },
-  } = useApolloQuery<TDocuments>(DOCUMENTS_QUERY);
+  } = useQuery<TDocuments>(DOCUMENTS_QUERY);
 
   return (
     <ListLayout>

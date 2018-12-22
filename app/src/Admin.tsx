@@ -12,7 +12,7 @@ import Avatar from './components/Avatar';
 import Button from './components/Button';
 import Loader from './components/Loader';
 import ErrorBoundary from './containers/ErrorBoundary';
-import { useApolloClient, useApolloQuery } from './hooks/Apollo';
+import { useApolloClient, useQuery } from './hooks/useApollo';
 import PortalOutlet from './PortalOutlet';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';
@@ -111,7 +111,7 @@ function Admin({ className, match }: Props) {
 
   const {
     data: { session },
-  } = useApolloQuery<TCurrentUser>(CURRENT_USER_QUERY);
+  } = useQuery<TCurrentUser>(CURRENT_USER_QUERY);
   const user = session && session.user;
   const profile = user && user.profile;
   const avatar = profile && profile.avatar ? profile.avatar.url : '';

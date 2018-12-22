@@ -16,7 +16,7 @@ import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
 import Select from './components/Select';
-import { useApolloMutation, useApolloQuery } from './hooks/Apollo';
+import { useMutation, useQuery } from './hooks/useApollo';
 import useFileUpload from './hooks/useFileUpload';
 import { useField, useForm } from './hooks/useForm';
 import useTitle from './hooks/useTitle';
@@ -95,7 +95,7 @@ function AdminEditUser({ className, ...props }: Props) {
   const { match, history } = props;
   const {
     data: { user },
-  } = useApolloQuery<User, UserVariables>(EDIT_USER_QUERY, {
+  } = useQuery<User, UserVariables>(EDIT_USER_QUERY, {
     variables: { id: match.params.userId },
   });
 
@@ -105,9 +105,7 @@ function AdminEditUser({ className, ...props }: Props) {
 
   useTitle(`Edit ${user.email} | Admin`);
 
-  const updateUserMutation = useApolloMutation<TUpdateUser, TUpdateUserVariables>(
-    USER_UPDATE_MUTATION,
-  );
+  const updateUserMutation = useMutation<TUpdateUser, TUpdateUserVariables>(USER_UPDATE_MUTATION);
 
   async function updateUser(values: Values) {
     if (!user) {

@@ -1,6 +1,7 @@
 import { padding, rem } from 'polished';
 import React, { ChangeEventHandler, FormEventHandler, HTMLProps, useEffect, useState } from 'react';
-import { animated, config, useSpring, interpolate } from 'react-spring';
+// @ts-ignore
+import { useSpring, animated } from 'react-spring/hooks';
 import styled from 'styled-components';
 import InputLabel from './InputLabel';
 
@@ -60,18 +61,22 @@ interface Props {
 }
 
 function Input({ className, label, touched, error, dirty: _, ...field }: Props) {
-  const [{ value: errorSpring }, setErrorSpring] = useSpring({
-    config: config.default,
-    value: field.value !== '' ? 1 : 0,
+  const [{ value: errorSpring }, setErrorSpring] = useSpring(() => {
+    return {
+      value: field.value !== '' ? 1 : 0,
+    };
   });
-  const [{ value: focusSpring }, setFocusSpring] = useSpring({
-    config: config.default,
-    value: 0,
+
+  const [{ value: focusSpring }, setFocusSpring] = useSpring(() => {
+    return { value: 0 };
   });
-  const [{ value: hoverSpring }, setHoverSpring] = useSpring({
-    config: config.default,
-    value: 0,
+
+  const [{ value: hoverSpring }, setHoverSpring] = useSpring(() => {
+    return {
+      value: 0,
+    };
   });
+
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);
   const id = `field-${field.name}`;
@@ -95,15 +100,18 @@ function Input({ className, label, touched, error, dirty: _, ...field }: Props) 
           id={id}
           placeholder={undefined}
           onFocus={() => setFocus(true)}
+          // @ts-ignore
           onBlur={event => {
             setFocus(false);
             field.onBlur(event);
           }}
           style={{
+            // @ts-ignore
             backgroundColor: focusSpring.interpolate({
               output: ['#fff', 'hsla(0, 0%, 20%, 0.2'],
               range: [0, 1],
             }),
+            // @ts-ignore
             color: focusSpring.interpolate({
               output: ['#000', '#fff'],
               range: [0, 1],
@@ -115,13 +123,17 @@ function Input({ className, label, touched, error, dirty: _, ...field }: Props) 
         </InputLabel>
         <InputBorder
           style={{
+            // @ts-ignore
             backgroundColor: hoverSpring.interpolate(x => `hsla(212, 50%, 50%, ${x})`),
+            // @ts-ignore
             transform: hoverSpring.interpolate(x => `scaleX(${x})`),
           }}
         />
         <InputBorder
           style={{
+            // @ts-ignore
             backgroundColor: focusSpring.interpolate((x: number) => `hsla(90, 50%, 50%, ${x})`),
+            // @ts-ignore
             transform: focusSpring.interpolate(x => `scaleX(${x})`),
           }}
         />
@@ -129,6 +141,7 @@ function Input({ className, label, touched, error, dirty: _, ...field }: Props) 
           hidden={!showError}
           style={{
             opacity: errorSpring,
+            // @ts-ignore
             transform: errorSpring.interpolate(x => `translate3d(0, ${rem(x * 16)}, 0)`),
           }}
         >

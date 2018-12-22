@@ -1,5 +1,6 @@
 import { rem, size } from 'polished';
-import { animated } from 'react-spring';
+// @ts-ignore
+import { animated } from 'react-spring/hooks';
 import styled from 'styled-components';
 
 const Avatar = styled(animated.span)<{ size: number; src: string }>`

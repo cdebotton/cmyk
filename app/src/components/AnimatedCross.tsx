@@ -1,5 +1,6 @@
 import React, { SVGProps, useEffect, useState } from 'react';
-import { animated, config, useSpring } from 'react-spring';
+// @ts-ignore
+import { animated, config, useSpring } from 'react-spring/hooks';
 import styled from 'styled-components';
 
 interface Props extends SVGProps<SVGElement> {
@@ -8,11 +9,13 @@ interface Props extends SVGProps<SVGElement> {
 
 function AnimatedCross({ className, ...props }: Props) {
   const [hovering, setHovering] = useState(false);
-  const [interpolation, setInterpolation] = useSpring({
-    config: config.default,
-    leftPath: 'M 20 20 L 20 44',
-    rightPath: 'M 44 20 L 44 44',
-    strokeWidth: '2px',
+  const [interpolation, setInterpolation] = useSpring(() => {
+    return {
+      config: config.default,
+      leftPath: 'M 20 20 L 20 44',
+      rightPath: 'M 44 20 L 44 44',
+      strokeWidth: '2px',
+    };
   });
 
   useEffect(() => {
@@ -21,6 +24,7 @@ function AnimatedCross({ className, ...props }: Props) {
     const strokeWidth = hovering ? '4px' : '2px';
 
     setInterpolation({
+      config: config.default,
       leftPath,
       rightPath,
       strokeWidth,
