@@ -5,7 +5,7 @@ import Button from './components/Button';
 import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';
 import { useField, useForm } from './hooks/useForm';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { useQuery } from './hooks/useApollo';
 import { NewDocument } from './types';
 import Select from './components/Select';
@@ -22,7 +22,7 @@ const NEW_DOCUMENT_QUERY = gql`
 `;
 
 const DocumentForm = styled(Form)`
-  grid-template-columns: [form-start] 1fr 1fr max-content max-content [form-end];
+  grid-template-columns: [form-start col1-start] 1fr [col1-end col2-start] 1fr [col2-end col3-start] 1fr [col3-end col4-start] 1fr [col4-end form-end];
 `;
 
 const validationSchema = yup.object().shape({
@@ -38,6 +38,7 @@ function AdminNewDocument() {
     validationSchema,
     initialValues: {
       title: '',
+      layout: null,
     },
     onSubmit: async values => {
       alert(JSON.stringify(values, null, 2));
@@ -45,6 +46,8 @@ function AdminNewDocument() {
   });
 
   const title = useField(form, 'title');
+  const layout = useField(form, 'layout');
+
   const layoutOptions = useMemo(
     () => {
       return [
@@ -76,12 +79,19 @@ function AdminNewDocument() {
     <EditorLayout>
       <Heading>New document</Heading>
       <DocumentForm onSubmit={form.handleSubmit}>
-        <Input name="title" label="Title" {...title.input} {...title.meta} />
+        <Input
+          css="grid-column: col1-start / col2-end;"
+          name="title"
+          label="Title"
+          {...title.input}
+          {...title.meta}
+        />
         <Select
+          {...layout.input}
+          css="grid-column: col3-start / col4-end"
           ref={newLayoutSelectRef}
           name="layout"
           label="Layout"
-          value=""
           options={layoutOptions}
           change={handleLayoutChange}
         />

@@ -1,7 +1,6 @@
 import { padding, position, rem, size } from 'polished';
 import React, { Fragment, ReactNode, useState, MouseEvent } from 'react';
 import { Link } from 'react-router-dom';
-// @ts-ignore
 import { animated, config, useSpring } from 'react-spring/hooks';
 import styled from 'styled-components';
 import AnimatedCross from './AnimatedCross';
@@ -97,8 +96,16 @@ interface Props extends Detail {
 function Item({ image, to, label, info, details, onDelete, deleteTooltip }: Props) {
   const [isHoveringList, setIsHoveringList] = useState(false);
   const [isHoveringDelete, setIsHoveringDelete] = useState(false);
-  const zoomStyle = useSpring({
+
+  const listItemProps = useSpring({
     backgroundColor: isHoveringList ? 'hsla(0, 0%, 100%, 0.225)' : 'hsla(0, 0%, 100%, 0.1)',
+    boxShadow: isHoveringList
+      ? '0px 0px 10px hsla(0, 0%, 0%, 0.4)'
+      : '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
+    transform: isHoveringList ? 'translate3d(0, 0, 20px)' : 'translate3d(0px, 0px, 0px)',
+  });
+
+  const avatarProps = useSpring({
     boxShadow: isHoveringList
       ? '0px 0px 10px hsla(0, 0%, 0%, 0.4)'
       : '0px 0px 10px hsla(0, 0%, 0%, 0.1)',
@@ -109,22 +116,13 @@ function Item({ image, to, label, info, details, onDelete, deleteTooltip }: Prop
     <AnimatedLi
       onMouseEnter={() => setIsHoveringList(true)}
       onMouseLeave={() => setIsHoveringList(false)}
-      style={zoomStyle}
+      style={listItemProps}
     >
       <DeleteFill preserveAspectRatio="none" viewBox="0 0 100 100">
         <AnimatedDeleteBar on={isHoveringDelete} />
       </DeleteFill>
       <ItemLink to={to}>
-        {image && (
-          <Image
-            style={{
-              boxShadow: zoomStyle.boxShadow,
-              transform: zoomStyle.transform,
-            }}
-            src={image}
-            size={96}
-          />
-        )}
+        {image && <Image style={avatarProps} src={image} size={96} />}
         {!image && <span />}
         <Details>
           <Title>{label}</Title>

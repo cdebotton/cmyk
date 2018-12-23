@@ -1,10 +1,11 @@
 import { ApolloError } from 'apollo-client';
 import { size } from 'polished';
 import React, { ChangeEvent, FormEventHandler, useCallback, useState } from 'react';
-import styled from 'styled-components';
+import styled, { CSSProp } from 'styled-components/macro';
 
 interface Props {
   className?: string;
+  css?: CSSProp;
   error?: ApolloError | null;
   uploading: boolean;
   name: string;
@@ -16,7 +17,7 @@ interface Props {
   onChange: FormEventHandler<HTMLInputElement>;
 }
 
-function ImageSelector({ className, name, value, onChange, uploading }: Props) {
+function ImageSelector({ className, css, name, value, onChange, uploading }: Props) {
   const [currentUrl, setCurrentUrl] = useState<string | null>(null);
 
   const url = currentUrl || (value ? value.url : null);
@@ -50,7 +51,7 @@ function ImageSelector({ className, name, value, onChange, uploading }: Props) {
   }, []);
 
   return (
-    <ImageSelectorContainer className={className} disabled={uploading}>
+    <ImageSelectorContainer css={css} className={className} disabled={uploading}>
       {url && <Image src={url} />}
       {!url && <EmptyImage />}
       {!uploading && <FileInput id={id} onChange={handleChange} />}

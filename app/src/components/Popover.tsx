@@ -1,6 +1,6 @@
-import React, { ReactNode, MutableRefObject, useLayoutEffect, useState } from 'react';
+import React, { ReactNode, MutableRefObject, useLayoutEffect, useState, useMemo } from 'react';
 import { createPortal } from 'react-dom';
-import styled, { css } from 'styled-components';
+import { css } from 'styled-components/macro';
 import { padding, rem } from 'polished';
 import useBoundingBox from '../hooks/useBoundingBox';
 import useViewport from '../hooks/useViewport';
@@ -25,18 +25,6 @@ function getWidth({ minWidth, anchorWidth, left }: PortalProps) {
     left: ${rem(left)};
   `;
 }
-
-const Portal = styled.div<PortalProps>`
-  position: fixed;
-  top: 0;
-  left: 0;
-  background-color: hsla(0, 0%, 0%, 0.5);
-  color: #fff;
-  border-radius: 4px;
-  top: ${props => rem(props.top)};
-  ${getWidth};
-  ${padding(rem(8))};
-`;
 
 const MARGIN = 8;
 
@@ -71,10 +59,30 @@ function Popover({ anchor, children, hidden, minWidth = 0 }: Props) {
     [rect, viewport],
   );
 
+  const width = useMemo(() => getWidth({ top, minWidth, anchorWidth: rect.width, left }), [
+    top,
+    minWidth,
+    rect.width,
+    left,
+  ]);
+
   return createPortal(
-    <Portal top={top} left={left} anchorWidth={rect.width} minWidth={minWidth} hidden={hidden}>
+    <div
+      css={`
+        position: fixed;
+        top: 0;
+        left: 0;
+        background-color: hsla(0, 0%, 0%, 0.5);
+        color: #fff;
+        border-radius: 4px;
+        top: ${rem(top)};
+        ${width};
+        ${padding(rem(8))};
+      `}
+      hidden={hidden}
+    >
       {children}
-    </Portal>,
+    </div>,
     portal,
   );
 }

@@ -9,9 +9,8 @@ import React, {
   Ref,
   MouseEventHandler,
 } from 'react';
-// @ts-ignore
-import { animated, useSpring } from 'react-spring/hooks';
-import styled, { css } from 'styled-components';
+import { animated, useSpring, useTrail } from 'react-spring/hooks';
+import styled, { css } from 'styled-components/macro';
 import InputLabel from './InputLabel';
 import useViewport from '../hooks/useViewport';
 import useBoundingBox from '../hooks/useBoundingBox';
@@ -24,7 +23,7 @@ interface Option<T> {
 interface Props<T> {
   className?: string;
   name: string;
-  value: T;
+  value: T | null;
   label: ReactNode;
   options: Option<T>[];
   tabIndex?: number;
@@ -52,7 +51,7 @@ const SelectLabel = styled(animated.div)`
   background-color: #fff;
   color: #000;
   cursor: pointer;
-  ${padding(rem(8), rem(16))};
+  ${padding(rem(8), rem(8))};
 `;
 
 const Arrow = styled(animated.svg)`
@@ -74,6 +73,7 @@ const OptionList = styled(animated.ul)`
   top: 100%;
   width: 100%;
   box-shadow: 0 1px 5px hsla(0, 0%, 0%, 0.4);
+  background-color: hsla(0, 0%, 20%, 0.2);
 `;
 
 const Border = styled(animated.span)<{ format: 'hover' | 'focus' }>`
@@ -95,7 +95,6 @@ const Border = styled(animated.span)<{ format: 'hover' | 'focus' }>`
 
 const Option = styled(animated.li)<{ disabled: boolean }>`
   ${padding(rem(8), rem(16))};
-  background-color: hsla(0, 0%, 20%, 0.2);
   pointer-events: ${({ disabled }) => (disabled ? 'none' : 'inherit')};
 
   ${({ disabled }) =>
@@ -131,6 +130,7 @@ function Select<T extends string>(
   const [openDir, setOpenDir] = useState<OpenDir>(OpenDir.down);
   const [open, setOpen] = useState(false);
   const [hover, setHover] = useState(false);
+
   const [spring, setSpring] = useSpring(() => {
     return {
       empty: 0,
@@ -172,6 +172,11 @@ function Select<T extends string>(
 
   const selectedLabel = !selected ? props.label : selected[0];
 
+  const animatedOptions = useTrail(options.length, {
+    x: open ? 0 : 30,
+    opacity: open ? 1.0 : 0.0,
+  });
+
   return (
     <SelectContainer
       className={className}
@@ -185,44 +190,46 @@ function Select<T extends string>(
       ref={ref}
     >
       <SelectWrapper>
+        <InputLabel focused={open} empty={value === null}>
+          {props.label}
+        </InputLabel>
         <SelectLabel
           style={{
-            // @ts-ignore
             backgroundColor: spring.open.interpolate({
               output: ['#fff', 'hsla(0, 0%, 20%, 0.2)'],
               range: [0, 1],
             }),
             borderRadius: spring.open
-              // @ts-ignore
               .interpolate({
                 output: ['3px', '0px'],
                 range: [0, 1],
               })
-              // @ts-ignore
               .interpolate(x => `3px 3px ${x} ${x}`),
-            // @ts-ignore
             color: spring.open.interpolate({
               output: ['#000', '#fff'],
               range: [0, 1],
             }),
           }}
         >
-          {selectedLabel}
+          <span
+            css={`
+              opacity: ${value === null ? 0 : 1};
+            `}
+          >
+            {selectedLabel}
+          </span>
           <Arrow viewBox="0 0 10 5">
             <animated.path
               d="M0,0 L10,0 L5,5 L0,0 Z"
               style={{
                 transform: spring.open
-                  // @ts-ignore
                   .interpolate({
                     output: ['0deg', '180deg'],
                     range: [0, 1],
                   })
-                  // @ts-ignore
                   .interpolate(r => `rotateZ(${r})`),
                 transformOrigin: 'center center',
               }}
-              // @ts-ignore
               fill={spring.open.interpolate({
                 output: ['#000', '#fff'],
                 range: [0, 1],
@@ -230,20 +237,15 @@ function Select<T extends string>(
             />
           </Arrow>
         </SelectLabel>
-        <InputLabel focused={open} empty={value === null}>
-          {props.label}
-        </InputLabel>
         <Border
           format="hover"
           style={{
-            // @ts-ignore
             transform: spring.hover.interpolate(x => `scaleX(${x})`),
           }}
         />
         <Border
           format="focus"
           style={{
-            // @ts-ignore
             transform: spring.open.interpolate(x => `scaleX(${x})`),
           }}
         />
@@ -253,30 +255,36 @@ function Select<T extends string>(
             opacity: spring.open,
             pointerEvents: open ? 'inherit' : 'none',
             transform: spring.open
-              // @ts-ignore
               .interpolate({
                 output:
                   openDir === OpenDir.down ? [rem(-20), rem(0)] : [rem(20), rem(-32 - rect.height)],
                 range: [0, 1],
               })
-              // @ts-ignore
               .interpolate(y => `translate3d(0, ${y}, 0)`),
           }}
         >
-          {options.map(option => (
-            <Option
-              role="menuitem"
-              tabIndex={option.value === value ? -1 : tabIndex}
-              key={`OPTION_${name}_${option.value}`}
-              disabled={option.value === value}
-              onClick={() => {
-                change(option.value);
-                setOpen(false);
-              }}
-            >
-              {option.label}
-            </Option>
-          ))}
+          {animatedOptions.map(({ opacity, x }, key) => {
+            const option = options[key];
+
+            return (
+              <Option
+                role="menuitem"
+                style={{
+                  opacity,
+                  transform: x.interpolate(dx => `translate3d(${dx}px, 0px, 0px)`),
+                }}
+                tabIndex={option.value === value ? -1 : tabIndex}
+                key={`OPTION_${name}_${option.value}`}
+                disabled={option.value === value}
+                onClick={() => {
+                  change(option.value);
+                  setOpen(false);
+                }}
+              >
+                {option.label}
+              </Option>
+            );
+          })}
         </OptionList>
       </SelectWrapper>
     </SelectContainer>

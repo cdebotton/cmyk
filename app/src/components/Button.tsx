@@ -1,6 +1,6 @@
 import { rem } from 'polished';
 import { HTMLProps } from 'react';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import { Format } from '../styles/helpers';
 
 interface Props extends HTMLProps<HTMLButtonElement> {
@@ -8,7 +8,7 @@ interface Props extends HTMLProps<HTMLButtonElement> {
   format?: Format;
 }
 
-export default styled.button<Props>`
+const Button = styled.button<Props>`
   position: relative;
   border: none;
   cursor: pointer;
@@ -22,3 +22,5 @@ export default styled.button<Props>`
     cursor: default;
   }
 `;
+
+export default Button;

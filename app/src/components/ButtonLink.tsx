@@ -1,31 +1,14 @@
 import { padding, rem } from 'polished';
 import React, { MouseEvent } from 'react';
 import { Link, LinkProps } from 'react-router-dom';
-// @ts-ignore
-import { useSpring, animated, config, interpolate } from 'react-spring/hooks';
-import styled from 'styled-components';
+import { useSpring, animated, interpolate } from 'react-spring/hooks';
+import styled from 'styled-components/macro';
 import { Format } from '../styles/helpers';
 
 interface Props extends LinkProps {
   className?: string;
   format?: Format;
 }
-
-const Element = styled(Link)`
-  position: relative;
-  font-size: ${rem(16)};
-  ${padding(rem(8), rem(16))};
-  border-radius: 3px;
-  font-family: 'Roboto', sans-serif;
-  backdrop-filter: blur(2px);
-  color: #fff;
-  text-decoration: none;
-  overflow: hidden;
-`;
-
-const Label = styled.span`
-  position: relative;
-`;
 
 const Backer = styled(animated.span)`
   background-color: hsla(0, 0%, 20%, 0.2);
@@ -39,7 +22,7 @@ const Backer = styled(animated.span)`
 
 function ButtonLink({ children, ...props }: Props) {
   const [spring, setSpring] = useSpring(() => {
-    return { x: 0, config: config.stiff };
+    return { x: 0 };
   });
 
   function onMouseEnter(event: MouseEvent<any>) {
@@ -47,7 +30,7 @@ function ButtonLink({ children, ...props }: Props) {
       props.onMouseEnter(event);
     }
 
-    setSpring({ x: 1, config: config.stiff });
+    setSpring({ x: 1 });
   }
 
   function onMouseLeave(event: MouseEvent<any>) {
@@ -55,15 +38,29 @@ function ButtonLink({ children, ...props }: Props) {
       props.onMouseLeave(event);
     }
 
-    setSpring({ x: 0, config: config.stiff });
+    setSpring({ x: 0 });
   }
 
   return (
-    <Element {...props} onMouseEnter={onMouseEnter} onMouseLeave={onMouseLeave}>
+    <Link
+      {...props}
+      css={`
+        position: relative;
+        font-size: ${rem(16)};
+        ${padding(rem(8), rem(16))};
+        border-radius: 3px;
+        font-family: 'Roboto', sans-serif;
+        backdrop-filter: blur(2px);
+        color: #fff;
+        text-decoration: none;
+        overflow: hidden;
+      `}
+      onMouseEnter={onMouseEnter}
+      onMouseLeave={onMouseLeave}
+    >
       <Backer
         style={{
           backgroundColor: 'hsla(0, 0%, 20%, 0.2)',
-          // @ts-ignore
           transform: interpolate([spring.x], x => `scaleX(${x}) translate3d(0, 0, ${rem(x * 20)})`),
           transformOrigin: '0 0',
         }}
@@ -73,14 +70,13 @@ function ButtonLink({ children, ...props }: Props) {
           backgroundColor: `hsla(0, 0%, 100%, 0.2)`,
           transform: interpolate(
             [spring.x],
-            // @ts-ignore
             x => `scaleX(${1 - x}) translate3d(0, 0, ${rem((1 - x) * 20)})`,
           ),
           transformOrigin: '100% 0',
         }}
       />
-      <Label>{children}</Label>
-    </Element>
+      <span css="position: relative;">{children}</span>
+    </Link>
   );
 }
 

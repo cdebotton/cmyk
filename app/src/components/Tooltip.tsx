@@ -1,6 +1,5 @@
 import { padding, rem } from 'polished';
 import React, { ReactNode, useMemo, useRef } from 'react';
-// @ts-ignore
 import { animated, useSpring } from 'react-spring/hooks';
 import styled, { css } from 'styled-components';
 import useBoundingClientRect from '../hooks/useBoundingClientRect';

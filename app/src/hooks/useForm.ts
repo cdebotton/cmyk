@@ -8,6 +8,8 @@ import {
   useCallback,
   FormEventHandler,
   ChangeEventHandler,
+  useReducer,
+  Dispatch,
 } from 'react';
 
 import { Schema, ValidationError, number } from 'yup';
@@ -51,6 +53,106 @@ function isPromise(obj: any): obj is Promise<any> {
   );
 }
 
+interface State<T> {
+  draft: T;
+  committed: T;
+  submitting: boolean;
+  validating: boolean;
+  touched: Map<keyof T, boolean>;
+  focused: Map<keyof T, boolean>;
+  dirty: Map<keyof T, boolean>;
+  errors: Map<keyof T, string[]>;
+}
+
+enum ActionType {
+  update,
+  focus,
+  blur,
+  reset,
+  validateRequest,
+  validateSuccess,
+  validateFalure,
+  submitRequest,
+  submitSuccess,
+  submitFailure,
+}
+
+type Action<T, P extends keyof T> =
+  | { type: ActionType.update; payload: { name: P; value: T[P] } }
+  | { type: ActionType.focus; payload: { name: P } }
+  | { type: ActionType.blur; payload: { name: P } }
+  | { type: ActionType.reset }
+  | { type: ActionType.validateRequest }
+  | { type: ActionType.validateSuccess }
+  | { type: ActionType.validateFalure; payload: { errors: Map<P, string[]> } }
+  | { type: ActionType.submitRequest }
+  | { type: ActionType.submitSuccess };
+
+function reducer<T, P extends keyof T>(state: State<T>, action: Action<T, P>): State<T> {
+  switch (action.type) {
+    case ActionType.update:
+      return {
+        ...state,
+        draft: {
+          ...state.draft,
+          [action.payload.name]: action.payload.value,
+        },
+        dirty: state.dirty.get(name) === true ? state.dirty : state.dirty.set(name, true),
+      };
+    case ActionType.focus:
+      return {
+        ...state,
+        focused: state.focused.set(name, true),
+      };
+    case ActionType.blur:
+      return {
+        ...state,
+        touched: state.touched.get(name) === true ? state.touched : state.touched.set(name, true),
+        focused: state.focused.set(name, false),
+      };
+    case ActionType.reset:
+      return {
+        ...state,
+        submitting: false,
+        draft: state.committed,
+        touched: new Map(),
+        focused: new Map(),
+        dirty: new Map(),
+        errors: new Map(),
+      };
+    case ActionType.validateRequest:
+      return {
+        ...state,
+        validating: true,
+      };
+    case ActionType.validateSuccess:
+      return {
+        ...state,
+        validating: false,
+        errors: state.errors.size === 0 ? state.errors : new Map(),
+      };
+    case ActionType.validateFalure:
+      return {
+        ...state,
+        validating: false,
+        errors: action.payload.errors,
+      };
+    case ActionType.submitRequest:
+      return {
+        ...state,
+        submitting: true,
+      };
+    case ActionType.submitSuccess:
+      return {
+        ...state,
+        submitting: false,
+        committed: state.draft,
+      };
+    default:
+      return state;
+  }
+}
+
 export interface Form<T> {
   valid: boolean;
   dirty: boolean;
@@ -59,14 +161,8 @@ export interface Form<T> {
   handleReset: VoidFunction;
 
   [CONTROLLER]: {
-    dirty: BoolShape<T>;
-    errors: ErrorShape<T>;
-    focused: BoolShape<T>;
-    touched: BoolShape<T>;
-    values: T;
-    blur: (name: keyof T) => void;
-    change: <K extends keyof T>(name: K, value: T[K]) => void;
-    focus: (name: keyof T) => void;
+    state: State<T>;
+    dispatch: Dispatch<Action<T, keyof T>>;
   };
 }
 
@@ -78,77 +174,54 @@ function useForm<T>({
   validateOnChange = true,
   validateOnFirstRun = true,
 }: Options<T>): Form<T> {
-  const firstRun = useRef(true);
-  const [values, setValues] = useState(initialValues);
-  const [submitting, setSubmitting] = useState(false);
-  const [dirty, setDirty] = useState(() => getBooleanShape(initialValues));
-  const [focused, setFocused] = useState(() => getBooleanShape(initialValues));
-  const [touched, setTouched] = useState(() => getBooleanShape(initialValues));
-  const [errors, setErrors] = useState(() => getErrorShape(initialValues));
+  const [state, dispatch] = useReducer<State<T>, Action<T, keyof T>>(reducer, {
+    draft: initialValues,
+    committed: initialValues,
+    validating: false,
+    submitting: false,
+    touched: new Map(),
+    dirty: new Map(),
+    focused: new Map(),
+    errors: new Map(),
+  });
 
-  function validate() {
+  async function validate() {
     if (validationSchema) {
       try {
-        validationSchema.validateSync(values);
-        setErrors(getErrorShape(initialValues));
+        await validationSchema.validate(state.draft);
+        dispatch({ type: ActionType.validateSuccess });
       } catch (err) {
         if (isValidationError(err)) {
           const { path, message } = err;
-          setErrors(state => {
-            return Object.assign({}, state, { [path]: [message] });
-          });
+          const errors = new Map().set(path, [message]);
+          dispatch({ type: ActionType.validateFalure, payload: { errors } });
         }
       }
     }
   }
 
-  function change<K extends keyof T>(name: K, value: T[K]) {
-    setValues(state => {
-      return { ...state, [name]: value };
-    });
-
-    setDirty(state => {
-      return Object.assign({}, state, { [name]: value !== initialValues[name] });
-    });
-  }
-
-  function blur<K extends keyof T>(name: K) {
-    setTouched(state => {
-      return Object.assign({}, state, { [name]: true });
-    });
-    setFocused(state => {
-      return Object.assign({}, state, { [name]: false });
-    });
-  }
-
-  function focus<K extends keyof T>(name: K) {
-    setFocused(state => {
-      return Object.assign({}, state, { [name]: true });
-    });
-  }
-
   function handleReset() {
-    setValues(initialValues);
-    setTouched(getBooleanShape(initialValues));
-    setDirty(getBooleanShape(initialValues));
-    setFocused(getBooleanShape(initialValues));
+    dispatch({ type: ActionType.reset });
   }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    setSubmitting(true);
-    const submit = onSubmit(values);
+    dispatch({ type: ActionType.submitRequest });
+    const submit = onSubmit(state.draft);
+
     if (isPromise(submit)) {
       await submit;
     }
-    setSubmitting(false);
+
+    dispatch({ type: ActionType.submitSuccess });
   }
 
-  if (firstRun.current === true && validateOnFirstRun) {
-    validate();
-    firstRun.current = false;
-  }
+  useEffect(() => {
+    if (validateOnFirstRun) {
+      validate();
+    }
+  }, []);
 
   useEffect(
     () => {
@@ -156,7 +229,7 @@ function useForm<T>({
         validate();
       }
     },
-    [values],
+    [state.draft],
   );
 
   useEffect(
@@ -165,33 +238,21 @@ function useForm<T>({
         validate();
       }
     },
-    [touched],
+    [state.touched],
   );
 
-  const valid = useMemo(
-    () => {
-      return Object.values(errors).every(err => err === null);
-    },
-    [errors],
-  );
-
-  const isDirty = useMemo(() => Object.values(dirty).some(d => d === true), [dirty]);
+  const valid = useMemo(() => state.errors.size === 0, [state.errors]);
+  const dirty = useMemo(() => state.dirty.size === 0, [state.dirty]);
 
   return {
     handleReset,
     handleSubmit,
-    submitting,
     valid,
-    dirty: isDirty,
+    dirty,
+    submitting: state.submitting,
     [CONTROLLER]: {
-      blur,
-      change,
-      dirty,
-      errors,
-      focus,
-      focused,
-      touched,
-      values,
+      state,
+      dispatch,
     },
   };
 }
@@ -203,7 +264,6 @@ interface Field<T> {
     onFocus: FormEventHandler;
     value: T;
   };
-
   meta: {
     dirty?: boolean;
     errors?: string[] | null;
@@ -224,58 +284,66 @@ interface Field<T> {
 }
 
 function useField<T, K extends keyof T>(
-  { [CONTROLLER]: { values, change, blur, focus, dirty, touched, errors, focused } }: Form<T>,
+  { [CONTROLLER]: { state, dispatch } }: Form<T>,
   name: K,
 ): Field<T[K]> {
   const input = useMemo(
     () => {
       return {
         onBlur: (_event: FormEvent) => {
-          blur(name);
+          dispatch({ type: ActionType.blur, payload: { name } });
         },
         onChange: (event: ChangeEvent<{ value: T[K] }>) => {
-          change(name, event.currentTarget.value);
+          dispatch({
+            type: ActionType.update,
+            payload: { name, value: event.currentTarget.value },
+          });
         },
         onFocus: (_event: FormEvent) => {
-          focus(name);
+          dispatch({ type: ActionType.focus, payload: { name } });
         },
-        value: values[name],
+        value: state.draft[name],
       };
     },
-    [values[name]],
+    [state],
   );
 
   const meta = useMemo(
     () => {
       return {
-        dirty: dirty[name],
-        errors: errors[name],
-        focused: focused[name],
-        touched: touched[name],
+        dirty: state.dirty.get(name),
+        errors: state.errors.get(name),
+        focused: state.focused.get(name),
+        touched: state.touched.get(name),
       };
     },
-    [dirty[name], touched[name], errors[name], focused[name]],
+    [
+      state.dirty.get(name),
+      state.touched.get(name),
+      state.errors.get(name),
+      state.focused.get(name),
+    ],
   );
 
   const handlers = {
-    value: values[name],
+    value: state.draft[name],
     change: useCallback(
       (value: T[K]) => {
-        change(name, value);
+        dispatch({ type: ActionType.update, payload: { name, value } });
       },
-      [name, change],
+      [name, dispatch],
     ),
     blur: useCallback(
       () => {
-        blur(name);
+        dispatch({ type: ActionType.blur, payload: { name } });
       },
-      [name, blur],
+      [name, dispatch],
     ),
     focus: useCallback(
       () => {
-        focus(name);
+        dispatch({ type: ActionType.focus, payload: { name } });
       },
-      [name, focus],
+      [name, dispatch],
     ),
   };
 

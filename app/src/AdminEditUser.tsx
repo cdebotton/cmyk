@@ -1,7 +1,7 @@
 import gql from 'graphql-tag';
 import React, { FormEvent, lazy, useEffect } from 'react';
 import { RouteComponentProps } from 'react-router';
-import styled from 'styled-components/macro';
+import 'styled-components/macro';
 import * as yup from 'yup';
 import {
   Role,
@@ -58,23 +58,6 @@ const USER_UPDATE_MUTATION = gql`
       }
     }
   }
-`;
-
-const AvatarInput = styled(ImageSelector)`
-  grid-column: span 1;
-  grid-row: span 2;
-`;
-
-const EmailInput = styled(Input)`
-  grid-column: span 2;
-`;
-
-const SaveButton = styled(Button).attrs({ type: 'submit' })`
-  grid-column: span 1;
-`;
-
-const CancelButton = styled(Button).attrs({ type: 'reset' })`
-  grid-column: span 1;
 `;
 
 const NotFound = lazy(() => import('./NotFound'));
@@ -194,14 +177,21 @@ function AdminEditUser({ className, ...props }: Props) {
     <EditorLayout className={className}>
       <Heading>Edit {user.email}</Heading>
       <Form onSubmit={form.handleSubmit} autoComplete="off">
-        <AvatarInput
+        <ImageSelector
+          css="grid-column: span 1; grid-row: span 2;"
           value={avatar.input.value}
           name="avatar"
           onChange={handleFileChange}
           error={error}
           uploading={uploading}
         />
-        <EmailInput name="email" label="Email" {...email.input} {...email.meta} />
+        <Input
+          css="grid-column: span 2;"
+          name="email"
+          label="Email"
+          {...email.input}
+          {...email.meta}
+        />
         <Input name="firstName" label="First name" {...firstName.input} {...firstName.meta} />
         <Input name="lastName" label="Last name" {...lastName.input} {...lastName.meta} />
         <Select
@@ -217,17 +207,24 @@ function AdminEditUser({ className, ...props }: Props) {
             { label: 'Unauthorized', value: Role.UNAUTHORIZED },
           ]}
         />
-        <SaveButton format="neutral" disabled={!form.valid || form.submitting || !form.dirty}>
+        <Button
+          type="submit"
+          css="grid-column: span 1;"
+          format="neutral"
+          disabled={!form.valid || form.submitting || !form.dirty}
+        >
           {form.submitting ? 'Saving...' : 'Save'}
-        </SaveButton>
-        <CancelButton
+        </Button>
+        <Button
+          type="reset"
+          css="grid-column: span 1;"
           onClick={() => {
             form.handleReset();
             history.goBack();
           }}
         >
           Cancel
-        </CancelButton>
+        </Button>
       </Form>
     </EditorLayout>
   );

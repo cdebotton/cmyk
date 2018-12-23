@@ -1,8 +1,7 @@
 import { padding, position, rem, size } from 'polished';
 import React, { MouseEventHandler, ReactNode, useEffect, MouseEvent } from 'react';
-// @ts-ignore
 import { animated, config, interpolate, useSpring } from 'react-spring/hooks';
-import styled from 'styled-components';
+import styled from 'styled-components/macro';
 import Button from './Button';
 
 const Overlay = styled(animated.div)`
@@ -68,17 +67,16 @@ const interpolateTransform = (x: number) => {
 function Confirm({ title, message, onConfirm, onCancel }: Props) {
   const [{ x }, setSpring] = useSpring(() => {
     return {
-      config: config.default,
       x: 0,
     };
   });
 
   useOnMount(() => {
-    setSpring({ x: 1, config: config.default });
+    setSpring({ x: 1 });
   });
 
   useOnUnmount(() => {
-    setSpring({ x: 0, config: config.default });
+    setSpring({ x: 0 });
   });
 
   return (

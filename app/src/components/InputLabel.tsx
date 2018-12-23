@@ -1,6 +1,5 @@
 import { modularScale, rem } from 'polished';
 import React, { ReactNode, useMemo } from 'react';
-// @ts-ignore
 import { animated, config, useSpring } from 'react-spring/hooks';
 import styled from 'styled-components';
 

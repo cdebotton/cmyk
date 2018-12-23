@@ -1,5 +1,4 @@
 import React, { SVGProps, useEffect, useState } from 'react';
-// @ts-ignore
 import { animated, config, useSpring } from 'react-spring/hooks';
 import styled from 'styled-components';
 
@@ -24,7 +23,6 @@ function AnimatedCross({ className, ...props }: Props) {
     const strokeWidth = hovering ? '4px' : '2px';
 
     setInterpolation({
-      config: config.default,
       leftPath,
       rightPath,
       strokeWidth,
