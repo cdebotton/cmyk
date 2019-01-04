@@ -271,6 +271,7 @@ function Select<T extends string>(
                 role="menuitem"
                 style={{
                   opacity,
+                  // @ts-ignore
                   transform: x.interpolate(dx => `translate3d(${dx}px, 0px, 0px)`),
                 }}
                 tabIndex={option.value === value ? -1 : tabIndex}

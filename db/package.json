@@ -3,11 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "license": "MIT",
-  "scripts": {
-    "up": "node -r dotenv/config ./node_modules/.bin/migrate up --compiler=\"ts:./ts-register\"",
-    "down": "node -r dotenv/config ./node_modules/.bin/migrate down --compiler=\"ts:./ts-register\"",
-    "create": "node -r dotenv/config ./node_modules/.bin/migrate create --template-file ./lib/template-file.ts"
-  },
+  "scripts": {},
   "devDependencies": {
     "@types/knex": "0.15.1",
     "@types/pg": "7.4.11",
@@ -15,7 +11,7 @@
     "ts-node": "7.0.1"
   },
   "dependencies": {
-    "knex": "0.15.2",
+    "knex": "0.16.3",
     "migrate": "^1.6.2",
     "pg": "^7.7.1"
   }
