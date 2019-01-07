@@ -16,7 +16,7 @@ import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
 import Select from './components/Select';
-import { useMutation, useQuery } from './hooks/useApollo';
+import { useMutation, useQuery } from 'react-apollo-hooks';
 import useFileUpload from './hooks/useFileUpload';
 import { useField, useForm } from './hooks/useForm';
 import useTitle from './hooks/useTitle';

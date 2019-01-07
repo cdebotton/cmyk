@@ -2,7 +2,7 @@ import React, { ConcurrentMode } from 'react';
 import ReactDOM from 'react-dom';
 import { BrowserRouter } from 'react-router-dom';
 import client from './client';
-import { ApolloProvider } from './hooks/useApollo';
+import { ApolloProvider } from 'react-apollo-hooks';
 import Root from './Root';
 import * as serviceWorker from './serviceWorker';
 

@@ -9,7 +9,7 @@ import Layout from './components/Layout';
 import List, { Item } from './components/List';
 import PageHeading from './components/PageHeading';
 import PortalContext from './containers/PortalContext';
-import { useMutation, useQuery } from './hooks/useApollo';
+import { useMutation, useQuery } from 'react-apollo-hooks';
 import { getTimeAgo } from './utils/date';
 
 const FILES_QUERY = gql`

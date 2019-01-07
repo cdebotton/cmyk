@@ -6,7 +6,7 @@ import Confirm from './components/Confirm';
 import List, { Item } from './components/List';
 import ListLayout, { CreateLink, Heading } from './components/ListLayout';
 import PortalContext from './containers/PortalContext';
-import { useMutation, useQuery } from './hooks/useApollo';
+import { useMutation, useQuery } from 'react-apollo-hooks';
 import { getFormattedDate, getTimeAgo } from './utils/date';
 import useTitle from './hooks/useTitle';
 

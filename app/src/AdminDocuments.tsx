@@ -4,7 +4,7 @@ import { RouteComponentProps } from 'react-router';
 import { TDocuments } from './types';
 import List, { Item } from './components/List';
 import ListLayout, { CreateLink, Heading } from './components/ListLayout';
-import { useQuery } from './hooks/useApollo';
+import { useQuery } from 'react-apollo-hooks';
 import useTitle from './hooks/useTitle';
 
 const DOCUMENTS_QUERY = gql`

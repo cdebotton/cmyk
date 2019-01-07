@@ -10,7 +10,7 @@ import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import ImageSelector from './components/ImageSelector';
 import Input from './components/Input';
 import Select from './components/Select';
-import { useMutation } from './hooks/useApollo';
+import { useMutation } from 'react-apollo-hooks';
 import { useField, useForm } from './hooks/useForm';
 import useFileUpload from './hooks/useFileUpload';
 import useTitle from './hooks/useTitle';

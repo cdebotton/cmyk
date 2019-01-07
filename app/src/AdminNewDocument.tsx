@@ -6,7 +6,7 @@ import EditorLayout, { Form, Heading } from './components/EditorLayout';
 import Input from './components/Input';
 import { useField, useForm } from './hooks/useForm';
 import styled from 'styled-components/macro';
-import { useQuery } from './hooks/useApollo';
+import { useQuery } from 'react-apollo-hooks';
 import { NewDocument } from './types';
 import Select from './components/Select';
 import Popover from './components/Popover';

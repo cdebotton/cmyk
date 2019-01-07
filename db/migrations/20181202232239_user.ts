@@ -5,7 +5,7 @@ export async function up(knex: Knex) {
     table
       .uuid('id')
       .primary()
-      .defaultTo(knex.raw('gen_random_uuid()'));
+      .defaultTo(knex.raw('uuid_generate_v4()'));
     table.enum('role', ['ADMIN', 'EDITOR', 'VIEWER', 'USER', 'DEMO', 'UNAUTHORIZED'], {
       useNative: true,
       enumName: 'role_t',

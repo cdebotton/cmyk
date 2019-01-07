@@ -8,7 +8,7 @@ import { Login as LoginMutation, LoginVariables, Session } from './types';
 import Button from './components/Button';
 import Heading from './components/Heading';
 import Input from './components/Input';
-import { useApolloClient, useMutation, useQuery } from './hooks/useApollo';
+import { useApolloClient, useMutation, useQuery } from 'react-apollo-hooks';
 import { useField, useForm } from './hooks/useForm';
 import GlobalStyles from './styles/AdminStyles';
 import background from './styles/background';

@@ -3,8 +3,6 @@ import {
   FormEvent,
   useEffect,
   useMemo,
-  useRef,
-  useState,
   useCallback,
   FormEventHandler,
   ChangeEventHandler,
@@ -12,28 +10,12 @@ import {
   Dispatch,
 } from 'react';
 
-import { Schema, ValidationError, number } from 'yup';
+import { Schema, ValidationError } from 'yup';
 
 export const CONTROLLER = Symbol();
 
 function isValidationError(x: any): x is ValidationError {
   return x instanceof ValidationError;
-}
-
-type BoolShape<T> = { readonly [K in keyof T]?: boolean };
-
-function getBooleanShape<T>(values: T): BoolShape<T> {
-  return Object.keys(values).reduce((memo, key) => {
-    return Object.assign(memo, { [key]: false });
-  }, {});
-}
-
-type ErrorShape<T> = { readonly [K in keyof T]?: string[] };
-
-function getErrorShape<T>(values: T): ErrorShape<T> {
-  return Object.keys(values).reduce((memo, key) => {
-    return { ...memo, [key]: null };
-  }, {});
 }
 
 interface Options<T> {
@@ -53,7 +35,7 @@ function isPromise(obj: any): obj is Promise<any> {
   );
 }
 
-interface State<T> {
+interface State<T extends { [key: string]: any }> {
   draft: T;
   committed: T;
   submitting: boolean;
@@ -192,9 +174,22 @@ function useForm<T>({
         dispatch({ type: ActionType.validateSuccess });
       } catch (err) {
         if (isValidationError(err)) {
-          const { path, message } = err;
-          const errors = new Map().set(path, [message]);
-          dispatch({ type: ActionType.validateFalure, payload: { errors } });
+          if (err.inner) {
+            dispatch({
+              type: ActionType.validateFalure,
+              payload: {
+                errors: err.inner.reduce((memo, { path, message }) => {
+                  return memo.set(path, message);
+                }, new Map()),
+              },
+            });
+          } else {
+            const { path, message } = err;
+            dispatch({
+              type: ActionType.validateFalure,
+              payload: { errors: new Map().set(path, [message]) },
+            });
+          }
         }
       }
     }
@@ -350,27 +345,4 @@ function useField<T, K extends keyof T>(
   return { ...handlers, handlers, input, meta };
 }
 
-const arrayHelpers = {
-  push: <T>(field: Field<T[]>, value: T) => {
-    field.change([...field.input.value, value]);
-  },
-  remove: <T>(field: Field<T[]>, index: number): T => {
-    const shallowCopy = [...field.input.value];
-    const [deletedItem] = shallowCopy.splice(index);
-    field.change(shallowCopy);
-    return deletedItem;
-  },
-  update: <T>(field: Field<T[]>, index: number, value: T) => {
-    field.change(
-      field.value.map((item, i) => {
-        if (i !== index) {
-          return item;
-        }
-
-        return { ...item, ...value };
-      }),
-    );
-  },
-};
-
-export { useForm, useField, arrayHelpers };
+export { useForm, useField };
