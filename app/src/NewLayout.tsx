@@ -26,7 +26,7 @@ function NewLayout() {
   const titleInput = useInput(() => title, setTitle);
   const [fields, setFields] = useState<Field[]>([]);
 
-  console.log(title);
+  console.log({ title, fields });
 
   const handleAddField = useCallback(
     () => {
