@@ -51,7 +51,7 @@ interface Props {
   label: string;
   value: string;
   onChange: ChangeEventHandler<HTMLInputElement>;
-  onBlur: FormEventHandler<HTMLInputElement>;
+  onBlur: FormEventHandler;
   type?: HTMLProps<HTMLInputElement>['type'];
   name: string;
   dirty?: boolean;
@@ -75,8 +75,6 @@ function Input({ className, label, touched, errors, dirty: _, ...field }: Props)
       value: 0,
     };
   });
-
-  console.log(errors, '!!!');
 
   const [hover, setHover] = useState(false);
   const [focus, setFocus] = useState(false);

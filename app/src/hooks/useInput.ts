@@ -1,55 +1,38 @@
-import { useReducer, ChangeEvent, FormEvent, Dispatch } from 'react';
+import { useState, useCallback, ChangeEvent } from 'react';
 
-type State<T> = {
+type HandleChange<T> = (event: ChangeEvent<{ value: T }>) => void;
+type HandleFormEvent = () => void;
+
+type Field<T> = {
   value: T;
+  focused: boolean;
   dirty: boolean;
   touched: boolean;
-  focused: boolean;
+  errors: string[] | null;
+  onChange: HandleChange<T>;
+  onBlur: HandleFormEvent;
 };
 
-type Action<T> = { type: 'change'; payload: { value: T } } | { type: 'focus' } | { type: 'blur' };
+type Getter<T> = () => T;
+type Setter<T> = (value: T) => void;
 
-function reducer<T>(state: State<T>, action: Action<T>): State<T> {
-  switch (action.type) {
-    case 'change': {
-      const { value } = action.payload;
-      return { ...state, value, dirty: true };
-    }
-    case 'focus':
-      return { ...state, focused: true };
-    case 'blur':
-      return { ...state, focused: false, touched: true };
-  }
-}
-type HandleMapper<T, U> = (state: State<T>, dispatch: Dispatch<Action<T>>) => U;
+function useInput<T>(getValue: Getter<T>, setValue: Setter<T>): Field<T> {
+  const [focused, setFocused] = useState(false);
+  const [dirty, setDirty] = useState(false);
+  const [touched, setTouched] = useState(false);
+  const errors = null;
 
-function mapDefaultHandler<T>(state: State<T>, dispatch: Dispatch<Action<T>>) {
-  return {
-    value: state.value,
-    onChange: (event: ChangeEvent<{ value: T }>) => {
-      dispatch({ type: 'change', payload: { value: event.currentTarget.value } });
-    },
-    onFocus: (_event: FormEvent<HTMLInputElement>) => {
-      dispatch({ type: 'focus' });
-    },
-    onBlur: (_event: FormEvent<HTMLInputElement>) => {
-      dispatch({ type: 'blur' });
-    },
-  };
+  const onChange = useCallback((event: ChangeEvent<{ value: T }>) => {
+    setValue(event.currentTarget.value);
+    setDirty(event.currentTarget.value !== getValue());
+  }, []);
+
+  const onBlur = useCallback(() => {
+    setFocused(false);
+    setTouched(false);
+  }, []);
+
+  return { value: getValue(), onChange, onBlur, focused, dirty, touched, errors };
 }
 
-function useInput<T, F extends HandleMapper<T, any>>(
-  initialValue: T,
-  mapToHandler: F,
-): ReturnType<F> {
-  const [state, dispatch] = useReducer<State<T>, Action<T>>(reducer, {
-    value: initialValue,
-    dirty: false,
-    focused: false,
-    touched: false,
-  });
-
-  return mapToHandler(state, dispatch);
-}
-
-export { useInput, mapDefaultHandler };
+export default useInput;

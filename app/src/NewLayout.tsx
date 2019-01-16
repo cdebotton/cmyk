@@ -1,10 +1,10 @@
-import React, { useCallback, useRef } from 'react';
-import { useForm, useField } from './hooks/useForm';
-import Input from './components/Input';
+import React, { useState, ChangeEvent, useCallback } from 'react';
 import styled from 'styled-components/macro';
 import PageHeading from './components/PageHeading';
-import Select from './components/Select';
 import { rem } from 'polished';
+import Input from './components/Input';
+import useInput from './hooks/useInput';
+import { setIn } from './hooks/utils';
 
 const Form = styled.form`
   display: grid;
@@ -14,43 +14,31 @@ const Form = styled.form`
   grid-template-columns: [form-start col1-start] 1fr [col1-end col2-start] 1fr [col2-end form-end];
 `;
 
-enum FieldConfig {
-  plainText = 'plain_text',
-  assets = 'assets',
-}
-
-type Form = {
+type PlaintextField = {
+  type: 'PLAINTEXT';
   title: string;
-  fieldConfigs: FieldConfig[];
 };
 
-function PlainTextField() {
-  return <>PlainText</>;
-}
-
-function AssetsField() {
-  return <>Assets</>;
-}
+type Field = PlaintextField;
 
 function NewLayout() {
-  const form = useForm<Form>({
-    initialValues: {
-      title: '',
-      fieldConfigs: [],
+  const [title, setTitle] = useState('');
+  const titleInput = useInput(() => title, setTitle);
+  const [fields, setFields] = useState<Field[]>([]);
+
+  console.log(title);
+
+  const handleAddField = useCallback(
+    () => {
+      setFields(state => [
+        ...state,
+        {
+          type: 'PLAINTEXT',
+          title: '',
+        },
+      ]);
     },
-    onSubmit: () => {},
-  });
-
-  const title = useField(form, 'title');
-  const fieldConfigs = useField(form, 'fieldConfigs');
-
-  const lastKey = useRef(0);
-
-  const addField = useCallback(
-    (value: FieldConfig) => {
-      fieldConfigs.change([...fieldConfigs.value, value]);
-    },
-    [fieldConfigs],
+    [fields, setFields],
   );
 
   return (
@@ -58,52 +46,38 @@ function NewLayout() {
       <PageHeading css="grid-column: form-start / form-end" level={4}>
         New layout
       </PageHeading>
-      <Input
-        css="grid-column: col1-start / col1-end"
-        name="title"
-        label="Title"
-        {...title.input}
-        {...title.meta}
-      />
-      <Select
-        css="grid-column: col2-start / col2-end"
-        name="fieldType"
-        label="Add field"
-        value={null}
-        options={[
-          {
-            label: 'Plain text',
-            value: FieldConfig.plainText,
-          },
-          {
-            label: 'Assets',
-            value: FieldConfig.assets,
-          },
-        ]}
-        change={addField}
-      />
-      <ul
-        css="grid-column: form-start/ form-end; margin: 0; padding: 0; list-style: none"
-        hidden={fieldConfigs.value.length === 0}
-      >
-        {fieldConfigs.value.map(value => {
-          switch (value) {
-            case 'plain_text':
+      <Input css="grid-column: form-start / form-end" name="title" label="Title" {...titleInput} />
+      <button type="button" onClick={handleAddField}>
+        Add field
+      </button>
+      <ul hidden={fields.length === 0} css="grid-column: form-start / form-end">
+        {fields.map((field, index) => {
+          switch (field.type) {
+            case 'PLAINTEXT':
               return (
-                <li key={`PLAIN_TEXT:${lastKey.current++}`}>
-                  <PlainTextField />
-                </li>
+                <PlaintextField
+                  {...field}
+                  setTitle={(value: string) =>
+                    setFields(state => setIn(state, [index, 'title'], value))
+                  }
+                />
               );
-            case 'assets':
-              return (
-                <li key={`ASSETS:${lastKey.current++}`}>
-                  <AssetsField />
-                </li>
-              );
+            default:
+              throw new Error(`Invalid field type ${field.type}`);
           }
         })}
       </ul>
     </Form>
+  );
+}
+
+function PlaintextField<T extends { title: string; setTitle: (value: string) => void }>(props: T) {
+  const titleInput = useInput(() => props.title, value => props.setTitle(value));
+
+  return (
+    <>
+      <Input label="Title" name="name" {...titleInput} />
+    </>
   );
 }
 
