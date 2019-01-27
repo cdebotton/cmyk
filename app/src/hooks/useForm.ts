@@ -35,44 +35,36 @@ function isPromise(obj: any): obj is Promise<any> {
   );
 }
 
+type TouchedValues<T> = { [P in keyof T]: T[P] extends object ? TouchedValues<T[P]> : boolean };
+type FocusedValues<T> = { [P in keyof T]: T[P] extends object ? FocusedValues<T[P]> : boolean };
+type DirtyValues<T> = { [P in keyof T]: T[P] extends object ? DirtyValues<T[P]> : boolean };
+type ErrorValues<T> = { [P in keyof T]: T[P] extends object ? ErrorValues<T[P]> : string };
+
 interface State<T extends { [key: string]: any }> {
   draft: T;
   committed: T;
   submitting: boolean;
   validating: boolean;
-  touched: Map<keyof T, boolean>;
-  focused: Map<keyof T, boolean>;
-  dirty: Map<keyof T, boolean>;
-  errors: Map<keyof T, string[]>;
+  touched: Map<string, boolean>;
+  focused: Map<string, boolean>;
+  dirty: Map<string, boolean>;
+  errors: Map<string, string[]>;
 }
 
-enum ActionType {
-  update,
-  focus,
-  blur,
-  reset,
-  validateRequest,
-  validateSuccess,
-  validateFalure,
-  submitRequest,
-  submitSuccess,
-  submitFailure,
-}
+type Action =
+  | { type: 'UPDATE'; payload: { name: string; value: any } }
+  | { type: 'FOCUS'; payload: { name: string } }
+  | { type: 'BLUR'; payload: { name: string } }
+  | { type: 'RESET' }
+  | { type: 'VALIDATE_REQUEST' }
+  | { type: 'VALIDATE_SUCCESS' }
+  | { type: 'VALIDATE_FAILURE'; payload: { errors: Map<string, string[]> } }
+  | { type: 'SUBMIT_REQUEST' }
+  | { type: 'SUBMIT_SUCCESS' };
 
-type Action<T, P extends keyof T> =
-  | { type: ActionType.update; payload: { name: P; value: T[P] } }
-  | { type: ActionType.focus; payload: { name: P } }
-  | { type: ActionType.blur; payload: { name: P } }
-  | { type: ActionType.reset }
-  | { type: ActionType.validateRequest }
-  | { type: ActionType.validateSuccess }
-  | { type: ActionType.validateFalure; payload: { errors: Map<P, string[]> } }
-  | { type: ActionType.submitRequest }
-  | { type: ActionType.submitSuccess };
-
-function reducer<T, P extends keyof T>(state: State<T>, action: Action<T, P>): State<T> {
+function reducer<T, P extends keyof T>(state: State<T>, action: Action): State<T> {
   switch (action.type) {
-    case ActionType.update:
+    case 'UPDATE':
       return {
         ...state,
         draft: {
@@ -81,18 +73,18 @@ function reducer<T, P extends keyof T>(state: State<T>, action: Action<T, P>): S
         },
         dirty: state.dirty.get(name) === true ? state.dirty : state.dirty.set(name, true),
       };
-    case ActionType.focus:
+    case 'FOCUS':
       return {
         ...state,
         focused: state.focused.set(name, true),
       };
-    case ActionType.blur:
+    case 'BLUR':
       return {
         ...state,
         touched: state.touched.get(name) === true ? state.touched : state.touched.set(name, true),
         focused: state.focused.set(name, false),
       };
-    case ActionType.reset:
+    case 'RESET':
       return {
         ...state,
         submitting: false,
@@ -102,29 +94,29 @@ function reducer<T, P extends keyof T>(state: State<T>, action: Action<T, P>): S
         dirty: new Map(),
         errors: new Map(),
       };
-    case ActionType.validateRequest:
+    case 'VALIDATE_REQUEST':
       return {
         ...state,
         validating: true,
       };
-    case ActionType.validateSuccess:
+    case 'VALIDATE_SUCCESS':
       return {
         ...state,
         validating: false,
         errors: state.errors.size === 0 ? state.errors : new Map(),
       };
-    case ActionType.validateFalure:
+    case 'VALIDATE_FAILURE':
       return {
         ...state,
         validating: false,
         errors: action.payload.errors,
       };
-    case ActionType.submitRequest:
+    case 'SUBMIT_REQUEST':
       return {
         ...state,
         submitting: true,
       };
-    case ActionType.submitSuccess:
+    case 'SUBMIT_SUCCESS':
       return {
         ...state,
         submitting: false,
@@ -144,7 +136,7 @@ export interface Form<T> {
 
   [CONTROLLER]: {
     state: State<T>;
-    dispatch: Dispatch<Action<T, keyof T>>;
+    dispatch: Dispatch<Action>;
   };
 }
 
@@ -156,7 +148,7 @@ function useForm<T>({
   validateOnChange = true,
   validateOnFirstRun = true,
 }: Options<T>): Form<T> {
-  const [state, dispatch] = useReducer<State<T>, Action<T, keyof T>>(reducer, {
+  const [state, dispatch] = useReducer<State<T>, Action>(reducer, {
     draft: initialValues,
     committed: initialValues,
     validating: false,
@@ -171,12 +163,12 @@ function useForm<T>({
     if (validationSchema) {
       try {
         await validationSchema.validate(state.draft);
-        dispatch({ type: ActionType.validateSuccess });
+        dispatch({ type: 'VALIDATE_SUCCESS' });
       } catch (err) {
         if (isValidationError(err)) {
           if (err.inner) {
             dispatch({
-              type: ActionType.validateFalure,
+              type: 'VALIDATE_FAILURE',
               payload: {
                 errors: err.inner.reduce((memo, { path, message }) => {
                   return memo.set(path, message);
@@ -186,7 +178,7 @@ function useForm<T>({
           } else {
             const { path, message } = err;
             dispatch({
-              type: ActionType.validateFalure,
+              type: 'VALIDATE_FAILURE',
               payload: { errors: new Map().set(path, [message]) },
             });
           }
@@ -196,20 +188,20 @@ function useForm<T>({
   }
 
   function handleReset() {
-    dispatch({ type: ActionType.reset });
+    dispatch({ type: 'RESET' });
   }
 
   async function handleSubmit(event: FormEvent) {
     event.preventDefault();
 
-    dispatch({ type: ActionType.submitRequest });
+    dispatch({ type: 'SUBMIT_REQUEST' });
     const submit = onSubmit(state.draft);
 
     if (isPromise(submit)) {
       await submit;
     }
 
-    dispatch({ type: ActionType.submitSuccess });
+    dispatch({ type: 'SUBMIT_SUCCESS' });
   }
 
   useEffect(() => {
@@ -252,12 +244,12 @@ function useForm<T>({
   };
 }
 
-interface Field<T> {
+interface Field {
   input: {
     onBlur: FormEventHandler;
-    onChange: ChangeEventHandler<{ value: T }>;
+    onChange: ChangeEventHandler<HTMLInputElement>;
     onFocus: FormEventHandler;
-    value: T;
+    value: any;
   };
   meta: {
     dirty?: boolean;
@@ -266,36 +258,33 @@ interface Field<T> {
     touched?: boolean;
   };
   handlers: {
-    value: T;
-    change: (value: T) => void;
+    value: any;
+    change: (value: any) => void;
     blur: VoidFunction;
     focus: VoidFunction;
   };
 
-  value: T;
-  change: (value: T) => void;
+  value: any;
+  change: (value: any) => void;
   blur: VoidFunction;
   focus: VoidFunction;
 }
 
-function useField<T, K extends keyof T>(
-  { [CONTROLLER]: { state, dispatch } }: Form<T>,
-  name: K,
-): Field<T[K]> {
+function useField<T>({ [CONTROLLER]: { state, dispatch } }: Form<T>, name: string): Field {
   const input = useMemo(
     () => {
       return {
         onBlur: (_event: FormEvent) => {
-          dispatch({ type: ActionType.blur, payload: { name } });
+          dispatch({ type: 'BLUR', payload: { name } });
         },
-        onChange: (event: ChangeEvent<{ value: T[K] }>) => {
+        onChange: (event: ChangeEvent<{ value: any }>) => {
           dispatch({
-            type: ActionType.update,
+            type: 'UPDATE',
             payload: { name, value: event.currentTarget.value },
           });
         },
         onFocus: (_event: FormEvent) => {
-          dispatch({ type: ActionType.focus, payload: { name } });
+          dispatch({ type: 'FOCUS', payload: { name } });
         },
         value: state.draft[name],
       };
@@ -323,20 +312,20 @@ function useField<T, K extends keyof T>(
   const handlers = {
     value: state.draft[name],
     change: useCallback(
-      (value: T[K]) => {
-        dispatch({ type: ActionType.update, payload: { name, value } });
+      (value: any) => {
+        dispatch({ type: 'UPDATE', payload: { name, value } });
       },
       [name, dispatch],
     ),
     blur: useCallback(
       () => {
-        dispatch({ type: ActionType.blur, payload: { name } });
+        dispatch({ type: 'BLUR', payload: { name } });
       },
       [name, dispatch],
     ),
     focus: useCallback(
       () => {
-        dispatch({ type: ActionType.focus, payload: { name } });
+        dispatch({ type: 'FOCUS', payload: { name } });
       },
       [name, dispatch],
     ),
