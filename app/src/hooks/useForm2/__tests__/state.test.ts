@@ -145,11 +145,13 @@ describe('useForm.state', () => {
 
     state = reducer(state, { type: 'ARRAY_ADD', payload: { path: 'bat', value: false } });
 
-    expect(state.values.bat[2]).toBe(false);
-    expect(state.dirty.bat[2]).toBe(false);
-    expect(state.focused.bat[2]).toBe(false);
-    expect(state.touched.bat[2]).toBe(false);
-    expect(state.errors.bat[2]).toBe(null);
+    const last = state.values.bat.length - 1;
+
+    expect(state.values.bat[last]).toBe(false);
+    expect(state.dirty.bat[last]).toBe(false);
+    expect(state.focused.bat[last]).toBe(false);
+    expect(state.touched.bat[last]).toBe(false);
+    expect(state.errors.bat[last]).toBe(null);
 
     state = reducer(state, {
       type: 'ARRAY_ADD',
@@ -167,9 +169,9 @@ describe('useForm.state', () => {
     let state = reducer(undefined, { type: '@@INIT_ACTION', payload });
 
     expect(state.values.bat.length).toBe(3);
-    console.log(state.values);
+
     state = reducer(state, { type: 'ARRAY_REMOVE', payload: 'bat[0]' });
     expect(state.values.bat.length).toBe(2);
-    console.log(state.values);
+    expect(state.values.bat).toEqual([true, true]);
   });
 });

@@ -1,17 +1,10 @@
-import React from 'react';
-import styled from 'styled-components/macro';
+import React, { MouseEvent } from 'react';
+import 'styled-components/macro';
 import PageHeading from './components/PageHeading';
 import { rem } from 'polished';
-import { useForm, useField } from './hooks/useForm';
-import Input from './components/Input';
-
-const Form = styled.form`
-  display: grid;
-  justify-content: stretch;
-  align-items: center;
-  grid-gap: ${rem(16)};
-  grid-template-columns: [form-start col1-start] 1fr [col1-end col2-start] 1fr [col2-end form-end];
-`;
+import { FormProvider, useForm } from './hooks/useForm2';
+import Button from './components/Button';
+import Input from './components/Input2';
 
 type PlaintextField = { type: 'PLAINTEXT'; name: string };
 type MarkdownField = { type: 'MARKDOWN'; name: string };
@@ -23,24 +16,63 @@ type Values = {
 };
 
 function NewLayout() {
-  const form = useForm<Values>({
+  function handleSubmit(values: Values) {
+    console.log(values);
+  }
+
+  const [state, dispatch] = useForm<Values>({
     initialValues: {
       title: '',
       fields: [],
     },
-    onSubmit: values => console.log(values),
   });
 
-  const title = useField(form, 'title');
+  function handleClick(event: MouseEvent) {
+    event.preventDefault();
+
+    dispatch({
+      type: 'ARRAY_ADD',
+      payload: { path: 'fields', value: { type: 'PLAINTEXT', name: '' } },
+    });
+  }
+
+  const {
+    values: { fields },
+  } = state;
 
   return (
-    <Form>
+    <FormProvider
+      css={`
+        display: grid;
+        justify-content: stretch;
+        align-items: center;
+        grid-gap: ${rem(16)};
+        grid-template-columns: [form-start col1-start] 1fr [col1-end col2-start] 1fr [col2-end form-end];
+      `}
+      state={state}
+      dispatch={dispatch}
+      onSubmit={handleSubmit}
+    >
       <PageHeading css="grid-column: form-start / form-end" level={4}>
         New layout
       </PageHeading>
-      <Input name="title" label="Title" {...title.input} {...title.meta} />
-      <button type="button">Add field</button>
-    </Form>
+      <Input path="title" label="Title" />
+      <Button type="button" onClick={handleClick}>
+        Add Field
+      </Button>
+      {fields.map((_, i) => {
+        return (
+          <>
+            <Input
+              css="grid-column: form-start / form-end"
+              label="Field title"
+              path={`fields[${i}].title`}
+            />
+          </>
+        );
+      })}
+      <Button type="submit">Save</Button>
+    </FormProvider>
   );
 }
 

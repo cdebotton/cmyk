@@ -1,6 +1,5 @@
 import cloneDeep from 'lodash.clonedeep';
-import toPath from 'lodash.topath';
-import { Mapped, setNested, getIn, setIn } from './utils';
+import { Mapped, setNested, getIn, setIn, arrayRemoveIn, arrayAddIn } from './utils';
 
 export type State<Values> = {
   values: Values;
@@ -9,6 +8,8 @@ export type State<Values> = {
   dirty: Mapped<Values, boolean>;
   focused: Mapped<Values, boolean>;
   errors: Mapped<Values, string | null>;
+  isSubmitting: boolean;
+  isValidating: boolean;
 };
 
 type ChangeAction = {
@@ -77,6 +78,8 @@ export function reducer<Values>(
       dirty: setNested(action.payload, false),
       focused: setNested(action.payload, false),
       errors: setNested(action.payload, null),
+      isSubmitting: false,
+      isValidating: false,
     };
   }
 
@@ -118,43 +121,21 @@ export function reducer<Values>(
 
       return {
         ...state,
-        values: setIn(state.values, path, [...target, value]),
-        dirty: setIn(state.dirty, path, [
-          ...getIn(state.dirty, path),
-          typeof value === 'object' ? setNested(value, false) : false,
-        ]),
-        focused: setIn(state.focused, path, [
-          ...getIn(state.focused, path),
-          typeof value === 'object' ? setNested(value, false) : false,
-        ]),
-        touched: setIn(state.touched, path, [
-          ...getIn(state.touched, path),
-          typeof value === 'object' ? setNested(value, false) : false,
-        ]),
-        errors: setIn(state.errors, path, [
-          ...getIn(state.errors, path),
-          typeof value === 'object' ? setNested(value, null) : null,
-        ]),
+        values: arrayAddIn(state.values, path, value),
+        dirty: arrayAddIn(state.dirty, path, value, false),
+        focused: arrayAddIn(state.focused, path, value, false),
+        touched: arrayAddIn(state.touched, path, value, false),
+        errors: arrayAddIn(state.errors, path, value, null),
       };
     }
     case 'ARRAY_REMOVE': {
-      const path = toPath(action.payload);
-      const index = parseInt(path.pop()!, 10);
-
-      const target = getIn(state.values, path);
-
-      if (!Array.isArray(target)) {
-        throw new TypeError(`State value is type ${typeof target}, but must be an array`);
-      }
-      const { values, touched, dirty, focused, errors, ...oldState } = state;
-
       return {
-        ...oldState,
-        values: setIn(values, path, target.slice(index, 1)),
-        touched: setIn(touched, path, getIn(touched, path).slice(index, 1)),
-        dirty: setIn(dirty, path, getIn(dirty, path).slice(index, 1)),
-        focused: setIn(focused, path, getIn(focused, path).slice(index, 1)),
-        errors: setIn(errors, path, getIn(errors, path).slice(index, 1)),
+        ...state,
+        values: arrayRemoveIn(state.values, action.payload),
+        touched: arrayRemoveIn(state.touched, action.payload),
+        dirty: arrayRemoveIn(state.dirty, action.payload),
+        focused: arrayRemoveIn(state.focused, action.payload),
+        errors: arrayRemoveIn(state.errors, action.payload),
       };
     }
     case 'ARRAY_SWAP': {

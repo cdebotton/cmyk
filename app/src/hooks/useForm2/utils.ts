@@ -31,7 +31,9 @@ export function setNested<T, U>(
   return response;
 }
 
-const isInteger = (n: any) => String(Math.floor(Number(n))) === n;
+const isInteger = (n: any) => {
+  return Math.floor(parseInt(n, 10)) === n;
+};
 
 export function getIn<T>(source: T, key: string | string[], def?: any, p = 0): any {
   const path = toPath(key);
@@ -78,4 +80,31 @@ export function setIn<T, U>(source: T, path: string | string[], value: U): T {
   }
 
   return result;
+}
+
+export function arrayRemoveIn<T>(source: T, key: string | string[]) {
+  const path = toPath(key);
+  const index = parseInt(path.pop()!, 10);
+  const value: any[] = getIn(source, path);
+
+  if (!isInteger(index)) {
+    throw new TypeError('Invalid path provided to remove from array');
+  }
+
+  const newValue = value.filter((_, i) => i !== index);
+
+  return setIn(source, path, newValue);
+}
+
+export function arrayAddIn(source: any, key: string | string[], value: any, force?: any) {
+  const path = toPath(key);
+  const target = getIn(source, path);
+
+  if (force !== undefined) {
+    value = typeof value === 'object' ? setNested(value, force) : force;
+  }
+
+  const newValue = [...target, value];
+
+  return setIn(source, path, newValue);
 }
